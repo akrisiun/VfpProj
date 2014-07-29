@@ -1,0 +1,32 @@
+﻿<Window x:Class="VfpEdit.EditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:avalonedit="clr-namespace:ICSharpCode.AvalonEdit;assembly=ICSharpCode.AvalonEdit"
+        Height="441.188" Width="675.192">
+    
+    <!-- :avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit" -->
+    <Grid>
+    <Grid x:Name="topPanel" Grid.Column="0" Grid.Row="0">
+        <TextBox x:Name="text1" HorizontalAlignment="Left" Height="24" Margin="30,5,0,0"
+                    TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="321"/>
+        <Button x:Name="button1" Content="Open" HorizontalAlignment="Left" Margin="384,5,0,0" 
+                    VerticalAlignment="Top" Width="100"/>
+    </Grid>
+    <DockPanel x:Name="dockEditor" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.Column="0" Margin="0,39,0,0">
+        <DockPanel.Background>
+            <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlLightColorKey}}"/>
+        </DockPanel.Background>
+
+        <Border Width="1" >
+            <Border.BorderBrush>
+                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.AppWorkspaceColorKey}}"/>
+            </Border.BorderBrush>
+        </Border>
+        <avalonedit:TextEditor x:Name="editor" Margin="10,0,0,0"
+                               SyntaxHighlighting="C#"
+                               HorizontalScrollBarVisibility="Auto" BorderThickness="2,2,1,1"
+                               FontFamily="Courier New" FontSize="12">
+        </avalonedit:TextEditor>
+    </DockPanel>
+    </Grid>
+</Window>
