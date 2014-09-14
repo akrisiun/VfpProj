@@ -44,11 +44,12 @@ namespace VfpProj
             Native.WpfNoBorder.Init(window, window.titleBar, window.topLeft, window.top, window.topRight,
                    window.right, window.bottomRight, window.bottom, window.bottomLeft, window.left);
             window.cmdClose.Click += (s, evt) => window.Close();
+            titleBar.MouseDown += (s, evt) => {
+                this.Topmost = !this.Topmost;
+            };
 
-            // this.hostFile.Visibility = System.Windows.Visibility.Visible;
-            // this.Height = 49;
 
-            SizeChanged += MainWindow_SizeChanged;
+            // SizeChanged += MainWindow_SizeChanged;
             ContentRendered += (s, e)
                 =>
                 {
@@ -65,17 +66,6 @@ namespace VfpProj
             Closing += MainWindow_Closing;
         }
 
-
-        private static readonly Thickness MainBorderMaximizedPadding = new Thickness(13);
-        private static readonly Thickness MainBorderNormalPadding = new Thickness(5);
-
-        protected override void OnStateChanged(EventArgs e)
-        {
-
-            // bdrRoot.Padding = WindowState == WindowState.Maximized ? MainBorderMaximizedPadding : MainBorderNormalPadding;
-        }
-
-        
         ~MainWindow()
         {
             FoxCmd.Dispose();
@@ -85,12 +75,6 @@ namespace VfpProj
         {
             if (!FoxCmd.QueryUnload())
                 e.Cancel = true;
-        }
-
-
-        void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            // txtFile.Width = Width - buttonCD.Width - buttonModi.Width - 50;
         }
 
     }

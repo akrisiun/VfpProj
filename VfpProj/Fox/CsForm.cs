@@ -32,8 +32,8 @@ namespace VfpProj
         public string Directory { get; set; }
         public Native.WindowsEvents Events { get { return Form.events; } }
 
-        string _Form.Name { get { return "VfpProj.CsForm"; } }
-        IntPtr _Form.Handle
+        public string Name { get { return "VfpProj.CsForm"; } }
+        public IntPtr Handle
         {
             get
             {
@@ -58,6 +58,13 @@ namespace VfpProj
                     Form.Dispatcher.Invoke(() => { Form.Topmost = value; });
             }
         }
+
+        public bool AlwaysOnTop
+        {
+            get { return OnTop; }
+            set { OnTop = value; }
+        }
+
         public string Text
         {
             get
@@ -89,10 +96,103 @@ namespace VfpProj
             }
 
         }
-        int _Form.Width { get { return Convert.ToInt32(Form.Width); } set { Form.Width = value; } }
-        int _Form.Height { get { return Convert.ToInt32(Form.Height); } set { Form.Height = value; } }
-        int _Form.Left { get { return Convert.ToInt32(Form.Left); } set { Form.Left = value; } }
-        int _Form.Top { get { return Convert.ToInt32(Form.Top); } set { Form.Top = value; } }
+
+        public int Width
+        {
+            get
+            {
+                if (Form == null) return -1;
+                if (Form.Dispatcher.CheckAccess())
+                    return Convert.ToInt32(Form.Width);
+                return Form.Dispatcher.Invoke<int>(() =>
+                {
+                    return Convert.ToInt32(Form.Width);
+                });
+            }
+            set
+            {
+                if (Form == null) return;
+                if (Form.Dispatcher.CheckAccess())
+                    Form.Width = value;
+                else
+                    Form.Dispatcher.Invoke(() =>
+                    {
+                        Form.Width = value;
+                    });
+            }
+        }
+        public int Height
+        {
+            get
+            {
+                if (Form == null) return -1;
+                if (Form.Dispatcher.CheckAccess())
+                    return Convert.ToInt32(Form.Height);
+                return Form.Dispatcher.Invoke<int>(() =>
+                {
+                    return Convert.ToInt32(Form.Height);
+                });
+            }
+            set
+            {
+                if (Form == null) return;
+                if (Form.Dispatcher.CheckAccess())
+                    Form.Height = value;
+                else
+                    Form.Dispatcher.Invoke(() =>
+                    {
+                        Form.Height = value;
+                    });
+            }
+        }
+        public int Left
+        {
+            get
+            {
+                if (Form == null) return -1;
+                if (Form.Dispatcher.CheckAccess())
+                    return Convert.ToInt32(Form.Left);
+                return Form.Dispatcher.Invoke<int>(() =>
+                {
+                    return Convert.ToInt32(Form.Left);
+                });
+            }
+            set
+            {
+                if (Form == null) return;
+                if (Form.Dispatcher.CheckAccess())
+                    Form.Left = value;
+                else
+                    Form.Dispatcher.Invoke(() =>
+                    {
+                        Form.Left = value;
+                    });
+            }
+        }
+        public int Top
+        {
+            get
+            {
+                if (Form == null) return -1;
+                if (Form.Dispatcher.CheckAccess())
+                    return Convert.ToInt32(Form.Top);
+                return Form.Dispatcher.Invoke<int>(() =>
+                {
+                    return Convert.ToInt32(Form.Top);
+                });
+            }
+            set
+            {
+                if (Form == null) return;
+                if (Form.Dispatcher.CheckAccess())
+                    Form.Top = value;
+                else
+                    Form.Dispatcher.Invoke(() =>
+                    {
+                        Form.Top = value;
+                    });
+            }
+        }
 
 
     }

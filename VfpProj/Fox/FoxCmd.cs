@@ -175,6 +175,9 @@ namespace VfpProj
                 app.Visible = true;
                 foreach(string cmd in initCmd)
                     AppCmd(cmd);
+
+                if (FoxCmd.cfg_startFxp.Length > 0 && File.Exists(FoxCmd.cfg_startFxp))
+                    app.DoCmd("DO " + FoxCmd.cfg_startFxp);
             }
 
             // hWnd = nativeWindow.Handle;

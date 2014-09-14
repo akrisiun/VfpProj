@@ -62,7 +62,7 @@ namespace VfpProj.Native
 
             frm.Activated += form1_Enter;
             frm.MouseEnter += form1_MouseEnter;
-            frm.MouseLeave += form1_MouseLeave;
+            // frm.MouseLeave += form1_MouseLeave;
             frm.Deactivated += form1_Leave;
 
             frm.Topmost = true;
@@ -113,7 +113,7 @@ namespace VfpProj.Native
                         app = FoxCmd.app;
                         FoxCmd.CreateForm(form1);
                     }
-                    app.Application.Visible = true;
+                    Debug.Assert(app.Application.Visible);
                 }
                 if (app != null && app.DefaultFilePath != dir)
                     Directory.SetCurrentDirectory(app.DefaultFilePath);
@@ -226,14 +226,12 @@ namespace VfpProj.Native
         }
 
         #region Focus Events
-        void form1_MouseLeave(object sender, EventArgs e)
-        {
-            Trace.Write("mouse Leave");
-        }
+        // void form1_MouseLeave(object sender, EventArgs e)
+            // Trace.Write("mouse Leave");
 
         void form1_MouseEnter(object sender, EventArgs e)
         {
-            Trace.Write("mouse Enter");
+            // Trace.Write("mouse Enter");
             var hWnd = RpcTest();
             AfterFocus(hWnd);
         }
@@ -262,13 +260,10 @@ namespace VfpProj.Native
                 Trace.WriteLine(ex.Message);
             }
 
-            Trace.Write("form leave");
-
+            // Trace.Write("form leave");
             // HWND WINAPI GetForegroundWindow(void);  User32.dll 
-            if (FoxCmd.hWnd == NativeMethods.GetForegroundWindow())
-            {
+            // if (FoxCmd.hWnd == NativeMethods.GetForegroundWindow())
                 // FoxCmd.app = null;
-            }
         }
 
         void form1_Enter(object sender, EventArgs e)
