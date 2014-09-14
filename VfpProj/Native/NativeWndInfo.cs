@@ -9,15 +9,19 @@ namespace VfpInterop
     {
         public IntPtr ptr;
         public string text;
+        public string textorig;
         public string cls;
-        public string item;
+
+        public string item;     // unique record
 
         public NativeWndInfo(IntPtr ptr)
         {
             this.ptr = ptr;
             item = ptr.ToString("X8");
 
-            text = NativeMethods.GetWindowText(ptr);
+            textorig = NativeMethods.GetWindowText(ptr);
+            text = textorig.StartsWith("Properties") ? "Properties" :
+                        textorig.Equals("Data Session") ? "View" : textorig;
             cls = NativeMethods.GetClassName(ptr);
         }
 

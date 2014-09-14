@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Windows;
 using System.Windows.Forms.Integration;
@@ -10,13 +11,22 @@ namespace VfpProj
 {
     public static class FoxCmd
     {
+        static string[] initCmd = new[] { 
+                    "_SCREEN.WindowState = 2",
+                    "HIDE WINDOW Standard",
+                    "ACTIVATE WINDOW Command", 
+                    "MOVE WINDOW 'Command' TO 4,1",
+                    "SIZE WINDOW 'Command' TO 50, 50",
+                    "SET",
+                    "MOVE WINDOW 'View' TO 40, 210" 
+                };
+
         public static FoxApplication app;
         public static CsObj ocs;
         public static CsForm form;
         public static IntPtr hWnd;
         public static string cfg_startDir;
         public static string cfg_startFxp;
-
 
         static FoxCmd()
         {
@@ -36,6 +46,15 @@ namespace VfpProj
             hWnd = IntPtr.Zero;
             form = null;
         }
+
+        public static void Dispose()
+        {
+            hWnd = IntPtr.Zero;
+            ocs = null;
+            form = null;
+            app = null;
+        }
+
 
         public static void AppCmd(string cmd)
         {
@@ -65,7 +84,7 @@ namespace VfpProj
                 return;
 
             FoxCmd.form.Text = dir;
-            FoxCmd.form.events.directory = dir;
+            FoxCmd.form.Events.directory = dir;
         }
 
         public static bool ShowApp()
@@ -152,7 +171,11 @@ namespace VfpProj
             SetVar();
 
             if (!app.Visible)
+            {
                 app.Visible = true;
+                foreach(string cmd in initCmd)
+                    AppCmd(cmd);
+            }
 
             // hWnd = nativeWindow.Handle;
             return ShowForm(FoxCmd.form.Form);
@@ -195,12 +218,67 @@ namespace VfpProj
             form.Top = -5;
             form.Left = SystemParameters.PrimaryScreenWidth / 2;
             form.Topmost = true;
+
             // GetWindowFromHwnd is a method-wrapped version of your code
             //   static private WindowsFormsHost GetWindowFromHost(int hwnd)
             //   WindowsFormsHost nativeWindow = new WindowsFormsHost();
             //     nativeWindow.AssignHandle(handle);
 
             return true;
+        }
+
+        public static bool QueryUnload()
+        {
+            try
+            {
+                dynamic isClose = app.Eval("_SCREEN.QueryUnload()");
+                if (isClose is Boolean && !isClose)
+                    return false;
+
+                app.Quit();
+            }
+            catch (Exception ex)
+            {
+                Trace.Write(ex);
+            }
+
+            app = null;
+            return true;
+        }
+
+
+        public static void TextFileCmd(string cmd)
+        {
+
+            if (File.Exists(cmd) || Directory.Exists(cmd))
+            {
+                if (!File.Exists(cmd))
+                {
+                    FoxCmd.AppCmd("CD " + cmd);
+                    form.Events.directory = FoxCmd.app.DefaultFilePath;
+                    Directory.SetCurrentDirectory(form.Events.directory);
+                    return;
+                }
+
+                string ext = Path.GetExtension(cmd).ToLower();
+                if (ext == ".prg")
+                    FoxCmd.AppCmd("MODI COMM " + cmd + " NOWAIT");
+                else
+                    if (ext == ".pjx")
+                        FoxCmd.AppCmd("MODI PROJ " + cmd + " NOWAIT");
+            }
+            else
+                FoxCmd.AppCmd(cmd);
+
+            try
+            {
+                if (form.Events.directory != FoxCmd.app.DefaultFilePath)
+                {
+                    if (form.Events.directory != FoxCmd.app.DefaultFilePath)
+                        Directory.SetCurrentDirectory(form.Events.directory);
+                }
+            }
+            catch (Exception) { }
         }
 
     }

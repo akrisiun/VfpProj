@@ -1,0 +1,8 @@
+ICSharpCode.AvalonEdit/
+*.pdb
+*.vshost.exe
+*.vshost.exe.config
+*.suo
+obj/
+*.csproj.user
+VfpProj/VfpProj.csproj.user

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using VfpProj.Native;
 using VisualFoxpro;
 
 namespace VfpProj
@@ -58,6 +59,12 @@ namespace VfpProj
 
         [ComVisible(true), DispId(0x60030011)]
         bool IsDisposed { get; }
+
+        [ComVisible(true), DispId(0x60030020)]
+        MainWindow Form { get; }
+
+        [ComVisible(true), DispId(0x60030020)]
+        WindowsEvents Events { get; }
 
         [ComVisible(true), DispId(0x60030021)]
         bool OnTop { get; set; }

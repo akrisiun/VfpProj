@@ -76,13 +76,12 @@ namespace VfpProj.Native
         }
 
         static System.Collections.ObjectModel.Collection<IntPtr> items;
-        /// 
-        public static System.Collections.ObjectModel.Collection<IntPtr> GetWindows()
+
+        public static System.Collections.ObjectModel.Collection<IntPtr> GetWindows(IntPtr handle)
         {
             items = new System.Collections.ObjectModel.Collection<IntPtr>();
-            // EnumWindows(new EnumWindowsProc(WindowEnum), 0);
-            
-            // EnumChildWindows(Program.nativeWindow.Handle, new EnumWindowsProc(WindowEnum), 0);
+            if (handle != IntPtr.Zero)
+                EnumChildWindows(handle, new EnumWindowsProc(WindowEnum), 0);
             return items;
         }
 

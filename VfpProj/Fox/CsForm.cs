@@ -30,7 +30,7 @@ namespace VfpProj
         }
 
         public string Directory { get; set; }
-        public Native.WindowsEvents events { get { return Form.events; } }
+        public Native.WindowsEvents Events { get { return Form.events; } }
 
         string _Form.Name { get { return "VfpProj.CsForm"; } }
         IntPtr _Form.Handle

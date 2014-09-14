@@ -14,6 +14,7 @@ using System.Windows.Shell;
 using System.Windows.Forms.Integration;
 using VfpEdit;
 using System.Threading;
+using System.Windows.Media.Imaging;
 
 namespace VfpProj
 {
@@ -31,9 +32,7 @@ namespace VfpProj
 
         public App()
         {
-            Startup += App_Startup;
-            // Application.Current.Th
-            // res = Application.LoadComponent(uri) as ResourceDictionary;
+            Startup += App_Startup; 
         }
 
         public static void Application_ThreadException(object sender, ThreadExceptionEventArgs args)
@@ -45,35 +44,26 @@ namespace VfpProj
         {
             JumpList jumpList1 = JumpList.GetJumpList(App.Current);
 
-            MainWindow window = new MainWindow();
+            MainWindow window = new MainWindow();   // NoBorder 
+            window.AllowsTransparency = false;
             window.Show();
 
             if (FoxCmd.Attach())
                 FoxCmd.CreateForm(window);
         }
 
-        public EditWindow ShowEditWindow()
+        public EditWindow ShowEditWindow(string file)
         {
             var winEdit = new EditWindow();
             winEdit.ShowInTaskbar = true;
-
-            /*
-            string key = "Editor";
-            Uri uri = new Uri("/VfpProj;component/editpanel.xaml", System.UriKind.Relative);
-
-            // Style textStyle = res[key] as Style;
-            // DependencyObject obj = new UIElement() { Content = }
-            try
+            if (file.Length > 0)
             {
-                var res = Application.LoadComponent(uri) as ResourceDictionary;
-                var textStyle = res[key] as Style;
-                winEdit.Content = new ICSharpCode.AvalonEdit.TextEditor() { Style = textStyle };
+                winEdit.txtPath.Text = file;
+                winEdit.OpenFile();
             }
-            catch (Exception ex)
-            {
-                Trace.Write(ex.Message);
-            }
-            */
+
+            // Uri iconUri = new Uri("pack://application:,,,/PRG.ico", UriKind.RelativeOrAbsolute);
+            // winEdit.Icon = BitmapFrame.Create(iconUri);
             winEdit.Show();
             return winEdit;
         }

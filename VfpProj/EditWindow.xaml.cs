@@ -7,10 +7,14 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Markup;
+using Forms = System.Windows.Forms;
 using System.IO;
 using System.Text;
 using ICSharpCode.AvalonEdit;
 using AvalonEdit.Sample;
+using VfpProj.Native;
+using System.Windows.Media.Imaging;
+using VfpProj;
 
 namespace VfpEdit
 {
@@ -19,20 +23,20 @@ namespace VfpEdit
     /// </summary>
     public partial class EditWindow : Window
     {
+        const string filter = "code files|*.prg;*.cs;.x*;*.csproj;*.css;*.js;*.aspx|all files|*.*";
         string fileName;
         HighlightingManager defManager;
         FoldingManager foldManager;
         XmlFoldingStrategy xmlStrategy;
         
         BraceFoldingStrategy csStrategy;
-
-        //  Button button1;
-        //  TextBox text1;
-        //  TextEditor editor;
+        public Forms.TextBox txtPath;
 
         public EditWindow()
         {
-            Loaded += EditWindow_Loaded;
+            // Uri iconUri = new Uri("pack://application:,,,/PRG.ICO", UriKind.RelativeOrAbsolute);
+            Icon = MainWindow.PrgIco; //  BitmapFrame.Create(iconUri);
+
             fileName = string.Empty;
             InitializeComponent();
             PostLoad();
@@ -40,8 +44,11 @@ namespace VfpEdit
 
         void PostLoad()
         {
-            button1.Click += button1_Click;
-            text1.Text = Directory.GetCurrentDirectory();
+            buttonOpen.Click += buttonOpen_Click;
+
+            txtPath = hostPath.Child as System.Windows.Forms.TextBox;
+            txtPath.Text = Directory.GetCurrentDirectory();
+            txtPath.SetFileAutoComplete();
 
             xmlStrategy = new XmlFoldingStrategy();
             csStrategy = new BraceFoldingStrategy();
@@ -52,19 +59,9 @@ namespace VfpEdit
             editor.SyntaxHighlighting = defManager.GetDefinitionByExtension(".cs");
         }
 
-        protected override void OnContentChanged(object oldContent, object newContent)
+        void buttonOpen_Click(object sender, RoutedEventArgs e)
         {
-            base.OnContentChanged(oldContent, newContent);
-        }
-
-        void EditWindow_Loaded(object sender, RoutedEventArgs e)
-        {
-             //    throw new NotImplementedException();
-        }
-
-        void button1_Click(object sender, RoutedEventArgs e)
-        {
-            string dir = text1.Text.Trim();
+            string dir = txtPath.Text.Trim();
             if (Directory.Exists(dir))
                 Directory.SetCurrentDirectory(dir);
 
@@ -72,7 +69,7 @@ namespace VfpEdit
 
             // Set filter for file extension and default file extension 
             dlg.DefaultExt = ".prg";
-            dlg.Filter = "code files|*.prg;*.cs;.x*;*.csproj;*.css;*.js;*.aspx|all files|*.*";
+            dlg.Filter = filter;
             dlg.InitialDirectory = Directory.GetCurrentDirectory();
 
             // Display OpenFileDialog by calling ShowDialog method 
@@ -81,18 +78,34 @@ namespace VfpEdit
                 return;
 
             fileName = dlg.FileName.Replace(".PRG", ".prg");
-            text1.Text = fileName;
+            txtPath.Text = fileName;
+            OpenFile();
+
+        }
+
+        public void OpenFile()
+        {
+            string fileName = txtPath.Text;
             FileInfo f = new FileInfo(fileName);
             if (!f.Exists)
                 return;
+            Title = Path.GetFileName(fileName) + " " + Path.GetDirectoryName(fileName);
+
             Directory.SetCurrentDirectory(Path.GetDirectoryName(fileName));
 
             if (foldManager != null)
-                FoldingManager.Uninstall(foldManager);            
+                FoldingManager.Uninstall(foldManager);
 
-            using(var stream = FileReader.OpenFile(fileName, Encoding.GetEncoding(1257)))
+            try
             {
-                editor.Text = stream.ReadToEnd();
+                using (var stream = FileReader.OpenFile(fileName, Encoding.GetEncoding(1257)))
+                {
+                    editor.Text = stream.ReadToEnd();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("File " + fileName + " error\n" + ex);
             }
 
             string ext = Path.GetExtension(fileName);
