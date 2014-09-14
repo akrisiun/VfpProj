@@ -6,3 +6,5 @@ ICSharpCode.AvalonEdit/
 obj/
 *.csproj.user
 VfpProj/VfpProj.csproj.user
+VfpProjEd.sln
+*.vshost.exe.manifest
