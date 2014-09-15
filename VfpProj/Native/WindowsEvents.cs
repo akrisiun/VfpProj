@@ -62,8 +62,6 @@ namespace VfpProj.Native
 
             frm.Activated += form1_Enter;
             frm.MouseEnter += form1_MouseEnter;
-            // frm.MouseLeave += form1_MouseLeave;
-            frm.Deactivated += form1_Leave;
 
             frm.Topmost = true;
             frm.tabList.SelectionChanged += tabWI_IndexChanged;
@@ -183,24 +181,10 @@ namespace VfpProj.Native
 
             Form.txtFile.Text = dlg.FileName;  // dlg.InitialDirectory + "\\" + dlg.SafeFileNames[0];
             file = Form.txtFile.Text.Trim();
-            ext = Path.GetExtension(file).ToLower();
-
-            var app = FoxCmd.app;
-            if (app == null) return;
 
             try
             {
-                if (ext == ".prg")
-                    app.DoCmd("modi comm " + file + " nowait");
-                if (ext == ".pjx")
-                {
-                    path = Path.GetDirectoryName(file);
-                    app.DoCmd("modi proj " + file + " nowait");
-                    app.DoCmd("cd " + path);
-                    if (FoxCmd.cfg_startFxp.Length > 0 && File.Exists(FoxCmd.cfg_startFxp))
-                        app.DoCmd("DO " + FoxCmd.cfg_startFxp);
-                }
-
+                FoxCmd.SelectFile(file);
             }
             catch (Exception ex)
             {
@@ -231,40 +215,16 @@ namespace VfpProj.Native
 
         void form1_MouseEnter(object sender, EventArgs e)
         {
-            // Trace.Write("mouse Enter");
             var hWnd = RpcTest();
             AfterFocus(hWnd);
         }
 
-        void form1_Leave(object sender, EventArgs e)
-        {
-            var form1 = sender as MainWindow;
-            string dir = form1.events.directory;
-            var app = FoxCmd.app;
-            if (app == null)
-                return;
-
-            // {"An outgoing call cannot be made since the application is dispatching an input-synchronous call. 
-            // (Exception from HRESULT: 0x8001010D (RPC_E_CANTCALLOUT_ININPUTSYNCCALL))"}
-            try
-            {
-                if (app.DefaultFilePath.ToLower() != dir.ToLower())
-                {
-                    app.Caption = dir;
-                    app.DefaultFilePath = dir;
-                }
-                FoxCmd.hWnd = (IntPtr)app.hWnd;
-            }
-            catch (Exception ex)
-            {
-                Trace.WriteLine(ex.Message);
-            }
-
+        //void form1_Leave(object sender, EventArgs e)
+            //  string dir = form1.events.directory;
             // Trace.Write("form leave");
             // HWND WINAPI GetForegroundWindow(void);  User32.dll 
             // if (FoxCmd.hWnd == NativeMethods.GetForegroundWindow())
                 // FoxCmd.app = null;
-        }
 
         void form1_Enter(object sender, EventArgs e)
         {
@@ -312,15 +272,7 @@ namespace VfpProj.Native
             {
                 NativeMethods.BringWindowToTop(hWnd);
                 NativeMethods.SetFocus(hWnd);
-
-                string cmd = wi.text;
-                if (wi.text.StartsWith("Project"))
-                    cmd = "ACTIVATE WINDOW Project";
-                else
-                    cmd = "ACTIVATE WINDOW '" + cmd + "'";
-
-                if (cmd.Length > 0)
-                    FoxCmd.AppCmd(cmd);
+                FoxCmd.ActivateWindow(wi);
             }
             catch (Exception ex)
             { Trace.Write(ex); }
