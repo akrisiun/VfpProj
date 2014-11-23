@@ -8,3 +8,7 @@ obj/
 VfpProj/VfpProj.csproj.user
 VfpProjEd.sln
 *.vshost.exe.manifest
+Lib/gdiplus.dll
+Lib/msvcr70.dll
+Lib/VFP8ENU.DLL
+Lib/vfp8renu.dll
