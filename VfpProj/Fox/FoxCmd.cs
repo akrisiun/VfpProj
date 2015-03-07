@@ -5,6 +5,7 @@ using System.IO;
 using System.Threading;
 using System.Windows;
 using System.Windows.Forms.Integration;
+using VfpInterop;
 using VisualFoxpro;
 
 namespace VfpProj
@@ -80,36 +81,6 @@ namespace VfpProj
 
             // An outgoing call cannot be made as the application is despatching an input-synchronous call.
             // (Exception from HRESULT: 0x8001010D (RPC_E_CANTCALLOUT_ININPUTSYNCCALL))
-            if (string.IsNullOrEmpty(dir))
-                return;
-
-            FoxCmd.form.Text = dir;
-            FoxCmd.form.Events.directory = dir;
-        }
-
-        public static bool ShowApp()
-        {
-            string msg = "";
-            try
-            {
-                // dynamic x = app.Eval("IIF(TYPE(\"_SCREEN.ocs_form\") = 'U', 0, _SCREEN.ocs_form)");
-                if (!app.Visible)
-                {
-                    app.Visible = true;
-                    app.DoCmd("_SCREEN.WindowState = 2");
-                    app.DoCmd("_SCREEN.LockScreen = .F.");
-
-                }
-                return true;
-            }
-            catch (Exception ex1)
-            {
-                // RPC server is not available
-                msg = ex1.Message;
-                Trace.Write(msg);
-            }
-
-            return false;
         }
 
         public static bool Attach()
@@ -265,10 +236,14 @@ namespace VfpProj
 
                 string ext = Path.GetExtension(cmd).ToLower();
                 if (ext == ".prg")
-                    FoxCmd.AppCmd("MODI COMM " + cmd + " NOWAIT");
+                    FoxCmd.AppCmd("MODIFY COMMAND " + cmd + " NOWAIT");
                 else
                     if (ext == ".pjx")
-                        FoxCmd.AppCmd("MODI PROJ " + cmd + " NOWAIT");
+                    {
+                        FoxCmd.AppCmd("MODIFY PROJECT " + cmd + " NOWAIT");
+                        FoxCmd.AppCmd("CD (_VFP.ActiveProject.HomeDir)");
+                        form.Events.directory = FoxCmd.app.DefaultFilePath;
+                    }
             }
             else
                 FoxCmd.AppCmd(cmd);
@@ -277,11 +252,50 @@ namespace VfpProj
             {
                 if (form.Events.directory != FoxCmd.app.DefaultFilePath)
                 {
-                    if (form.Events.directory != FoxCmd.app.DefaultFilePath)
+                    form.Events.directory = FoxCmd.app.DefaultFilePath;
+                    if (!Directory.GetCurrentDirectory().Equals(form.Events.directory))
                         Directory.SetCurrentDirectory(form.Events.directory);
                 }
             }
             catch (Exception) { }
+
+            form.Text = form.Events.directory;
+        }
+
+        public static void SelectFile(string file)
+        {
+            if (app == null) return;
+
+            string ext = Path.GetExtension(file).ToLower();
+            if (ext == ".prg")
+                app.DoCmd("MODI COMM " + file + " NOWAIT");
+            if (ext == ".pjx")
+            {
+                string path = Path.GetDirectoryName(file);
+                app.DoCmd("MODIFY PROJECT " + file + " NOWAIT");
+                FoxCmd.AppCmd("CD (_VFP.ActiveProject.HomeDir)");
+                app.DoCmd("cd " + path);
+                if (FoxCmd.cfg_startFxp.Length > 0 && File.Exists(FoxCmd.cfg_startFxp))
+                    app.DoCmd("DO " + FoxCmd.cfg_startFxp);
+
+                form.Events.directory = FoxCmd.app.DefaultFilePath;
+                form.Text = form.Events.directory;
+            }
+        }
+
+        public static void ActivateWindow(NativeWndInfo wi)
+        {
+            string cmd = wi.text;
+            if (wi.text.StartsWith("Project"))
+                cmd = "ACTIVATE WINDOW Project";
+            else
+                cmd = "ACTIVATE WINDOW '" + cmd + "'";
+
+            if (cmd.Length > 0)
+            {
+                AppCmd(cmd);
+                form.Text = cmd;
+            }
         }
 
     }

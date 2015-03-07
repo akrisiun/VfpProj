@@ -11,14 +11,14 @@
         </Border.Effect>
         <Grid Background="White">
             <Grid.RowDefinitions>
-                <RowDefinition Height="4" />
+                <RowDefinition Height="3" />
                 <RowDefinition Height="*" />
-                <RowDefinition Height="4" />
+                <RowDefinition Height="3" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="4" />
+                <ColumnDefinition Width="3" />
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="4" />
+                <ColumnDefinition Width="3" />
             </Grid.ColumnDefinitions>
             <DockPanel Grid.RowSpan="3" Grid.ColumnSpan="3">
                 <Grid DockPanel.Dock="Top" Height="24" Background="Silver">
@@ -34,20 +34,21 @@
                             Text="VfpProj"
                             Foreground="White" FontWeight="Bold"  FontSize="14" />
                     <Button Name="cmdClose" Grid.Column="4" 
-                        Margin="0,3,3,0" HorizontalAlignment="Stretch" Content="X" Background="Silver" />
+                        Margin="0,3,3,1" HorizontalAlignment="Stretch" Content="X" Background="Silver" />
                     
                     <Button 
                         Name="buttonModi" Grid.Column="1" Content="Modi" FontSize="10"
-                        HorizontalAlignment="Stretch" Margin="2,3,0,0" />
+                        HorizontalAlignment="Stretch" Margin="2,3,0,1" />
                     <WindowsFormsHost 
-                        Name="hostFile" Grid.Column="2" Height="20"  Panel.ZIndex="10" Margin="2,3,5,0"
+                        Name="hostFile" Grid.Column="2" Height="20" 
+                        Panel.ZIndex="10" Margin="2,3,5,0"
                         VerticalAlignment="Top" HorizontalAlignment="Stretch" MinWidth="80">
                         <wf:TextBox x:Name="txtFile" Text="" Visible="True"/>
                     </WindowsFormsHost>
                     <Button 
-                        Name="buttonCD" Grid.Column="3"
+                        Name="buttonCD" Grid.Column="3" Margin="0,3,0,1"
                         Content="Cd" Height="20" Panel.ZIndex="2"
-                        VerticalAlignment="Top" HorizontalAlignment="Left" Width="40" Margin="0,3,0,0" FontSize="9" />
+                        VerticalAlignment="Top" HorizontalAlignment="Left" Width="40" FontSize="9" />
                 </Grid>
                 <ContentControl Name="content" DockPanel.Dock="Bottom">
                     <Grid>
