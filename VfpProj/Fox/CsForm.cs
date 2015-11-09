@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Windows.Interop;
+using Vfp;
 
 namespace VfpProj
 {
@@ -22,12 +23,15 @@ namespace VfpProj
 
         public CsObj Object { get { return FoxCmd.ocs; } }
 
+        public _Startup Instance { get { return Startup.Instance; } }
+
         public VisualFoxpro.FoxApplication App
         {
             get { return FoxCmd.App.Application; }
             set
             {
-                FoxCmd.App = value;
+                if (value != null)
+                    FoxCmd.SetApp(value);
                 FoxCmd.Attach();
             }
         }
@@ -108,11 +112,6 @@ namespace VfpProj
             }
 
         }
-
-        //public int Width { get { return Convert.ToInt32(Form.Width); } set { Form.Width = value; } }
-        //public int Height { get { return Convert.ToInt32(Form.Height); } set { Form.Height = value; } }
-        //public int Left { get { return Convert.ToInt32(Form.Left); } set { Form.Left = value; } }
-        //public int Top { get { return Convert.ToInt32(Form.Top); } set { Form.Top = value; } }
 
         public int Width
         {

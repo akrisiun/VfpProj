@@ -33,7 +33,6 @@ RETURN
 FUNCTION Clr(toForm as Form)
 
    SET ASSERTS ON
-   assert .f.
 
     DECLARE Integer SetClrVersion IN "Clr.dll"  string    
     DECLARE Integer ClrLoad IN "Clr.dll"  string@ errMessage, integer@ dwErrorSize
@@ -47,9 +46,6 @@ FUNCTION Clr(toForm as Form)
     lcDir = ADDBS(FULLPATH(CURDIR()))
 
     ret1 = SetClrVersion("v4.0.30319")
-    * -2 : "CLRCreateInstance(CLSID_CLRMetaHost
-    * nDispHandle = ClrCreateInstanceFrom("Vfp.dll", 
-    
     nDispHandle = ClrCreateInstanceFrom("VfpProj.exe",;
                   "Vfp.Startup",;
                    @lcMessage, 100) 
@@ -57,16 +53,42 @@ FUNCTION Clr(toForm as Form)
     * // "The given assembly name or codebase was invalid. o d e b a s e ,   ' % 1 ' ,   w a s   i n v a l i d  "
     * "The assembly is built by a runtime newer than the currently loaded runtime, and cannot be loaded. 
     
-    ? nDispHandle 
-    ? lcMessage 
+    * ? nDispHandle 
+    * ? lcMessage 
 
-ASSERT .f. 
+   ASSERT .f. 
 
     public goVfp
     goVfp = SYS(3096, nDispHandle)
-    goVfp.Main(_VFP, .T.)
+    * goVfp.Main(_VFP, .F.)
 
+    _VFP.AutoYield = .F.
+    DOEVENTS FORCE 
+
+    goVfp.LoadMain(_VFP)
+    
+    
+    _VFP.AutoYield = .F.
+    _SCREEN.AddProperty("ocs_inst", m.ocs_form.instance)
+    
+    DOEVENTS FORCE   
+    _VFP.Eval("_SCREEN.ocs_inst.LoadMain(_VFP)")
     RETURN
 * Assembly.GetEntryAssembly null
 *          entryLocation = new Uri(Application.ResourceAssembly.CodeBase);
 * DO ClrHost in main
+
+FUNCTION  StartupInstance
+* DO StartupInstance in Main 
+
+  PUBLIC m.o1
+
+  m.o1 = m.ocs_form.Instance
+  
+  _SCREEN.AddProperty("ocs_inst", m.ocs_form.instance)
+  
+  * _Startup LoadMain(FoxApplication app) 
+  * m.o1.LoadMain(_VFP)
+  
+  _SCREEN.ocs_inst.LoadMain(_VFP)
+  return

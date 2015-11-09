@@ -33,6 +33,8 @@ namespace VfpProj
             set { startRef = value; }
         }
 
+        public MainWindow Window { get; set; }
+
         public static App Ref()
         {
             return Instance ?? new App();
@@ -41,12 +43,27 @@ namespace VfpProj
         public App()
         {
             startRef = this;
-            Startup += App_Startup;
+            // Startup += App_Startup;
+            Startup += App_StartupLoad;
         }
 
         public static void Application_ThreadException(object sender, ThreadExceptionEventArgs args)
         {
             Trace.Write(args.Exception.Message);
+        }
+
+        void App_StartupLoad(object sender, StartupEventArgs e)
+        {
+            var app = new VisualFoxpro.FoxApplication();
+            app.Visible = true;
+            Vfp.Startup.Instance.LoadMain(app);
+
+            //try
+            //{
+            //    if (Application.Current.MainWindow != null)
+            //        Application.Current.Run(); // Application.Current.MainWindow);
+            //}
+            //catch (Exception) { }
         }
 
         void App_Startup(object sender, StartupEventArgs e)

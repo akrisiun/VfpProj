@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Shell;
+using System.Windows.Threading;
 using VfpEdit;
 using VfpProj;
 using VisualFoxpro;
@@ -14,17 +15,22 @@ using Application = System.Windows.Application;
 
 namespace Vfp
 {
-    public class Startup
+    public class Startup : _Startup
     {
         static Startup()
         {
             Instance = new Startup();
         }
+
         public static Startup Instance { get; protected set; }
 
         public static Startup Load() { return Instance; }
 
+        public _Startup LoadMain(FoxApplication app) { Main(app, false); return this; }
+
         public FoxApplication App { get; set; }
+
+        protected App appCur;
 
         [STAThread]
         public void Main(FoxApplication app = null, bool lRun = false)
@@ -32,24 +38,52 @@ namespace Vfp
             this.App = app;
 
             // System.AppDomain.CurrentDomain.ApplicationIdentity.
-            var appCur = Application.Current;
-            // VfpProj.MainWindow.Dll = "/Vfp";
             VfpProj.MainWindow.Dll = "/VfpProj";
 
-            if (appCur == null)
-                appCur = VfpProj.App.Ref();
+            appCur = Application.Current as App ?? VfpProj.App.Instance;
+            try
+            {
+                if (appCur == null)
+                    appCur = VfpProj.App.Ref();
 
-            appCur.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-            var mainWnd = new VfpProj.MainWindow();
+                appCur.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+            }
+            catch (Exception) { }
+
+            var mainWnd = appCur.Window;
+            bool checkAccess = true;
+            if (mainWnd == null)
+                mainWnd = new VfpProj.MainWindow();
+            else
+                checkAccess = (mainWnd as DispatcherObject).CheckAccess();
+
             appCur.MainWindow = mainWnd;
+            // calling thread must be STA because many UI components
 
+            mainWnd.IsStart = true;
 
+            if (!checkAccess)
+                mainWnd.Dispatcher.Invoke(new Action(() =>
+                    {
+                        WindowLoad(mainWnd, app, lRun);
+                        mainWnd.Visibility = Visibility.Visible;
+                    }));
+            else
+                WindowLoad(mainWnd, app, lRun);
+        }
+
+        public void WindowLoad(VfpProj.MainWindow mainWnd, FoxApplication app, bool lRun = false)
+        {
+
+            //if (FoxCmd.Attach())
+            //    FoxCmd.CreateForm(window);
             try
             {
                 mainWnd.Load(app);
-                mainWnd.Show();
+                // mainWnd.Show();
 
                 app.DoCmd("DOEVENTS FORCE");
+                
                 mainWnd.events.AfterRendered();
 
                 app.DoCmd("CANCEL");
@@ -58,9 +92,7 @@ namespace Vfp
 
             if (lRun)
                 appCur.Run();
-
-            }
-
+        }
     }
 }
 

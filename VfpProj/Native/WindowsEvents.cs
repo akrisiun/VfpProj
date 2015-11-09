@@ -32,11 +32,12 @@ namespace VfpProj.Native
         public Collection<NativeWndInfo> listWI;
 
         public EditWindow edit;
-        public Forms.TextBox txtFile;
+        // public Forms.TextBox txtFile;
+        public System.Windows.Controls.TextBox txtFile;
 
         public WindowsEvents(MainWindow form)
         {
-            this.form = form.form;
+            this.form = form.FormObject;
             edit = null;
 
             listWI = new Collection<NativeWndInfo>();
@@ -59,7 +60,8 @@ namespace VfpProj.Native
                 return;
 
             isBound = true;
-            txtFile = Form.hostFile.Child as Forms.TextBox;
+            //txtFile = Form.hostFile.Child as Forms.TextBox;
+            txtFile = Form.txtFile;
 
             var frm = Form;
 
@@ -74,17 +76,19 @@ namespace VfpProj.Native
 
             frm.Topmost = true;
             frm.tabList.SelectionChanged += tabWI_IndexChanged;
-            frm.txtFile.KeyDown += txtFile_KeyDown;
+            //frm.txtFile.KeyDown += txtFile_KeyDown;
         }
 
         public void AfterRendered()
         {
             Bind();
-            var textFile = Form.hostFile.Child as Forms.TextBox;
-            textFile.IsAccessible = true;
-            Form.hostFile.Visibility = Visibility.Visible;
+            var textFile = Form.txtFile;
+            //var textFile = Form.hostFile.Child as Forms.TextBox;
+            //textFile.IsAccessible = true;
+            //textFile.Visible = true;
+            //Form.hostFile.Visibility = Visibility.Visible;
 
-            NativeAutocomplete.SetFileAutoComplete(textFile);
+            //NativeAutocomplete.SetFileAutoComplete(textFile);
             textFile.Text = Directory.GetCurrentDirectory() + "\\";
             FormFocus(Form);
         }
@@ -114,7 +118,7 @@ namespace VfpProj.Native
             {
                 if (hWnd == IntPtr.Zero)
                 {
-                    FoxCmd.App = null;
+                    // FoxCmd.App = null;
                     if (FoxCmd.Attach())
                     {
                         app = FoxCmd.App;
@@ -277,7 +281,8 @@ namespace VfpProj.Native
             // HWND WINAPI GetForegroundWindow(void);  User32.dll 
             if (FoxCmd.hWnd == NativeMethods.GetForegroundWindow())
             {
-                FoxCmd.App = null;
+                FoxCmd.SetApp(null); // = null;
+                FoxCmd.SetFormObj(null);
             }
         }
 

@@ -76,6 +76,9 @@ namespace VfpProj
         [ComVisible(true), DispId(0x60030022)]
         CsObj Object { get; }
 
+        [ComVisible(true), DispId(0x60030055)]
+        _Startup Instance { get; }
+
         #region Positions
 
         [ComVisible(true), DispId(0x60030003)]
@@ -115,4 +118,17 @@ namespace VfpProj
         bool OnTop { get; set; }
     }
 
+    [Guid("c155b373-563f-433f-8fcf-18fd98100002")]
+    [InterfaceType(ComInterfaceType.InterfaceIsIDispatch)]
+    public interface _Startup
+    {
+        [DispId(0x60050001)]
+        [ComVisible(true)]
+        FoxApplication App { get; set; }
+
+        [DispId(0x60050001)]
+        _Startup LoadMain(FoxApplication app);
+
+    }
+     
 }

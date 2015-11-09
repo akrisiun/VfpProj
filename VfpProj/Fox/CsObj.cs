@@ -36,7 +36,7 @@ namespace VfpProj
         [ComVisible(true)]
         public _Form Form(FoxApplication app)
         {
-            FoxCmd.App = app;
+            FoxCmd.SetApp(app);
             if (FoxCmd.Attach())
                 FoxCmd.ShowForm(FoxCmd.FormObj.Form);
 

@@ -11,8 +11,10 @@ namespace VfpProj
 {
     public static class FoxCmd
     {
-        public static FoxApplication App { get; set; }
-        public static CsForm FormObj { get; set; }
+        public static FoxApplication App { get; private set; }
+        public static CsForm FormObj { get; private set; }
+        public static void SetApp(FoxApplication app) { App = app; }
+        public static void SetFormObj(CsForm obj) { FormObj = obj; }
 
         static string[] initCmd = new[] { 
                     "_SCREEN.WindowState = 2",
@@ -131,12 +133,23 @@ namespace VfpProj
         {
             try
             {
-                if (App == null)
-                    App = new VisualFoxpro.FoxApplication();
+                if (App == null &&  !VfpProj.App.Instance.Window.IsStart)
+                {
+                    if (Vfp.Startup.Instance.App != null)
+                        App = Vfp.Startup.Instance.App;
 
-                App.AutoYield = false;
-                hWnd = (IntPtr)App.hWnd;
-                SetHWnd();
+                    if (App == null)
+                        App = new VisualFoxpro.FoxApplication();
+
+                    Vfp.Startup.Instance.App = App;
+                }
+
+                if (App != null)
+                {
+                    App.AutoYield = true;
+                    hWnd = (IntPtr)App.hWnd;
+                    SetHWnd();
+                }
             }
             finally
             {
@@ -148,6 +161,21 @@ namespace VfpProj
 
             return App != null;
         }
+
+        //[DispId(21)]
+        //dynamic DataToClip(ref object lpvarWrkArea = Type.Missing, ref object lpvarNumRows = Type.Missing, ref object lpvarClipFormat = Type.Missing);
+        //[DispId(17)]
+        //void DoCmd(string bstrCmd);
+        //[DispId(18)]
+        //dynamic Eval(string bstrExpr);
+        //[DispId(23)]
+        //void Help(ref object lpvarHelpFile = Type.Missing, ref object lpvarHelpCid = Type.Missing, ref object lpvarHelpString = Type.Missing);
+        //[DispId(19)]
+        //void Quit();
+        //[DispId(20)]
+        //dynamic RequestData(ref object lpvarWrkArea = Type.Missing, ref object lpvarNumRows = Type.Missing);
+        //[DispId(22)]
+        //void SetVar(string bstrVarName, ref object lpvarNumRows);
 
         public static void SetHWnd()
         {
@@ -173,14 +201,17 @@ namespace VfpProj
             if (ocs_form != null && ocs_form is CsForm && (ocs_form as CsForm).Visible)
                 FoxCmd.FormObj = ocs_form as CsForm;
 
-            if (FoxCmd.FormObj == null
-                && form != null && form.form != null)
-                FoxCmd.FormObj = form.form;
-            else
+            if (FoxCmd.FormObj == null)
             {
-                FoxCmd.FormObj = new CsForm();
-                FoxCmd.FormObj.Form = form;
+                if (form != null && form.FormObject != null)
+                    FoxCmd.FormObj = form.FormObject;
+                else
+                {
+                    FoxCmd.SetFormObj(new CsForm());
+                    FoxCmd.FormObj.Form = form;
+                }
             }
+
             if (FoxCmd.FormObj == null)
                 return false;
             if (FoxCmd.FormObj.Form == null)
@@ -255,7 +286,8 @@ namespace VfpProj
                 Trace.Write(ex);
             }
 
-            // App = null;
+            SetApp(null);
+            SetFormObj(null);
             return true;
         }
     }

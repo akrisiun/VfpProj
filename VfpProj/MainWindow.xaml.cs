@@ -18,8 +18,9 @@ namespace VfpProj
     /// </summary>
     public partial class MainWindow : Window
     {
-        public CsForm form;
+        public CsForm FormObject;
         public Native.WindowsEvents events;
+        public bool IsStart;
 
         public static BitmapFrame PrgIco;
 
@@ -27,6 +28,9 @@ namespace VfpProj
 
         public MainWindow()
         {
+            App.Instance.Window = this;
+            IsStart = false;
+
             if (Dll == null)
                 Dll = "/VfpProj";
 
@@ -55,13 +59,14 @@ namespace VfpProj
 
         public void Load(VisualFoxpro.FoxApplication app = null)
         {
-            form = new CsForm();
-            form.Form = this;
-            FoxCmd.FormObj = form;
+            FormObject = new CsForm();
+            FormObject.Form = this;
+            FoxCmd.SetFormObj(FormObject);
 
             events = new Native.WindowsEvents(this);
 
-            FoxCmd.App = app;
+            if (app != null)
+                FoxCmd.SetApp(app);
             if (FoxCmd.Attach())
                 FoxCmd.CreateForm(this);
 
@@ -74,19 +79,21 @@ namespace VfpProj
             // this.Height = 49;
 
             SizeChanged += MainWindow_SizeChanged;
-            ContentRendered += (s, e)
-                =>
-                {
-                    // this.border.Effect = new DropShadowEffect();
-                    /*
+
+            if (!this.IsStart)
+                ContentRendered += (s, e)
+                    =>
                     {
-                        Color = Color.FromRgb(0, 0, 0),
-                        Direction = 270,
-                        BlurRadius = 10,
-                        ShadowDepth = 2
-                    }; */
-                    events.AfterRendered();
-                };
+                        // this.border.Effect = new DropShadowEffect();
+                        /*
+                        {
+                            Color = Color.FromRgb(0, 0, 0),
+                            Direction = 270,
+                            BlurRadius = 10,
+                            ShadowDepth = 2
+                        }; */
+                        events.AfterRendered();
+                    };
             Closing += MainWindow_Closing;
         }
 
@@ -110,6 +117,8 @@ namespace VfpProj
         {
             if (!FoxCmd.QueryUnload())
                 e.Cancel = true;
+
+            App.Current.Shutdown();
         }
 
 

@@ -40,12 +40,21 @@
                     <Button 
                         Name="buttonModi" Grid.Column="1" Content="Modi" FontSize="10"
                         HorizontalAlignment="Stretch" Margin="2 3 0 0" />
-                    
-                    <WindowsFormsHost 
+
+                    <StackPanel Orientation="Horizontal"
                         Name="hostFile" Grid.Column="2" Height="20"  Panel.ZIndex="10" Margin="2 3 5 0"
+                        Background="WhiteSmoke"
                         VerticalAlignment="Top" HorizontalAlignment="Stretch" MinWidth="80">
-                        <wf:TextBox x:Name="txtFile" Text="" Visible="True"/>
+                        <TextBox x:Name="txtFile" Background="Transparent" Padding="3 2 0 0" BorderThickness="0" Text="loading.." />
+                    </StackPanel>
+                    
+                    <!--<WindowsFormsHost 
+                        Name="hostFile" Grid.Column="2" Height="20"  Panel.ZIndex="10" Margin="2 3 5 0"
+                        Background="WhiteSmoke"
+                        VerticalAlignment="Top" HorizontalAlignment="Stretch" MinWidth="80">
+                        <wf:TextBox x:Name="txtFile" Text="loading.." Visible="True"/>
                     </WindowsFormsHost>
+                    -->
                     <Button 
                         Name="buttonCD" Grid.Column="3"
                         Content="Cd" Height="20" Panel.ZIndex="2"
