@@ -3,8 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         ResizeMode="NoResize" AllowsTransparency="True" Background="Transparent"
-        Icon="PJX.ico" Title="MainWindow" 
+         Title="MainWindow" 
         WindowStyle="None" Height="49" Width="600" FontSize="10">
+    <!--Icon="PJX.ico"-->
     <Border Name="border">
         <Border.Effect>
             <DropShadowEffect BlurRadius="10" Color="Silver" ShadowDepth="5" />
@@ -29,26 +30,26 @@
                         <ColumnDefinition Width="41"/>
                         <ColumnDefinition Width="22"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Name="titleBar" Margin="5,3,0,0" Background="Silver" 
+                    <TextBlock Name="titleBar" Margin="2 3 0 0" Background="Silver" 
                             VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                             Text="VfpProj"
                             Foreground="White" FontWeight="Bold"  FontSize="14" />
                     <Button Name="cmdClose" Grid.Column="4" 
-                        Margin="0,3,3,1" HorizontalAlignment="Stretch" Content="X" Background="Silver" />
+                        Margin="0 3 3 0" HorizontalAlignment="Stretch" Content="X" Background="Silver" />
                     
                     <Button 
                         Name="buttonModi" Grid.Column="1" Content="Modi" FontSize="10"
-                        HorizontalAlignment="Stretch" Margin="2,3,0,1" />
+                        HorizontalAlignment="Stretch" Margin="2 3 0 0" />
+                    
                     <WindowsFormsHost 
-                        Name="hostFile" Grid.Column="2" Height="20" 
-                        Panel.ZIndex="10" Margin="2,3,5,0"
+                        Name="hostFile" Grid.Column="2" Height="20"  Panel.ZIndex="10" Margin="2 3 5 0"
                         VerticalAlignment="Top" HorizontalAlignment="Stretch" MinWidth="80">
                         <wf:TextBox x:Name="txtFile" Text="" Visible="True"/>
                     </WindowsFormsHost>
                     <Button 
-                        Name="buttonCD" Grid.Column="3" Margin="0,3,0,1"
+                        Name="buttonCD" Grid.Column="3"
                         Content="Cd" Height="20" Panel.ZIndex="2"
-                        VerticalAlignment="Top" HorizontalAlignment="Left" Width="40" FontSize="9" />
+                        VerticalAlignment="Top" HorizontalAlignment="Left" Width="40" Margin="0 3 0 0" FontSize="9" />
                 </Grid>
                 <ContentControl Name="content" DockPanel.Dock="Bottom">
                     <Grid>
@@ -58,7 +59,7 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TabControl Name="tabList" Grid.Row="0" Height="22" VerticalAlignment="Top" Margin="2,0,2,0">
+                        <TabControl Name="tabList" Grid.Row="0" Height="22" VerticalAlignment="Top" Margin="2 0 2 0">
                             <TabItem Name="tab1" Header="TabItem1" />
                         </TabControl>
                     </Grid>

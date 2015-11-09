@@ -23,33 +23,57 @@ namespace VfpProj
 
         public static BitmapFrame PrgIco;
 
+        public static string Dll { get; set; }
+
         public MainWindow()
         {
+            if (Dll == null)
+                Dll = "/VfpProj";
+
             Uri iconUri;
-            iconUri = new Uri("pack://application:,,,/PRG.ico", UriKind.RelativeOrAbsolute);
-            MainWindow.PrgIco = BitmapFrame.Create(iconUri);
+            try
+            {
+                iconUri = new Uri("pack://application:,,," + Dll + ";component/PRG.ico", UriKind.RelativeOrAbsolute);
+                MainWindow.PrgIco = BitmapFrame.Create(iconUri);
 
-            iconUri = new Uri("pack://application:,,,/PJX.ico", UriKind.RelativeOrAbsolute);
-            Icon = BitmapFrame.Create(iconUri);
+                // Resources/
+                iconUri = iconUri = new Uri("pack://application:,,," + Dll + ";component/PJX.ico", UriKind.RelativeOrAbsolute);
+                Icon = BitmapFrame.Create(iconUri);
+            }
+            catch (Exception) { }
 
+            if (_contentLoaded)
+            {
+                return;
+            }
+            _contentLoaded = true;
+            System.Uri resourceLocater = new System.Uri(Dll + ";component/mainwindow.xaml", System.UriKind.Relative);
+            System.Windows.Application.LoadComponent(this, resourceLocater);
+
+            // WindowStyle = System.Windows.WindowStyle.None;
+        }
+
+        public void Load(VisualFoxpro.FoxApplication app = null)
+        {
             form = new CsForm();
             form.Form = this;
+            FoxCmd.FormObj = form;
+
             events = new Native.WindowsEvents(this);
 
-            // WindowStyle = System.Windows.WindowStyle.SingleBorderWindow;
-            InitializeComponent();
-            // WindowStyle = System.Windows.WindowStyle.None;
+            FoxCmd.App = app;
+            if (FoxCmd.Attach())
+                FoxCmd.CreateForm(this);
 
             var window = this; // NoBorder init
             Native.WpfNoBorder.Init(window, window.titleBar, window.topLeft, window.top, window.topRight,
                    window.right, window.bottomRight, window.bottom, window.bottomLeft, window.left);
             window.cmdClose.Click += (s, evt) => window.Close();
-            titleBar.MouseDown += (s, evt) => {
-                this.Topmost = !this.Topmost;
-            };
 
+            this.hostFile.Visibility = System.Windows.Visibility.Visible;
+            // this.Height = 49;
 
-            // SizeChanged += MainWindow_SizeChanged;
+            SizeChanged += MainWindow_SizeChanged;
             ContentRendered += (s, e)
                 =>
                 {
@@ -66,6 +90,17 @@ namespace VfpProj
             Closing += MainWindow_Closing;
         }
 
+
+        private static readonly Thickness MainBorderMaximizedPadding = new Thickness(13);
+        private static readonly Thickness MainBorderNormalPadding = new Thickness(5);
+
+        protected override void OnStateChanged(EventArgs e)
+        {
+
+            // bdrRoot.Padding = WindowState == WindowState.Maximized ? MainBorderMaximizedPadding : MainBorderNormalPadding;
+        }
+
+
         ~MainWindow()
         {
             FoxCmd.Dispose();
@@ -75,6 +110,12 @@ namespace VfpProj
         {
             if (!FoxCmd.QueryUnload())
                 e.Cancel = true;
+        }
+
+
+        void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            // txtFile.Width = Width - buttonCD.Width - buttonModi.Width - 50;
         }
 
     }

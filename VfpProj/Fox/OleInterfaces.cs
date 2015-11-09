@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Xml.Linq;
 using VfpProj.Native;
 using VisualFoxpro;
 
@@ -12,8 +13,45 @@ namespace VfpProj
         [ComVisible(true), DispId(0x60020000)]
         _Form Form(FoxApplication app);
 
+        [ComVisible(true), DispId(0x60020004)]
+        _Form CmdForm { get; }
+
+
         [ComVisible(true), DispId(0x60020001)]
         FoxApplication App { get; }
+
+        [ComVisible(true), DispId(0x60020011)]
+        string DoCmd(string cmd);
+
+        [ComVisible(true), DispId(0x60020012)]
+        string Eval(string expr);
+
+        [ComVisible(true), DispId(0x60020013)]
+        IntPtr EvalPtr(string expr);
+
+        [ComVisible(true), DispId(0x60020014)]
+        string SetPtr(dynamic ptr);
+
+        [ComVisible(true), DispId(0x60020020)]
+        string SetIntPtr(IntPtr ptr);
+
+        [ComVisible(true), DispId(0x60020021)]
+        string SetFoxObj(IFoxObjects ptr);
+
+        [ComVisible(true), DispId(0x60020022)]
+        string SetFoxForms(IFoxForms ptr);
+
+        [ComVisible(true), DispId(0x60020023)]
+        string SetProjects(IFoxProjects ptr);
+
+        [ComVisible(true), DispId(0x60020024)]
+        string GetXml(string command);
+
+        [ComVisible(true), DispId(0x60020025)]
+        XElement LoadXml(string command);
+
+        [ComVisible(true), DispId(0x60020026)]
+        string SetProperty(IntPtr ptr, string property);
 
         [ComVisible(true), DispId(0x60020002)]
         IntPtr hWnd { get; set; }
@@ -34,6 +72,11 @@ namespace VfpProj
         [DispId(0x60030002)]
         [ComVisible(true)]
         FoxApplication App { get; set; }
+
+        [ComVisible(true), DispId(0x60030022)]
+        CsObj Object { get; }
+
+        #region Positions
 
         [ComVisible(true), DispId(0x60030003)]
         bool Visible { get; set; }
@@ -56,6 +99,8 @@ namespace VfpProj
 
         [ComVisible(true), DispId(0x60030010)]
         IntPtr Handle { get; }
+
+        #endregion
 
         [ComVisible(true), DispId(0x60030011)]
         bool IsDisposed { get; }

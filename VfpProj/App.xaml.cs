@@ -23,16 +23,25 @@ namespace VfpProj
     /// </summary>
     public partial class App : Application
     {
+        static App() { } // debugger entry
 
+        static App startRef;
         public static App Instance
         {
             [DebuggerStepThrough]
-            get { return Application.Current as App; }
+            get { return startRef ?? Application.Current as App; }
+            set { startRef = value; }
+        }
+
+        public static App Ref()
+        {
+            return Instance ?? new App();
         }
 
         public App()
         {
-            Startup += App_Startup; 
+            startRef = this;
+            Startup += App_Startup;
         }
 
         public static void Application_ThreadException(object sender, ThreadExceptionEventArgs args)
@@ -46,6 +55,7 @@ namespace VfpProj
 
             MainWindow window = new MainWindow();   // NoBorder 
             window.AllowsTransparency = false;
+            window.Load(null);
             window.Show();
 
             if (FoxCmd.Attach())

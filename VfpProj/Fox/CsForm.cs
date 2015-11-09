@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Windows.Interop;
 
 namespace VfpProj
 {
@@ -17,14 +18,16 @@ namespace VfpProj
             Directory = string.Empty;
         }
 
-        bool _Form.IsDisposed { get { return Form != null; } }
+        public bool IsDisposed { get { return Form != null; } }
+
+        public CsObj Object { get { return FoxCmd.ocs; } }
 
         public VisualFoxpro.FoxApplication App
         {
-            get { return FoxCmd.app.Application; }
+            get { return FoxCmd.App.Application; }
             set
             {
-                FoxCmd.app = value;
+                FoxCmd.App = value;
                 FoxCmd.Attach();
             }
         }
@@ -32,12 +35,21 @@ namespace VfpProj
         public string Directory { get; set; }
         public Native.WindowsEvents Events { get { return Form.events; } }
 
+        string _Form.Name { get { return "VfpProj._Form.CsForm"; } }
+
         public string Name { get { return "VfpProj.CsForm"; } }
+
+        IntPtr? hWnd = null;
         public IntPtr Handle
         {
             get
             {
-                return IntPtr.Zero;    //  this.HandlesScrolling }
+                if (hWnd == null)
+                {
+                    var wih = new WindowInteropHelper(Form);
+                    hWnd = wih.Handle;
+                }
+                return hWnd ?? IntPtr.Zero;
             }
         }
         public bool OnTop
@@ -96,6 +108,11 @@ namespace VfpProj
             }
 
         }
+
+        //public int Width { get { return Convert.ToInt32(Form.Width); } set { Form.Width = value; } }
+        //public int Height { get { return Convert.ToInt32(Form.Height); } set { Form.Height = value; } }
+        //public int Left { get { return Convert.ToInt32(Form.Left); } set { Form.Left = value; } }
+        //public int Top { get { return Convert.ToInt32(Form.Top); } set { Form.Top = value; } }
 
         public int Width
         {
@@ -193,7 +210,6 @@ namespace VfpProj
                     });
             }
         }
-
 
     }
 }

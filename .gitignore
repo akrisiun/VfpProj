@@ -12,3 +12,10 @@ Lib/gdiplus.dll
 Lib/msvcr70.dll
 Lib/VFP8ENU.DLL
 Lib/vfp8renu.dll
+*.sdf
+Lib/
+*.FXP
+*.exe
+*.zip
+*.csproj.user
+*.app
