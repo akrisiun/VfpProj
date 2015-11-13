@@ -1,0 +1,2 @@
+LIBRARY   GdiPlus
+EXPORTS	  DllMain              @1

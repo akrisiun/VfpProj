@@ -19,3 +19,6 @@ Lib/
 *.zip
 *.csproj.user
 *.app
+VfpCmd/*.dll
+*.opensdf
+Lib/VfpProj.exe

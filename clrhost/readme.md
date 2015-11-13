@@ -1,4 +1,4 @@
-#ClrLoader.dll
+# ClrLoader.dll
 -------------
 This project contains the Win32 Stub loader for hosting the .NET Runtime
 
