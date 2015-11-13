@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Windows.Interop;
+using System.ComponentModel;
 using System.Xml.Linq;
 using VfpProj.Native;
 using VisualFoxpro;
@@ -8,6 +10,8 @@ namespace VfpProj
 {
     [Guid("c155b373-563f-433f-8fcf-18fd98100001")]
     [InterfaceType(ComInterfaceType.InterfaceIsIDispatch)]
+    //[ProgId("VfpProj.Events")] 
+    //[InterfaceType(ComInterfaceType.InterfaceIsDual)]
     public interface _Events
     {
         [ComVisible(true), DispId(0x60020000)]
@@ -109,16 +113,19 @@ namespace VfpProj
         bool IsDisposed { get; }
 
         [ComVisible(true), DispId(0x60030020)]
-        MainWindow Form { get; }
-
-        [ComVisible(true), DispId(0x60030020)]
         WindowsEvents Events { get; }
 
         [ComVisible(true), DispId(0x60030021)]
-        bool OnTop { get; set; }
+        bool AlwaysOnTop { get; set; }
+
+        [ComVisible(true), DispId(0x60030022)]
+        MainWindow Form { get; }
+
+        [ComVisible(true), DispId(0x60030023)]
+        bool CheckAccess();
     }
 
-    [Guid("c155b373-563f-433f-8fcf-18fd98100002")]
+    [Guid("c155b373-563f-433f-8fcf-18fd98100003")]
     [InterfaceType(ComInterfaceType.InterfaceIsIDispatch)]
     public interface _Startup
     {
@@ -130,5 +137,27 @@ namespace VfpProj
         _Startup LoadMain(FoxApplication app);
 
     }
-     
+
+
+    public static class TypeStatic
+    {
+        public static object GetObj(string progIdString)
+        {
+            var type = Type.GetTypeFromProgID(progIdString);
+            var obj = Activator.CreateInstance(type);
+            return obj;
+        }
+
+        //public static IComponent Server(object obj)
+        //{
+        //    //IComponentServer server = new IComponentServer.
+        //    // var server = (IComponentServer)obj;
+        //    var server = obj as IComponent;
+        //    return server;
+        //}
+    }
 }
+
+//_Events [Guid("c155b373-563f-433f-8fcf-18fd98100001")]
+//_Form [Guid("c155b373-563f-433f-8fcf-18fd98100002")]
+//_Startup [Guid("c155b373-563f-433f-8fcf-18fd98100002")]

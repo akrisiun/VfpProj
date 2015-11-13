@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Runtime.Remoting;
+using System.ComponentModel;
 using System.Text;
 using System.Xml.Linq;
 using VisualFoxpro;
@@ -8,16 +9,21 @@ using VisualFoxpro;
 namespace VfpProj
 {
 
-    [Guid("c155b373-563f-433f-8fcf-18fd98100003")]
+    [Guid("c155b373-563f-433f-8fcf-18fd98100013")]
     [ClassInterface(ClassInterfaceType.AutoDispatch), ProgId("VfpProj.CsObj")]
     [ComVisible(true)]
-    public sealed class CsObj : _Events
+    public sealed class CsObj : _Events, IComponent, IDisposable
     {
         public static int cnt = 0;
         public CsObj()
         {
             cnt++;
         }
+
+        public void Dispose() {}
+        ISite IComponent.Site { get; set; }
+#pragma warning disable 0067
+        public event EventHandler Disposed;
 
         public _Form CmdForm { get { return FoxCmd.FormObj as _Form; } }
 

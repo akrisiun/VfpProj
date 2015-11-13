@@ -8,11 +8,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using Forms = System.Windows.Forms;
 using VfpEdit;
 using VfpInterop;
 using VfpProj;
+using System.Windows.Input;
 
 namespace VfpProj.Native
 {
@@ -76,8 +78,15 @@ namespace VfpProj.Native
 
             frm.Topmost = true;
             frm.tabList.SelectionChanged += tabWI_IndexChanged;
+#if NOWPF_TEXTBOX
             //frm.txtFile.KeyDown += txtFile_KeyDown;
+#else
+            frm.txtFile.KeyDown += txtFile_KeyDown;
+#endif
+            frm.buttonDO.Click += (s, e) => DoCmd(form.Text);
         }
+
+        #region Render, Focus
 
         public void AfterRendered()
         {
@@ -127,16 +136,31 @@ namespace VfpProj.Native
                     app.Application.Visible = true;
                 }
                 if (app != null && app.DefaultFilePath != dir)
-                    Directory.SetCurrentDirectory(app.DefaultFilePath);
+                {
+                    dir = app.DefaultFilePath;
+                    Trace.WriteLine("Focus set dir=" + dir);
+                    Directory.SetCurrentDirectory(dir);
+
+                }
             }
             catch (Exception ex)
             {
                 Trace.WriteLine(ex.Message);
             }
 
-            form1.events.directory = Directory.GetCurrentDirectory();
+            dir = Directory.GetCurrentDirectory();
+            form1.events.directory = dir;
+            if (form1.FormObject != null)
+            {
+                form1.FormObject.Directory = dir;
+                form1.FormObject.Caption = form1.FormObject.Directory;
+            }
+
             Trace.Write("form Focus");
             AfterFocus(hWnd);
+
+            if (form.CheckAccess())
+                form1.txtFile.Focus();
         }
 
         public void AfterFocus(IntPtr? hWnd = null)
@@ -147,13 +171,20 @@ namespace VfpProj.Native
             if (!hWnd.HasValue)
                 return;
             WindowsTab.FillList(form, hWnd.Value);
+        }
 
+        public void StartDir()
+        {
             if (FoxCmd.cfg_startDir.Length > 0 && !Directory.GetCurrentDirectory().Contains(FoxCmd.cfg_startDir))
             {
                 Directory.SetCurrentDirectory(FoxCmd.cfg_startDir);
                 FoxCmd.AppCmd("CD " + FoxCmd.cfg_startDir);
             }
         }
+
+        #endregion
+
+        #region Button clicks
 
         void buttonModi_Click(object sender, RoutedEventArgs e)
         {
@@ -223,23 +254,33 @@ namespace VfpProj.Native
 
         void cmdCD_Click(object sender, EventArgs e)
         {
-            // FolderBrowserDialog dlg = new FolderBrowserDialog();
-            FileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-
             directory = Directory.GetCurrentDirectory();
-            // dlg.SelectedPath = directory;
+
+#if WPF_DLG
+            // FileDialog dlg = new Microsoft.Win32.OpenFileDialog();
             dlg.InitialDirectory = directory;
             bool? res = dlg.ShowDialog();
             if (!res ?? true)
                 return;
-
             Directory.SetCurrentDirectory(dlg.InitialDirectory);
+#else
+            var dlg = new System.Windows.Forms.FolderBrowserDialog();
+            dlg.SelectedPath = directory;
+            var res = dlg.ShowDialog();
+            if (res != Forms.DialogResult.OK)
+                return;
+            Directory.SetCurrentDirectory(dlg.SelectedPath);
+#endif
+
             directory = Directory.GetCurrentDirectory();
 
             Form.txtFile.Text = directory;
         }
 
+        #endregion
+
         #region Focus Events
+
         static void form1_MouseLeave(object sender, EventArgs e)
         {
             Trace.Write("mouse Leave");
@@ -294,48 +335,64 @@ namespace VfpProj.Native
 
         #endregion
 
+#if NOWPF_TEXTBOX
         void txtFile_KeyDown(object sender, Forms.KeyEventArgs e)
         {
             var textFile = sender as Forms.TextBox;
             var formCS = form.Form;
             if (e.KeyCode == Forms.Keys.Enter)
             {
+#else
+        void txtFile_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+#endif
+            var textFile = sender as Forms.TextBox;
+            if (e.Key == Key.Enter)
+            {
                 string cmd = textFile.Text.Trim();
+                DoCmd(cmd);
+            }
+        }
 
-                if (File.Exists(cmd) || Directory.Exists(cmd))
+        public void DoCmd(string cmd)
+        {
+            var formCS = form.Form;
+            if (File.Exists(cmd) || Directory.Exists(cmd))
+            {
+                if (!File.Exists(cmd))
                 {
-                    if (!File.Exists(cmd))
-                    {
-                        FoxCmd.AppCmd("CD " + cmd);
-                        form.Events.directory = FoxCmd.App.DefaultFilePath;
-                        Directory.SetCurrentDirectory(form.Events.directory);
-                        return;
-                    }
-
-                    string ext = Path.GetExtension(cmd).ToLower();
-                    if (ext == ".prg")
-                        FoxCmd.AppCmd("MODI COMM " + cmd + " NOWAIT");
-                    else
-                        if (ext == ".pjx")
-                            FoxCmd.AppCmd("MODI PROJ " + cmd + " NOWAIT");
+                    FoxCmd.AppCmd("CD " + cmd);
+                    form.Events.directory = FoxCmd.App.DefaultFilePath;
+                    Directory.SetCurrentDirectory(form.Events.directory);
+                    return;
                 }
-                else
-                    FoxCmd.AppCmd(cmd);
 
-                try
+                string ext = Path.GetExtension(cmd).ToLower();
+                if (ext == ".prg")
+                    FoxCmd.AppCmd("MODI COMM " + cmd + " NOWAIT");
+                else
+                    if (ext == ".pjx")
+                        FoxCmd.AppCmd("MODI PROJ " + cmd + " NOWAIT");
+            }
+            else
+                FoxCmd.AppCmd(cmd);
+
+            try
+            {
+                if (form.Events.directory != FoxCmd.App.DefaultFilePath)
                 {
                     if (form.Events.directory != FoxCmd.App.DefaultFilePath)
-                    {
-                        if (form.Events.directory != FoxCmd.App.DefaultFilePath)
-                            Directory.SetCurrentDirectory(form.Events.directory);
-                    }
+                        Directory.SetCurrentDirectory(form.Events.directory);
                 }
-                catch (Exception) { }
-
-                var hWnd = (IntPtr)form.App.hWnd;
-                WindowsTab.FillList(form, hWnd);
-
             }
+            catch (Exception ex)
+            {
+                form.LastError = ex;
+                Trace.WriteLine(ex.Message);
+            }
+
+            var hWnd = (IntPtr)form.App.hWnd;
+            WindowsTab.FillList(form, hWnd);
         }
 
         void tabWI_IndexChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)

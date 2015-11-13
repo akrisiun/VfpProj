@@ -49,7 +49,11 @@ namespace VfpProj
 
         public static void Application_ThreadException(object sender, ThreadExceptionEventArgs args)
         {
-            Trace.Write(args.Exception.Message);
+            var ex = args.Exception;
+            if (App.Instance.Window.FormObject != null)
+                App.Instance.Window.FormObject.LastError = ex;
+
+            Trace.Write(ex.Message);
         }
 
         void App_StartupLoad(object sender, StartupEventArgs e)
@@ -57,13 +61,7 @@ namespace VfpProj
             var app = new VisualFoxpro.FoxApplication();
             app.Visible = true;
             Vfp.Startup.Instance.LoadMain(app);
-
-            //try
-            //{
-            //    if (Application.Current.MainWindow != null)
-            //        Application.Current.Run(); // Application.Current.MainWindow);
-            //}
-            //catch (Exception) { }
+            Vfp.Startup.Instance.Show(app);
         }
 
         void App_Startup(object sender, StartupEventArgs e)

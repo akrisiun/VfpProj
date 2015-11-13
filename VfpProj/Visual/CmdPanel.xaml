@@ -1,0 +1,57 @@
+﻿<UserControl x:Class="VfpProj.Visual.CmdPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="24" d:DesignWidth="400">
+    <!--<visual:CmdPanel x:Name="cmdPanel"-->
+    <UserControl.Resources>
+
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="57"/>
+            <ColumnDefinition Width="27"/>
+            <ColumnDefinition Width="57"/>
+            <ColumnDefinition Width="475*"/>
+            <ColumnDefinition Width="41"/>
+        </Grid.ColumnDefinitions>
+
+        <Button 
+            Name="buttonModi" 
+            Grid.Column="0" 
+            Content="_Modi" FontSize="10"
+            HorizontalAlignment="Stretch" Margin="2 3 0 0" />
+
+        <Button 
+            Name="buttonDO"  x:FieldModifier="public"
+            Grid.Column="1" 
+            Content="_DO" FontSize="10"
+            HorizontalAlignment="Stretch" Margin="2 3 0 0" />
+
+        <ComboBox Name="comboCfg" x:FieldModifier="public"
+            Grid.Column="2" />
+
+        <StackPanel Orientation="Horizontal"
+                    Name="hostFile" Grid.Column="3" 
+                    Height="20"  Panel.ZIndex="10" Margin="2 3 5 0"
+                    Background="WhiteSmoke"
+                    VerticalAlignment="Top" HorizontalAlignment="Stretch" MinWidth="80">
+            <TextBox x:Name="txtFile" Background="Transparent" Padding="3 2 0 0" BorderThickness="0" Text="loading.." />
+        </StackPanel>
+
+        <!--<WindowsFormsHost 
+                    Name="hostFile" Grid.Column="2" Height="20"  Panel.ZIndex="10" Margin="2 3 5 0"
+                    Background="WhiteSmoke"
+                    VerticalAlignment="Top" HorizontalAlignment="Stretch" MinWidth="80">
+                    <wf:TextBox x:Name="txtFile" Text="loading.." Visible="True"/>
+                </WindowsFormsHost>
+                -->
+        <Button 
+            Name="buttonCD" Grid.Column="4"
+            Content="_Cd" Height="20" Panel.ZIndex="2"
+            VerticalAlignment="Top" HorizontalAlignment="Left" 
+            Width="40" Margin="0 3 0 0" FontSize="9" />
+    </Grid>
+</UserControl>

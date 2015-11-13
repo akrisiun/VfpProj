@@ -1,29 +1,31 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Interop;
+using System.ComponentModel;
+using IO = System.IO;
 using Vfp;
 
 namespace VfpProj
 {
-    [Guid("c155b373-563f-433f-8fcf-18fd98100004")]
-    [ClassInterface(ClassInterfaceType.AutoDispatch)]
+    [Guid("c155b373-563f-433f-8fcf-18fd98100014")]
+    [ClassInterface(ClassInterfaceType.AutoDual)] // .AutoDispatch)]
     [ProgId("VfpProj.Form")]
     [ComVisible(true)]
-    public class CsForm : _Form
+    public class CsForm : _Form, IComponent, IDisposable
     {
         public MainWindow Form { get; set; }
-
-        public CsForm()
-        {
-            Form = null;
-            Directory = string.Empty;
-        }
-
-        public bool IsDisposed { get { return Form != null; } }
+        public bool CheckAccess() { return Form != null && Form.Dispatcher.CheckAccess(); }
 
         public CsObj Object { get { return FoxCmd.ocs; } }
-
         public _Startup Instance { get { return Startup.Instance; } }
+        public Exception LastError { get; set; }
+
+        public void Dispose() { Form = null; }
+        ISite IComponent.Site { get; set; }
+#pragma warning disable 0067
+        public event EventHandler Disposed;
 
         public VisualFoxpro.FoxApplication App
         {
@@ -33,14 +35,42 @@ namespace VfpProj
                 if (value != null)
                     FoxCmd.SetApp(value);
                 FoxCmd.Attach();
+
+                try
+                {
+                    if (FoxCmd.App.Application != null)
+                    {
+                        var app = FoxCmd.App.Application;
+                        Directory = app.DefaultFilePath;
+                        Caption = Directory;
+                    }
+                }
+                catch (Exception ex) { LastError = ex; }
             }
         }
 
-        public string Directory { get; set; }
+        public CsForm()
+        {
+            Form = null;
+            Directory = string.Empty;
+        }
+
+        public bool IsDisposed { get { return Form == null; } } // || !Form.IsLoaded; } }
+
+        protected string _directory = string.Empty;
+        public string Directory
+        {
+            get { return _directory; }
+            set
+            {
+                _directory = value;
+                if (!string.IsNullOrWhiteSpace(_directory) && IO.Directory.Exists(_directory))
+                    IO.Directory.SetCurrentDirectory(_directory);
+            }
+        }
         public Native.WindowsEvents Events { get { return Form.events; } }
 
         string _Form.Name { get { return "VfpProj._Form.CsForm"; } }
-
         public string Name { get { return "VfpProj.CsForm"; } }
 
         IntPtr? hWnd = null;
@@ -48,7 +78,7 @@ namespace VfpProj
         {
             get
             {
-                if (hWnd == null)
+                if (hWnd == null && Form != null)
                 {
                     var wih = new WindowInteropHelper(Form);
                     hWnd = wih.Handle;
@@ -56,47 +86,31 @@ namespace VfpProj
                 return hWnd ?? IntPtr.Zero;
             }
         }
-        public bool OnTop
-        {
-            get
-            {
-                if (Form != null && Form.Dispatcher.CheckAccess())
-                    return Form.Topmost;
-                if (Form != null)
-                    return Form.Dispatcher.Invoke<bool>(() => { return Form.Topmost; });
-                else return false;
-            }
-            set
-            {
-                if (Form != null && Form.Dispatcher.CheckAccess())
-                    Form.Topmost = value;
-                else if (Form != null)
-                    Form.Dispatcher.Invoke(() => { Form.Topmost = value; });
-            }
-        }
 
         public bool AlwaysOnTop
         {
-            get { return OnTop; }
-            set { OnTop = value; }
+            get { return TopMost; }
+            set { TopMost = value; }
         }
 
         public string Text
         {
             get
             {
-                if (Form != null && Form.Dispatcher.CheckAccess())
-                    return Form.Title;
-                if (Form != null)
-                    return Form.Dispatcher.Invoke<string>(() => { return Form.Title; });
-                else return null;
+                if (!IsDisposed)
+                {
+                    if (Form.Dispatcher.CheckAccess())
+                        return Form.txtFile.GetValue(TextBox.TextProperty) as string;
+                    else
+                        return Form.Dispatcher.Invoke<string>(() =>
+                            Form.txtFile.GetValue(TextBox.TextProperty) as string);
+                }
+                return null;
             }
             set
             {
-                if (Form != null && Form.Dispatcher.CheckAccess())
-                    Form.Title = value;
-                else if (Form != null)
-                    Form.Dispatcher.Invoke(() => { Form.Title = value; });
+                if (!IsDisposed)
+                    SetValueAsync<string>(Form.txtFile, TextBox.TextProperty, value);
             }
         }
 
@@ -113,102 +127,75 @@ namespace VfpProj
 
         }
 
-        public int Width
+        #region AsyncValues
+
+        public static T ValueAsync<T>(FrameworkElement el, DependencyProperty dp, T value)
         {
-            get
-            {
-                if (Form == null) return -1;
-                if (Form.Dispatcher.CheckAccess())
-                    return Convert.ToInt32(Form.Width);
-                return Form.Dispatcher.Invoke<int>(() =>
-                {
-                    return Convert.ToInt32(Form.Width);
-                });
-            }
-            set
-            {
-                if (Form == null) return;
-                if (Form.Dispatcher.CheckAccess())
-                    Form.Width = value;
-                else
-                    Form.Dispatcher.Invoke(() =>
-                    {
-                        Form.Width = value;
-                    });
-            }
-        }
-        public int Height
-        {
-            get
-            {
-                if (Form == null) return -1;
-                if (Form.Dispatcher.CheckAccess())
-                    return Convert.ToInt32(Form.Height);
-                return Form.Dispatcher.Invoke<int>(() =>
-                {
-                    return Convert.ToInt32(Form.Height);
-                });
-            }
-            set
-            {
-                if (Form == null) return;
-                if (Form.Dispatcher.CheckAccess())
-                    Form.Height = value;
-                else
-                    Form.Dispatcher.Invoke(() =>
-                    {
-                        Form.Height = value;
-                    });
-            }
-        }
-        public int Left
-        {
-            get
-            {
-                if (Form == null) return -1;
-                if (Form.Dispatcher.CheckAccess())
-                    return Convert.ToInt32(Form.Left);
-                return Form.Dispatcher.Invoke<int>(() =>
-                {
-                    return Convert.ToInt32(Form.Left);
-                });
-            }
-            set
-            {
-                if (Form == null) return;
-                if (Form.Dispatcher.CheckAccess())
-                    Form.Left = value;
-                else
-                    Form.Dispatcher.Invoke(() =>
-                    {
-                        Form.Left = value;
-                    });
-            }
-        }
-        public int Top
-        {
-            get
-            {
-                if (Form == null) return -1;
-                if (Form.Dispatcher.CheckAccess())
-                    return Convert.ToInt32(Form.Top);
-                return Form.Dispatcher.Invoke<int>(() =>
-                {
-                    return Convert.ToInt32(Form.Top);
-                });
-            }
-            set
-            {
-                if (Form == null) return;
-                if (Form.Dispatcher.CheckAccess())
-                    Form.Top = value;
-                else
-                    Form.Dispatcher.Invoke(() =>
-                    {
-                        Form.Top = value;
-                    });
-            }
+            if (el == null)
+                return value;
+
+            if (el.Dispatcher.CheckAccess())
+                return (T)Convert.ChangeType(el.GetValue(dp), typeof(T));
+
+            return el.Dispatcher.Invoke<T>(() =>
+                   (T)Convert.ChangeType(el.GetValue(dp), typeof(T))
+                );
         }
 
+        public static void SetValueAsync<T>(FrameworkElement el, DependencyProperty dp, T value)
+        {
+            if (el == null)
+                return;
+
+            if (el.Dispatcher.CheckAccess())
+                el.SetValue(dp, value);
+
+            else
+                el.Dispatcher.Invoke(() =>
+                    el.SetValue(dp, value)
+                );
+        }
+
+        #endregion
+
+        #region Form properties
+
+        public Int32 Width
+        {
+            get { return ValueAsync<Int32>(Form, FrameworkElement.WidthProperty, -1); }
+            set { SetValueAsync<Double>(Form, FrameworkElement.WidthProperty, Convert.ToDouble(value)); }
+        }
+
+        public string Caption
+        {
+            get { return ValueAsync<string>(Form, Window.TitleProperty, ""); }
+            set { SetValueAsync<string>(Form, Window.TitleProperty, value); }
+        }
+
+        public Int32 Height
+        {
+            get { return ValueAsync<Int32>(Form, FrameworkElement.HeightProperty, -1); }
+            set { SetValueAsync<Double>(Form, FrameworkElement.HeightProperty, Convert.ToDouble(value)); }
+        }
+
+        public Int32 Left
+        {
+            get { return ValueAsync<Int32>(Form, Window.LeftProperty, -1); }
+            set { SetValueAsync<Double>(Form, Window.LeftProperty, Convert.ToDouble(value)); }
+        }
+
+        public Int32 Top
+        {
+            get { return ValueAsync<Int32>(Form, Window.TopProperty, -1); }
+            set { SetValueAsync<Double>(Form, Window.TopProperty, Convert.ToDouble(value)); }
+        }
+
+        public bool TopMost
+        {
+            get { return ValueAsync<bool>(Form, Window.TopmostProperty, false); }
+            set { SetValueAsync<bool>(Form, Window.TopmostProperty, value); }
+        }
+
+        #endregion
     }
 }

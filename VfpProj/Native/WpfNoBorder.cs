@@ -15,15 +15,10 @@ namespace VfpProj.Native
 {
     public static class WpfNoBorder
     {
-        // System.Windows.Shapes.Rectangle
         public static void Init(Window win, FrameworkElement titleBar,
                 Rectangle topLeft, Rectangle top, Rectangle topRight,
                 Rectangle right, Rectangle bottomRight, Rectangle bottom, Rectangle bottomLeft, Rectangle left)
         {
-
-            // Top = 0; Left = 200;
-            // Visibility = System.Windows.Visibility.Visible;
-
             titleBar.MouseLeftButtonDown += (o, e) => win.DragMove();
 
             new WindowResizer(win,
@@ -35,22 +30,14 @@ namespace VfpProj.Native
                 new WindowBorder(BorderPosition.Bottom, bottom),
                 new WindowBorder(BorderPosition.BottomLeft, bottomLeft),
                 new WindowBorder(BorderPosition.Left, left));
-        
+
         }
     }
-
 
     // http://bogglex.codeplex.com/SourceControl/changeset/view/9106#Boggle.Client/WindowBorder.cs
     public class WindowBorder
     {
-        /// <summary>
-        /// The element which is acting as the border.
-        /// </summary>
         public FrameworkElement Element { get; private set; }
-
-        /// <summary>
-        /// The position of the border.
-        /// </summary>
         public BorderPosition Position { get; private set; }
 
         /// <summary>
@@ -69,7 +56,6 @@ namespace VfpProj.Native
             Element = element;
         }
     }
-
 
     public enum BorderPosition
     {
@@ -101,19 +87,8 @@ namespace VfpProj.Native
             { BorderPosition.TopLeft, Cursors.SizeNWSE }
         };
 
-        /// <summary>
-        /// The borders for the window.
-        /// </summary>
         private readonly WindowBorder[] borders;
-
-        /// <summary>
-        /// The handle to the window.
-        /// </summary>
         private HwndSource hwndSource;
-
-        /// <summary>
-        /// The WPF window.
-        /// </summary>
         private readonly Window window;
 
         /// <summary>
@@ -143,8 +118,9 @@ namespace VfpProj.Native
                 border.Element.MouseLeave += ResetCursor;
             }
 
-            // 
-            window.SourceInitialized += (o, e) => hwndSource = PresentationSource.FromVisual((Visual)o) as HwndSource;
+            window.SourceInitialized +=
+                (o, e) =>
+                    hwndSource = PresentationSource.FromVisual(o as System.Windows.Media.Visual) as HwndSource;
         }
 
         /// <summary>

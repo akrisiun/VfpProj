@@ -43,6 +43,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Prefer32Bit>false</Prefer32Bit>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <LangVersion>5</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -74,6 +75,7 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -97,14 +99,19 @@
     <Compile Include="Fox\CsObj.cs" />
     <Compile Include="Fox\OleInterfaces.cs" />
     <Compile Include="Fox\FoxCmd.cs" />
-    <Compile Include="Native\WindowsEvents.cs" />
-    <Compile Include="Native\WindowsTab.cs" />
+    <Compile Include="Bind\WindowsEvents.cs" />
+    <Compile Include="Bind\WindowsTab.cs" />
     <Compile Include="Startup.cs" />
-    <Page Include="EditPanel.xaml">
+    <Compile Include="Visual\CmdPanel.xaml.cs">
+      <DependentUpon>CmdPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Visual\MainWindow.cs" />
+    <Compile Include="Visual\VfpTabs.cs" />
+    <Page Include="Visual\EditPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="EditWindow.xaml">
+    <Page Include="Visual\EditWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -116,7 +123,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="EditWindow.xaml.cs">
+    <Compile Include="Visual\EditWindow.xaml.cs">
       <DependentUpon>EditWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainWindow.xaml.cs">
@@ -131,6 +138,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Page>
+    <Page Include="Visual\CmdPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>

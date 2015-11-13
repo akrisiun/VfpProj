@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Shell;
 using System.Windows.Threading;
+using System.ComponentModel;
 using VfpEdit;
 using VfpProj;
 using VisualFoxpro;
@@ -15,18 +16,50 @@ using Application = System.Windows.Application;
 
 namespace Vfp
 {
-    public class Startup : _Startup
+    public class Startup : _Startup, IComponent, IDisposable
     {
         static Startup()
         {
             Instance = new Startup();
         }
 
+        public void Dispose()
+        {
+            appCur = null;
+            App = null;
+        }
+
+        ISite IComponent.Site { get; set; }
+#pragma warning disable 0067
+        public event EventHandler Disposed;
+
         public static Startup Instance { get; protected set; }
 
         public static Startup Load() { return Instance; }
 
-        public _Startup LoadMain(FoxApplication app) { Main(app, false); return this; }
+        public _Startup LoadMain(FoxApplication app) { 
+            Main(app, false); 
+            return this; 
+        }
+
+        public CsForm Show(FoxApplication app = null)
+        {
+            CsForm csForm = null;
+            Exception err = null;
+            try
+            {
+                var form = VfpProj.App.Instance.Window;
+                csForm = form.FormObject;
+
+                if (csForm.CheckAccess())
+                    form.events.AfterRendered();
+                else
+                    form.Dispatcher.Invoke(() => form.events.AfterRendered());
+            }
+            catch (Exception ex) { err = ex; } 
+
+            return csForm;
+        }
 
         public FoxApplication App { get; set; }
 
@@ -74,18 +107,18 @@ namespace Vfp
 
         public void WindowLoad(VfpProj.MainWindow mainWnd, FoxApplication app, bool lRun = false)
         {
+            string dir = Environment.CurrentDirectory;
 
-            //if (FoxCmd.Attach())
-            //    FoxCmd.CreateForm(window);
             try
             {
                 mainWnd.Load(app);
-                // mainWnd.Show();
 
                 app.DoCmd("DOEVENTS FORCE");
-                
-                mainWnd.events.AfterRendered();
 
+                dir = app.DefaultFilePath;
+                mainWnd.FormObject.Directory = dir;
+
+                // mainWnd.events.AfterRendered();
                 app.DoCmd("CANCEL");
             }
             catch (Exception) { }
