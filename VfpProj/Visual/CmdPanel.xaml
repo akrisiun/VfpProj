@@ -13,8 +13,8 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="57"/>
             <ColumnDefinition Width="27"/>
-            <ColumnDefinition Width="57"/>
             <ColumnDefinition Width="475*"/>
+            <ColumnDefinition Width="57"/>
             <ColumnDefinition Width="41"/>
         </Grid.ColumnDefinitions>
 
@@ -30,15 +30,13 @@
             Content="_DO" FontSize="10"
             HorizontalAlignment="Stretch" Margin="2 3 0 0" />
 
-        <ComboBox Name="comboCfg" x:FieldModifier="public"
-            Grid.Column="2" />
-
         <StackPanel Orientation="Horizontal"
-                    Name="hostFile" Grid.Column="3" 
-                    Height="20"  Panel.ZIndex="10" Margin="2 3 5 0"
+                    Name="hostFile" Grid.Column="2" 
+                    Height="20"  Panel.ZIndex="100" Margin="2 3 5 0"
                     Background="WhiteSmoke"
                     VerticalAlignment="Top" HorizontalAlignment="Stretch" MinWidth="80">
-            <TextBox x:Name="txtFile" Background="Transparent" Padding="3 2 0 0" BorderThickness="0" Text="loading.." />
+            <TextBox x:Name="txtFile"
+                     Background="Transparent" Padding="3 2 0 0" BorderThickness="0" Text="loading.." />
         </StackPanel>
 
         <!--<WindowsFormsHost 
@@ -48,6 +46,10 @@
                     <wf:TextBox x:Name="txtFile" Text="loading.." Visible="True"/>
                 </WindowsFormsHost>
                 -->
+        <ComboBox Name="comboCfg" x:FieldModifier="public"
+            Padding="5 3 0 0"
+            Grid.Column="3" />
+
         <Button 
             Name="buttonCD" Grid.Column="4"
             Content="_Cd" Height="20" Panel.ZIndex="2"

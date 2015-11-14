@@ -10,16 +10,22 @@ namespace VfpProj
 {
     [Guid("c155b373-563f-433f-8fcf-18fd98100001")]
     [InterfaceType(ComInterfaceType.InterfaceIsIDispatch)]
-    //[ProgId("VfpProj.Events")] 
-    //[InterfaceType(ComInterfaceType.InterfaceIsDual)]
     public interface _Events
     {
         [ComVisible(true), DispId(0x60020000)]
         _Form Form(FoxApplication app);
 
-        [ComVisible(true), DispId(0x60020004)]
-        _Form CmdForm { get; }
+        [ComVisible(true), DispId(0x60020003)]
+        bool IsLockForm { get; set; }
 
+        [ComVisible(true), DispId(0x60020004)]
+        CsObj GetInstance();
+
+        //[ComVisible(true), DispId(0x60020004)]
+        //_Form CmdForm { get; }
+
+        [ComVisible(true), DispId(0x60020030)]
+        _Form Show(FoxApplication app);
 
         [ComVisible(true), DispId(0x60020001)]
         FoxApplication App { get; }
@@ -78,7 +84,7 @@ namespace VfpProj
         FoxApplication App { get; set; }
 
         [ComVisible(true), DispId(0x60030022)]
-        CsObj Object { get; }
+        _Events CsObject { get; }
 
         [ComVisible(true), DispId(0x60030055)]
         _Startup Instance { get; }
@@ -133,9 +139,11 @@ namespace VfpProj
         [ComVisible(true)]
         FoxApplication App { get; set; }
 
-        [DispId(0x60050001)]
+        [DispId(0x60050002)]
         _Startup LoadMain(FoxApplication app);
 
+        [DispId(0x60050003)]
+        _Form Show(FoxApplication app);
     }
 
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,32 +29,61 @@ namespace VfpProj
         public void InitValues()
         {
             buttonCD = this.cmdPanel.buttonCD;
-            buttonCD = this.cmdPanel.buttonModi;
-            txtFile = this.cmdPanel.txtFile;
+            buttonModi = this.cmdPanel.buttonModi;
             buttonDO = this.cmdPanel.buttonDO;
+            txtFile = this.cmdPanel.txtFile;
             comboCfg = this.cmdPanel.comboCfg;
 
             var list = new List<string>();
-            list.Add("SA");
-            list.Add("TS");
-            list.Add("LV");
-            list.Add("EE");
+            var cfFile = System.AppDomain.CurrentDomain.BaseDirectory + @"cmd.cfg";
+            string[] commands = null;
+            if (File.Exists(cfFile))
+            {
+                commands = File.ReadAllLines(cfFile);
+                if (commands.Length > 0)
+                    foreach (string line in commands)
+                        list.Add(line);
+            }
+
+            if (list.Count == 0)
+                list.Add("CLEAR ALL;CANCEL");
+
             comboCfg.ItemsSource = list;
+            comboCfg.SelectionChanged += ComboCfg_SelectionChanged;
+
+            IsRendered = false;
+            this.ContentRendered += MainWindow_ContentRendered;
         }
 
+        private void ComboCfg_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count == 0)
+                return;
+
+            //  var comboCfg = sender as ComboBox;
+            txtFile.Text = e.AddedItems[0] as string;
+        }
+
+        public void ReLoad()
+        {
+            if (txtFile == null)
+                InitValues();
+            if (events == null)
+                Load(FoxCmd.App);
+        }
 
         public void Load(VisualFoxpro.FoxApplication app = null)
         {
-            FormObject = new CsForm();
-            FormObject.Form = this;
+            FormObject = FormObject ?? new CsForm();
             FoxCmd.SetFormObj(FormObject);
+            FoxCmd.FormObj.SetForm(this);
 
             events = new Native.WindowsEvents(this);
 
             if (app != null)
                 FoxCmd.SetApp(app);
             if (FoxCmd.Attach())
-                FoxCmd.CreateForm(this);
+                FoxCmd.AssignForm(this);
 
             var window = this; // NoBorder init
             Native.WpfNoBorder.Init(window, window.titleBar, window.topLeft, window.top, window.topRight,
@@ -70,8 +100,11 @@ namespace VfpProj
             Closing += MainWindow_Closing;
         }
 
+        public bool IsRendered { get; protected set; }
+
         void MainWindow_ContentRendered(object sender, EventArgs e)
         {
+            IsRendered = true;
             // this.border.Effect = new DropShadowEffect();
             /*
             {
@@ -88,22 +121,27 @@ namespace VfpProj
 
         protected override void OnStateChanged(EventArgs e)
         {
-
             // bdrRoot.Padding = WindowState == WindowState.Maximized ? MainBorderMaximizedPadding : MainBorderNormalPadding;
         }
 
 
         ~MainWindow()
         {
-            FoxCmd.Dispose();
+            if (this.FormObject != null)
+            {
+                this.FormObject.SetForm(null);
+                this.FormObject = null;
+            }
+            // FoxCmd.Dispose();
         }
 
         void MainWindow_Closing(object sender, CancelEventArgs e)
         {
             if (!FoxCmd.QueryUnload())
-                e.Cancel = true;
-
-            App.Current.Shutdown();
+            {    // e.Cancel = true;
+                return;
+            }
+            CsApp.Current.Shutdown();
         }
 
 

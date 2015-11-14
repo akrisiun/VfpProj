@@ -49,34 +49,21 @@ FUNCTION Clr(toForm as Form)
     nDispHandle = ClrCreateInstanceFrom("VfpProj.exe",;
                   "Vfp.Startup",;
                    @lcMessage, 100) 
-                  
     * // "The given assembly name or codebase was invalid. o d e b a s e ,   ' % 1 ' ,   w a s   i n v a l i d  "
-    * "The assembly is built by a runtime newer than the currently loaded runtime, and cannot be loaded. 
-    
-    * ? nDispHandle 
-    * ? lcMessage 
-
-   ASSERT .f. 
 
     public goVfp
     goVfp = SYS(3096, nDispHandle)
-    * goVfp.Main(_VFP, .F.)
-
     _VFP.AutoYield = .F.
     DOEVENTS FORCE 
 
     goVfp.LoadMain(_VFP)
     
-    
     _VFP.AutoYield = .F.
     _SCREEN.AddProperty("ocs_inst", m.ocs_form.instance)
     
     DOEVENTS FORCE   
-    _VFP.Eval("_SCREEN.ocs_inst.LoadMain(_VFP)")
+    _VFP.Eval("_SCREEN.ocs_inst.Show(_VFP)")
     RETURN
-* Assembly.GetEntryAssembly null
-*          entryLocation = new Uri(Application.ResourceAssembly.CodeBase);
-* DO ClrHost in main
 
 FUNCTION  StartupInstance
 * DO StartupInstance in Main 
@@ -92,3 +79,27 @@ FUNCTION  StartupInstance
   
   _SCREEN.ocs_inst.LoadMain(_VFP)
   return
+
+
+FUNCTION OCS_Form
+
+    IF TYPE("_SCREEN.ocs_form.Name") # "C"
+       DO Clr
+       
+       _VFP.AutoYield = .F.
+       DOEVENTS FORCE 
+
+       IF TYPE([goVfp]) != 'U' AND !ISNULL(goVfp)
+          goVfp.LoadMain(_VFP)
+          _VFP.Eval("_SCREEN.ocs_inst.Show(_VFP)")          
+       ENDIF
+    ENDIF
+
+    IF (_VFP.Projects.Count > 0)
+        CD (_VFP.ActiveProject.HomeDir)
+    ENDIF
+    _VFP.DefaultFilePath = FULLPATH(CURDIR())
+    IF TYPE([_SCREEN.ocs_form.Directory]) = 'C'
+        _SCREEN.ocs_form.Directory = _VFP.DefaultFilePath
+        _SCREEN.ocs_form.Text = _VFP.DefaultFilePath
+    ENDIF

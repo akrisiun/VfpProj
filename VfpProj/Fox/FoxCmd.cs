@@ -12,21 +12,51 @@ namespace VfpProj
     public static class FoxCmd
     {
         public static FoxApplication App { get; private set; }
+        public static bool IsAlive(this FoxApplication app)
+        {
+            if (app == null && App == null)
+                return false;
+            app = app ?? App;
+            IntPtr hWnd = IntPtr.Zero;
+            try { hWnd = (IntPtr)app.hWnd; }
+            catch (Exception) { App = null; }
+            return hWnd != IntPtr.Zero;
+        }
+
         public static CsForm FormObj { get; private set; }
-        public static void SetApp(FoxApplication app) { App = app; }
+        public static void SetApp(FoxApplication app)
+        {
+            App = app;
+            if (app == null)
+                return;
+            CsApp.Ref();
+
+            var form = CsApp.Instance.Window;
+            if (form != null)
+            {
+                var obj = form.FormObject ?? FormObj;
+                FoxCmd.SetFormObj(obj);
+                form.FormObject = obj;
+            }
+
+            var ocs = new CsObj();
+            App.DoCmd("PUBLIC m.ocs as VfpProj.CsObj");
+            App.SetVar("ocs", CsObj.Instance);
+        }
+
         public static void SetFormObj(CsForm obj) { FormObj = obj; }
 
-        static string[] initCmd = new[] { 
+        static string[] initCmd = new[] {
                     "_SCREEN.WindowState = 2",
                     "HIDE WINDOW Standard",
-                    "ACTIVATE WINDOW Command", 
+                    "ACTIVATE WINDOW Command",
                     "MOVE WINDOW 'Command' TO 4,1",
                     "SIZE WINDOW 'Command' TO 50, 50",
                     "SET",
-                    "MOVE WINDOW 'View' TO 40, 210" 
+                    "MOVE WINDOW 'View' TO 40, 210"
                 };
 
-        public static CsObj ocs;
+        public static CsObj ocs { get { return CsObj.Instance; } }
 
         public static IntPtr hWnd;
         public static string cfg_startDir;
@@ -46,23 +76,42 @@ namespace VfpProj
             }
 
             App = null;
-            ocs = null;
+            if (CsObj.Instance == null)
+                new CsObj();
             hWnd = IntPtr.Zero;
-            FormObj = null;
+            FormObj = new CsForm();
         }
 
         public static void Dispose()
         {
-            hWnd = IntPtr.Zero;
-            ocs = null;
+            if (CsObj.Instance != null)
+                CsObj.Instance.Dispose();
             FormObj = null;
             App = null;
         }
 
+        public static void TryDoCmd(string cmd)
+        {
+            string[] cmdList = new string[] { cmd };
+            if (cmd.Contains(";"))
+                cmdList = cmd.Split(new char[] { ';' });
+
+            try
+            {
+                foreach (string cmdItem in cmdList)
+                {
+                    App.DoCmd(cmdItem);
+                }
+            }
+            catch (Exception ex)
+            {
+                VfpProj.CsApp.Application_ThreadException(null, new ThreadExceptionEventArgs(ex));
+            }
+        }
 
         public static void AppCmd(string cmd)
         {
-            if (FormObj == null)
+            if (FormObj == null || ocs == null)
                 return;
             string dir = string.Empty;
             Trace.WriteLine("cmd:" + cmd);
@@ -71,12 +120,15 @@ namespace VfpProj
                 cmdList = cmd.Split(new char[] { ';' });
 
             dynamic ocs_form = null;
+            bool isBound = FormObj.IsBound();
             try
             {
                 foreach (string cmdItem in cmdList)
                 {
-                    FormObj.Text = cmdItem;
-                    App.DoCmd(cmdItem);
+                    var cmdTrim = cmdItem.Trim(new[] { ' ', '\n', '\r', '\t' });
+                    if (isBound)
+                        FormObj.SetText(cmdTrim);
+                    App.DoCmd(cmdTrim);
                 }
                 dir = App.DefaultFilePath;
 
@@ -92,16 +144,19 @@ namespace VfpProj
             }
             catch (Exception ex)
             {
-                VfpProj.App.Application_ThreadException(null, new ThreadExceptionEventArgs(ex));
+                VfpProj.CsApp.Application_ThreadException(null, new ThreadExceptionEventArgs(ex));
             }
 
             // An outgoing call cannot be made as the application is despatching an input-synchronous call.
             // (Exception from HRESULT: 0x8001010D (RPC_E_CANTCALLOUT_ININPUTSYNCCALL))
-            if (string.IsNullOrEmpty(dir))
+            if (string.IsNullOrEmpty(dir) || !isBound)
                 return;
 
-            FoxCmd.FormObj.Text = dir;
-            FoxCmd.FormObj.Events.directory = dir;
+            if (FoxCmd.FormObj.Events != null)
+            {
+                FoxCmd.FormObj.SetText(dir);
+                FoxCmd.FormObj.Events.directory = dir;
+            }
         }
 
         public static bool ShowApp()
@@ -119,21 +174,24 @@ namespace VfpProj
                 }
                 return true;
             }
-            catch (Exception ex1)
+            catch (Exception ex)
             {
                 // RPC server is not available
-                msg = ex1.Message;
+                msg = ex.Message;
                 Trace.Write(msg);
             }
 
             return false;
         }
 
-        public static bool Attach()
+        public static bool Attach(bool secondTime = false)
         {
+            if (secondTime)
+                CsObj.Instance.IsLockForm = true;
+
             try
             {
-                if (App == null &&  !VfpProj.App.Instance.Window.IsStart)
+                if (App == null && !VfpProj.CsApp.Instance.Window.IsStart)
                 {
                     if (Vfp.Startup.Instance.App != null)
                         App = Vfp.Startup.Instance.App;
@@ -142,13 +200,21 @@ namespace VfpProj
                         App = new VisualFoxpro.FoxApplication();
 
                     Vfp.Startup.Instance.App = App;
+                    App.SetVar("ocs", CsObj.Instance);
                 }
+                else
+                    secondTime = false;
 
                 if (App != null)
                 {
                     App.AutoYield = true;
                     hWnd = (IntPtr)App.hWnd;
                     SetHWnd();
+                }
+
+                if (secondTime)
+                {
+                    FoxCmd.StartCmd();
                 }
             }
             finally
@@ -159,6 +225,7 @@ namespace VfpProj
                 }
             }
 
+            CsObj.Instance.IsLockForm = false;
             return App != null;
         }
 
@@ -185,14 +252,13 @@ namespace VfpProj
             // nativeWindow = GetWindowFromHost((int)hWnd);
         }
 
-
-        public static bool CreateForm(MainWindow form)
+        public static bool AssignForm(MainWindow form, bool reload = false)
         {
-            var ocs = new CsObj();
-            App.SetVar("ocs", ocs);
+            if (ocs == null)
+                return false;
             if (FoxCmd.FormObj != null)
             {
-                AppCmd("PUBLIC m.ocs as VfpProj.CsObj");
+                TryDoCmd("PUBLIC m.ocs as VfpProj.CsObj");
                 App.SetVar("ocs", ocs);
             }
 
@@ -208,41 +274,64 @@ namespace VfpProj
                 else
                 {
                     FoxCmd.SetFormObj(new CsForm());
-                    FoxCmd.FormObj.Form = form;
+                    FoxCmd.FormObj.SetForm(form);
                 }
             }
 
             if (FoxCmd.FormObj == null)
                 return false;
-            if (FoxCmd.FormObj.Form == null)
-                FoxCmd.FormObj.Form = new MainWindow();
 
-            SetVar();
+            if (FoxCmd.FormObj.Form == null)
+            {
+                if (form != null)
+                    FoxCmd.FormObj.SetForm(form);
+            }
+
+            StartCmd();
 
             if (!App.Visible)
                 App.Visible = true;
 
-            // hWnd = nativeWindow.Handle;
+            if (reload)
+            {
+                //FoxCmd.FormObj.Form.ReLoad();
+            }
+
             return ShowForm(FoxCmd.FormObj.Form);
+        }
+
+        public static void NewForm()
+        {
+            FoxCmd.FormObj.SetForm(new MainWindow());
+            var form = FoxCmd.FormObj.Form;
+
+            StartCmd();
+            ShowForm(form);
         }
 
         public static void SetVar()
         {
             dynamic ocs_form = null;
-            ocs_form = App.Eval("IIF(TYPE(\"_SCREEN.ocs_form.text\") != 'C', 0, _SCREEN.ocs_form)");
+            ocs_form = App.Eval("IIF(TYPE(\"_SCREEN.ocs_form.Directory\") != 'C', 0, _SCREEN.ocs_form)");
 
             if (ocs_form != null && ocs_form is _Form && FoxCmd.FormObj.Equals(ocs_form))
                 return;
 
-            AppCmd("PUBLIC m.ocs_form as VfpProj.Form");
+            TryDoCmd("PUBLIC m.ocs as VfpProj.CsObj");
+            App.SetVar("ocs", CsObj.Instance);
 
             // non COM visible class 'System.Windows.Window', the QueryInterface call will fail.
-            // This is done to prevent 
-            // the non COM visible base class from being constrained by the COM versioning rules.
-
+            TryDoCmd("PUBLIC m.ocs_form as VfpProj.Form");
             App.SetVar("ocs_form", FoxCmd.FormObj);
-            AppCmd("_SCREEN.AddProperty(\"ocs_form\", .null.)");
-            AppCmd("_SCREEN.Visible = .T.");
+            TryDoCmd("_SCREEN.AddProperty(\"ocs_form\", .null.)");
+        }
+
+        public static void StartCmd()
+        {
+            SetVar();
+            AppCmd(@"SET;
+                    _SCREEN.Visible = .T.;
+                    ACTIVATE WINDOW Command");
         }
 
         public static bool ShowForm(MainWindow form)
@@ -253,38 +342,55 @@ namespace VfpProj
                 return false;
             }
 
-            if (!form.IsVisible)
+            if (form.Dispatcher.CheckAccess())
             {
-                form.ShowActivated = false;
-                form.Show();
+                if (!form.IsVisible)
+                {
+                    form.ShowActivated = false;
+                    form.Show();
+                }
+                DefPosition(form);
             }
 
-            form.ShowInTaskbar = true;
-            form.Top = -5;
-            form.Left = SystemParameters.PrimaryScreenWidth / 2;
-            form.Topmost = true;
             // GetWindowFromHwnd is a method-wrapped version of your code
             //   static private WindowsFormsHost GetWindowFromHost(int hwnd)
             //   WindowsFormsHost nativeWindow = new WindowsFormsHost();
             //     nativeWindow.AssignHandle(handle);
 
+            FoxCmd.FormObj.SetForm(form);
+
             return true;
+        }
+
+        public static void DefPosition(MainWindow form)
+        {
+            form.ShowInTaskbar = true;
+            form.Top = -5;
+            form.Left = SystemParameters.PrimaryScreenWidth / 2;
+            form.Topmost = true;
         }
 
         public static bool QueryUnload()
         {
+            int hWnd = 0;
             try
             {
                 dynamic isClose = App.Eval("_SCREEN.QueryUnload()");
                 if (isClose is Boolean && !isClose)
                     return false;
 
+                hWnd = App.hWnd;
+                if (!App.Visible)
+                    hWnd = 0;
                 // App.Quit();
             }
             catch (Exception ex)
             {
                 Trace.Write(ex);
             }
+
+            if (hWnd != 0)
+                return false;
 
             SetApp(null);
             SetFormObj(null);

@@ -1,15 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Markup;
-using System.Windows.Navigation;
 using System.Windows.Shell;
 using System.Windows.Forms.Integration;
 using VfpEdit;
@@ -19,54 +11,65 @@ using System.Windows.Media.Imaging;
 namespace VfpProj
 {
     /// <summary>
-    /// Interaction logic for App.xaml
+    /// Interaction logic for CsApp.xaml
     /// </summary>
-    public partial class App : Application
+    public partial class CsApp : Application
     {
-        static App() { } // debugger entry
+        static CsApp() { } // debugger entry
 
-        static App startRef;
-        public static App Instance
+        static CsApp startRef;
+        public static CsApp Instance
         {
             [DebuggerStepThrough]
-            get { return startRef ?? Application.Current as App; }
+            get { return startRef ?? Application.Current as CsApp; }
             set { startRef = value; }
         }
 
         public MainWindow Window { get; set; }
 
-        public static App Ref()
+        public static CsApp Ref()
         {
-            return Instance ?? new App();
+            return Instance ?? new CsApp();
         }
 
-        public App()
+        public static bool StartupMode = false;
+        public CsApp()
         {
             startRef = this;
             // Startup += App_Startup;
-            Startup += App_StartupLoad;
+            if (!StartupMode)
+                Startup += App_StartupLoad2;
         }
 
         public static void Application_ThreadException(object sender, ThreadExceptionEventArgs args)
         {
             var ex = args.Exception;
-            if (App.Instance.Window.FormObject != null)
-                App.Instance.Window.FormObject.LastError = ex;
+            if (CsApp.Instance.Window.FormObject != null)
+                CsApp.Instance.Window.FormObject.LastError = ex;
 
             Trace.Write(ex.Message);
         }
 
         void App_StartupLoad(object sender, StartupEventArgs e)
         {
+            Vfp.Startup.Instance.LoadMain(null);
+        }
+
+        void App_StartupLoad2(object sender, StartupEventArgs e)
+        {
+            Vfp.Startup.Instance.LoadMain(null);
+
             var app = new VisualFoxpro.FoxApplication();
             app.Visible = true;
-            Vfp.Startup.Instance.LoadMain(app);
+            FoxCmd.SetApp(app);
+            FoxCmd.SetVar();
+
             Vfp.Startup.Instance.Show(app);
         }
 
         void App_Startup(object sender, StartupEventArgs e)
         {
-            JumpList jumpList1 = JumpList.GetJumpList(App.Current);
+            JumpList jumpList1 = JumpList.GetJumpList(CsApp.Current);
 
             MainWindow window = new MainWindow();   // NoBorder 
             window.AllowsTransparency = false;
@@ -74,7 +77,7 @@ namespace VfpProj
             window.Show();
 
             if (FoxCmd.Attach())
-                FoxCmd.CreateForm(window);
+                FoxCmd.AssignForm(window);
         }
 
         public EditWindow ShowEditWindow(string file)

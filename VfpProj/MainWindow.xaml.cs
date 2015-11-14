@@ -20,7 +20,7 @@ namespace VfpProj
     {
         public MainWindow()
         {
-            App.Instance.Window = this;
+            CsApp.Instance.Window = this;
             IsStart = false;
 
             if (Dll == null)
@@ -46,7 +46,6 @@ namespace VfpProj
             }
 
             InitValues();
-            // WindowStyle = System.Windows.WindowStyle.None;
         }
 
     }

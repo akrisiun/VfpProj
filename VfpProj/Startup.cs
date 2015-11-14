@@ -13,6 +13,7 @@ using VfpEdit;
 using VfpProj;
 using VisualFoxpro;
 using Application = System.Windows.Application;
+using System.Runtime.InteropServices;
 
 namespace Vfp
 {
@@ -20,6 +21,8 @@ namespace Vfp
     {
         static Startup()
         {
+            if (CsApp.Instance == null)
+                CsApp.StartupMode = true;
             Instance = new Startup();
         }
 
@@ -37,47 +40,64 @@ namespace Vfp
 
         public static Startup Load() { return Instance; }
 
-        public _Startup LoadMain(FoxApplication app) { 
-            Main(app, false); 
-            return this; 
+        [ComVisible(true)]
+        public _Startup LoadMain(FoxApplication app)
+        {
+            Main(app, false);
+            return this;
         }
 
-        public CsForm Show(FoxApplication app = null)
+        [ComVisible(true)]
+        public _Form Show(FoxApplication app)
         {
             CsForm csForm = null;
             Exception err = null;
+            MainWindow form = null;
             try
             {
-                var form = VfpProj.App.Instance.Window;
-                csForm = form.FormObject;
+                CsApp.Ref();
+                FoxCmd.SetApp(app);
+                form = CsApp.Instance.Window ?? new MainWindow();
 
-                if (csForm.CheckAccess())
-                    form.events.AfterRendered();
-                else
-                    form.Dispatcher.Invoke(() => form.events.AfterRendered());
+                if (app != null)
+                {
+                    FoxCmd.SetVar();
+
+                    csForm = form.FormObject ?? new CsForm();
+
+                    if (csForm.CheckAccess())
+                        form.events.AfterRendered();
+                    else if (form.events == null)
+                        form.Dispatcher.Invoke(() => form.ReLoad());
+                    else
+                        form.Dispatcher.Invoke(() => form.events.AfterRendered());
+                }
             }
-            catch (Exception ex) { err = ex; } 
+            catch (Exception ex)
+            {
+                err = ex;
+                if (form != null)
+                    form.Show();
+            }
 
             return csForm;
         }
 
         public FoxApplication App { get; set; }
 
-        protected App appCur;
+        protected CsApp appCur;
 
         [STAThread]
         public void Main(FoxApplication app = null, bool lRun = false)
         {
             this.App = app;
-
-            // System.AppDomain.CurrentDomain.ApplicationIdentity.
             VfpProj.MainWindow.Dll = "/VfpProj";
 
-            appCur = Application.Current as App ?? VfpProj.App.Instance;
+            appCur = Application.Current as CsApp ?? VfpProj.CsApp.Instance;
             try
             {
                 if (appCur == null)
-                    appCur = VfpProj.App.Ref();
+                    appCur = VfpProj.CsApp.Ref();
 
                 appCur.ShutdownMode = ShutdownMode.OnExplicitShutdown;
             }
@@ -90,19 +110,21 @@ namespace Vfp
             else
                 checkAccess = (mainWnd as DispatcherObject).CheckAccess();
 
-            appCur.MainWindow = mainWnd;
             // calling thread must be STA because many UI components
-
+            appCur.MainWindow = mainWnd;
             mainWnd.IsStart = true;
 
-            if (!checkAccess)
-                mainWnd.Dispatcher.Invoke(new Action(() =>
-                    {
-                        WindowLoad(mainWnd, app, lRun);
-                        mainWnd.Visibility = Visibility.Visible;
-                    }));
-            else
-                WindowLoad(mainWnd, app, lRun);
+            if (app != null)
+            {
+                if (!checkAccess)
+                    mainWnd.Dispatcher.Invoke(new Action(() =>
+                        {
+                            WindowLoad(mainWnd, app, lRun);
+                            mainWnd.Visibility = Visibility.Visible;
+                        }));
+                else
+                    WindowLoad(mainWnd, app, lRun);
+            }
         }
 
         public void WindowLoad(VfpProj.MainWindow mainWnd, FoxApplication app, bool lRun = false)

@@ -15,10 +15,12 @@ namespace VfpProj
     [ComVisible(true)]
     public class CsForm : _Form, IComponent, IDisposable
     {
-        public MainWindow Form { get; set; }
-        public bool CheckAccess() { return Form != null && Form.Dispatcher.CheckAccess(); }
+        public MainWindow Form { get; private set; }
+        public void SetForm(MainWindow form) { Form = form; }
+        public bool CheckAccess() { return Form != null && Form.events != null && Form.Dispatcher.CheckAccess(); }
+        public bool IsBound() { return Form != null && Form.events != null && Form.events.IsBound; }
 
-        public CsObj Object { get { return FoxCmd.ocs; } }
+        public _Events CsObject { get { return CsObj.Instance; } }
         public _Startup Instance { get { return Startup.Instance; } }
         public Exception LastError { get; set; }
 
@@ -43,7 +45,16 @@ namespace VfpProj
                         var app = FoxCmd.App.Application;
                         Directory = app.DefaultFilePath;
                         Caption = Directory;
+
+                        FoxCmd.SetVar();
                     }
+
+                    CsApp.Ref();
+                    if (CsApp.Instance.Window == null)
+                    {
+
+                    }
+
                 }
                 catch (Exception ex) { LastError = ex; }
             }
@@ -58,6 +69,8 @@ namespace VfpProj
         public bool IsDisposed { get { return Form == null; } } // || !Form.IsLoaded; } }
 
         protected string _directory = string.Empty;
+        protected string _project = string.Empty;
+
         public string Directory
         {
             get { return _directory; }
@@ -68,7 +81,13 @@ namespace VfpProj
                     IO.Directory.SetCurrentDirectory(_directory);
             }
         }
-        public Native.WindowsEvents Events { get { return Form.events; } }
+
+        public string Project
+        {
+            get { return _project; }
+        }
+
+        public Native.WindowsEvents Events { get { return Form == null ? null : Form.events; } }
 
         string _Form.Name { get { return "VfpProj._Form.CsForm"; } }
         public string Name { get { return "VfpProj.CsForm"; } }
@@ -114,15 +133,31 @@ namespace VfpProj
             }
         }
 
+        public void SetText(string value)
+        {
+            if (!IsDisposed && !string.IsNullOrWhiteSpace(value) && value.Substring(1, 1) == ":")
+                SetValueAsync<string>(Form.txtFile, TextBox.TextProperty, value);
+        }
+
         public bool Visible
         {
             get { return (Form == null) ? false : Form.IsVisible; }
             set
             {
                 if (Form.IsVisible != value && !value)
-                    Form.Hide();
+                {
+                    if (Form.Dispatcher.CheckAccess())
+                        Form.Hide();
+                    else
+                        Form.Dispatcher.Invoke(() => Form.Hide());
+                }
                 else if (Form.IsVisible != value && value)
-                    Form.Show();
+                {
+                    if (Form.Dispatcher.CheckAccess())
+                        Form.Show();
+                    else
+                        Form.Dispatcher.Invoke(() => Form.Show());
+                }
             }
 
         }

@@ -22,3 +22,6 @@ Lib/
 VfpCmd/*.dll
 *.opensdf
 Lib/VfpProj.exe
+
+VfpProj/App.config
+Lib/VfpProj.exe.config

@@ -14,21 +14,24 @@ namespace VfpProj
     [ComVisible(true)]
     public sealed class CsObj : _Events, IComponent, IDisposable
     {
+        static CsObj() { }
+        public static CsObj Instance { get; private set; }
+        public bool IsLockForm { get; set; }
+
         public static int cnt = 0;
         public CsObj()
         {
+            IsLockForm = false;
+            Instance = this;
             cnt++;
         }
-
-        public void Dispose() {}
-        ISite IComponent.Site { get; set; }
-#pragma warning disable 0067
-        public event EventHandler Disposed;
+        public CsObj GetInstance() { return this; }
 
         public _Form CmdForm { get { return FoxCmd.FormObj as _Form; } }
 
         public string Name { get { return "VfpProj.CsObj." + cnt.ToString(); } }
         public FoxApplication App { get { return FoxCmd.App as FoxApplication; } }
+        public CsApp CSApp { get { return CsApp.Instance; } }
 
         public IntPtr hWnd
         {
@@ -44,9 +47,54 @@ namespace VfpProj
         {
             FoxCmd.SetApp(app);
             if (FoxCmd.Attach())
-                FoxCmd.ShowForm(FoxCmd.FormObj.Form);
+            {
+                CsApp.Ref();
+                if (FoxCmd.FormObj.Form != null || CsApp.Instance.Window != null)
+                    FoxCmd.ShowForm(FoxCmd.FormObj.Form ?? CsApp.Instance.Window);
+                else
+                    FoxCmd.NewForm();
+
+                if (!FoxCmd.FormObj.IsBound())
+                    FoxCmd.FormObj.Form.ReLoad();
+            }
 
             return FoxCmd.FormObj;
+        }
+
+        [ComVisible(true)]
+        public _Form Show(FoxApplication app)
+        {
+            var form = FoxCmd.FormObj;
+            try
+            {
+                if (form == null || form.Form == null || !form.IsBound())
+                    form = Form(app) as CsForm;
+
+                var wpfForm = form.Form;
+                CsObj.Instance.IsLockForm = true;
+                if (wpfForm.Dispatcher.CheckAccess())
+                {
+                    wpfForm.Show();
+                    wpfForm.Focus();
+                }
+                else
+                    wpfForm.Dispatcher.Invoke(() =>
+                    {
+                        wpfForm.Show();
+                    });
+
+                var hWnd = (IntPtr)app.hWnd;
+                if (wpfForm.IsRendered && !wpfForm.events.IsBound)
+                {
+                    var ev = wpfForm.events;
+                    ev.AfterRendered();
+                    ev.AfterFocus(hWnd);
+                }
+                CsObj.Instance.IsLockForm = false;
+            }
+            catch (Exception ex) { if (form != null) form.LastError = ex; }
+
+            return form;
         }
 
         public string DoCmd(string cmd)
@@ -141,6 +189,11 @@ namespace VfpProj
         {
             return "SetProperty: Ptr =" + (ptr == IntPtr.Zero ? " 0 " : ptr.ToString());
         }
+
+        public void Dispose() { Instance = null; }
+        ISite IComponent.Site { get; set; }
+#pragma warning disable 0067
+        public event EventHandler Disposed;
 
     }
 

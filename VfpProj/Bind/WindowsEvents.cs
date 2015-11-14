@@ -1,15 +1,12 @@
 ﻿using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using Forms = System.Windows.Forms;
 using VfpEdit;
 using VfpInterop;
@@ -25,7 +22,8 @@ namespace VfpProj.Native
         public MainWindow Form
         {
             [DebuggerStepThrough]
-            get { return form.Form; }
+            get
+            { return form.Form; }
         }
         public OpenFileDialog dlg;
         public string directory;
@@ -34,7 +32,6 @@ namespace VfpProj.Native
         public Collection<NativeWndInfo> listWI;
 
         public EditWindow edit;
-        // public Forms.TextBox txtFile;
         public System.Windows.Controls.TextBox txtFile;
 
         public WindowsEvents(MainWindow form)
@@ -45,7 +42,7 @@ namespace VfpProj.Native
             listWI = new Collection<NativeWndInfo>();
             directory = Directory.GetCurrentDirectory();
             dlg = null;
-            isBound = false;
+            IsBound = false;
         }
 
         void ISupportInitialize.BeginInit() { }
@@ -55,17 +52,16 @@ namespace VfpProj.Native
             Bind();
         }
 
-        bool isBound;
+        public bool IsBound;
         void Bind()
         {
-            if (isBound)
+            var frm = Form;
+            if (IsBound || frm == null || !frm.IsLoaded)
                 return;
 
-            isBound = true;
+            IsBound = true;
             //txtFile = Form.hostFile.Child as Forms.TextBox;
             txtFile = Form.txtFile;
-
-            var frm = Form;
 
             frm.buttonModi.Click += buttonModi_Click;
             frm.buttonModi.MouseDown += buttonModi_MouseClick;
@@ -99,7 +95,12 @@ namespace VfpProj.Native
 
             //NativeAutocomplete.SetFileAutoComplete(textFile);
             textFile.Text = Directory.GetCurrentDirectory() + "\\";
-            FormFocus(Form);
+
+            if (!CsObj.Instance.IsLockForm)
+            {
+                FoxCmd.DefPosition(Form);
+                FormFocus(Form);
+            }
         }
 
         public IntPtr RpcTest()
@@ -119,22 +120,25 @@ namespace VfpProj.Native
         void FormFocus(MainWindow form1)
         {
             string dir = form1.events.directory;
+            if (CsObj.Instance.IsLockForm)
+                return;
+
             var app = FoxCmd.App;
             IntPtr hWnd = IntPtr.Zero;
             hWnd = RpcTest();
 
             try
             {
-                if (hWnd == IntPtr.Zero)
-                {
-                    // FoxCmd.App = null;
-                    if (FoxCmd.Attach())
-                    {
-                        app = FoxCmd.App;
-                        FoxCmd.ShowForm(form1);
-                    }
-                    app.Application.Visible = true;
-                }
+                //if (hWnd == IntPtr.Zero)
+                //{
+                //    // FoxCmd.App = null;
+                //    if (FoxCmd.Attach(true))
+                //    {
+                //        app = FoxCmd.App;
+                //        FoxCmd.ShowForm(form1);
+                //    }
+                //    app.Application.Visible = true;
+                //}
                 if (app != null && app.DefaultFilePath != dir)
                 {
                     dir = app.DefaultFilePath;
@@ -157,7 +161,7 @@ namespace VfpProj.Native
             }
 
             Trace.Write("form Focus");
-            AfterFocus(hWnd);
+            form1.txtFile.GotFocus += (s,e) => AfterFocus(hWnd);
 
             if (form.CheckAccess())
                 form1.txtFile.Focus();
@@ -167,9 +171,12 @@ namespace VfpProj.Native
         {
             if (hWnd == null)
                 hWnd = RpcTest();
-
             if (!hWnd.HasValue)
                 return;
+
+            if (!FoxCmd.App.IsAlive())
+                return;
+            FoxCmd.SetVar();
             WindowsTab.FillList(form, hWnd.Value);
         }
 
@@ -194,7 +201,7 @@ namespace VfpProj.Native
         void buttonModi_MouseClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             if (e.RightButton == System.Windows.Input.MouseButtonState.Pressed)
-                edit = (Application.Current as App).ShowEditWindow(Form.txtFile.Text);
+                edit = (Application.Current as CsApp).ShowEditWindow(Form.txtFile.Text);
         }
 
         void cmdModi_Click(object sender, EventArgs e)
@@ -202,11 +209,12 @@ namespace VfpProj.Native
             if (dlg == null)
                 dlg = new OpenFileDialog();
 
-            // dlg.SupportMultiDottedExtensions = true;
+            //  dlg.SupportMultiDottedExtensions = true;
+
             directory = Directory.GetCurrentDirectory();
             this.file = Form.txtFile.Text;
-            string path = Path.GetDirectoryName(this.file);
-            if (!directory.StartsWith(path))
+            string path = Path.GetFullPath(this.file);
+            if (path != null && !directory.StartsWith(path))
             {
                 try
                 {
@@ -234,8 +242,10 @@ namespace VfpProj.Native
             try
             {
                 if (ext == ".prg")
+                {
                     app.DoCmd("modi comm " + file + " nowait");
-                if (ext == ".pjx")
+                }
+                else if (ext == ".pjx")
                 {
                     path = Path.GetDirectoryName(file);
                     app.DoCmd("modi proj " + file + " nowait");
@@ -254,7 +264,11 @@ namespace VfpProj.Native
 
         void cmdCD_Click(object sender, EventArgs e)
         {
-            directory = Directory.GetCurrentDirectory();
+            try
+            {
+                directory = FoxCmd.App.DefaultFilePath;
+            }
+            catch (Exception) { directory = Directory.GetCurrentDirectory(); }
 
 #if WPF_DLG
             // FileDialog dlg = new Microsoft.Win32.OpenFileDialog();
@@ -271,8 +285,13 @@ namespace VfpProj.Native
                 return;
             Directory.SetCurrentDirectory(dlg.SelectedPath);
 #endif
-
             directory = Directory.GetCurrentDirectory();
+            try
+            {
+                FoxCmd.App.DefaultFilePath = directory;
+                FoxCmd.App.DefaultFilePath = FoxCmd.App.DefaultFilePath;
+            }
+            catch (Exception) { }
 
             Form.txtFile.Text = directory;
         }
@@ -320,11 +339,11 @@ namespace VfpProj.Native
             Trace.Write("form leave");
 
             // HWND WINAPI GetForegroundWindow(void);  User32.dll 
-            if (FoxCmd.hWnd == NativeMethods.GetForegroundWindow())
-            {
-                FoxCmd.SetApp(null); // = null;
-                FoxCmd.SetFormObj(null);
-            }
+            //if (FoxCmd.hWnd == NativeMethods.GetForegroundWindow())
+            //{
+            //    FoxCmd.SetApp(null); // = null;
+            //    FoxCmd.SetFormObj(null);
+            //}
         }
 
         void form1_Enter(object sender, EventArgs e)
@@ -346,7 +365,7 @@ namespace VfpProj.Native
         void txtFile_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
 #endif
-            var textFile = sender as Forms.TextBox;
+            var textFile = sender as TextBox;
             if (e.Key == Key.Enter)
             {
                 string cmd = textFile.Text.Trim();
@@ -356,14 +375,36 @@ namespace VfpProj.Native
 
         public void DoCmd(string cmd)
         {
+            string dir = form.Directory;
             var formCS = form.Form;
+
+            if (!FoxCmd.App.IsAlive())
+            {
+                CsApp.Instance.Window.IsStart = false;
+                Vfp.Startup.Instance.App = null;
+                FoxCmd.Attach(true);
+                if (FoxCmd.App == null)
+                    return;
+
+                FoxCmd.App.Visible = true;
+                FoxCmd.App.DefaultFilePath = dir;
+            }
+
             if (File.Exists(cmd) || Directory.Exists(cmd))
             {
                 if (!File.Exists(cmd))
                 {
                     FoxCmd.AppCmd("CD " + cmd);
-                    form.Events.directory = FoxCmd.App.DefaultFilePath;
-                    Directory.SetCurrentDirectory(form.Events.directory);
+                    dir = FoxCmd.App.DefaultFilePath;
+                    try
+                    {
+                        Directory.SetCurrentDirectory(dir);
+                    }
+                    catch (Exception ex) { form.LastError = ex; dir = Environment.CurrentDirectory; }
+
+                    form.Events.directory = dir;
+                    form.Directory = dir;
+                    form.Caption = dir;
                     return;
                 }
 
@@ -372,18 +413,20 @@ namespace VfpProj.Native
                     FoxCmd.AppCmd("MODI COMM " + cmd + " NOWAIT");
                 else
                     if (ext == ".pjx")
-                        FoxCmd.AppCmd("MODI PROJ " + cmd + " NOWAIT");
+                    FoxCmd.AppCmd("MODI PROJ " + cmd + " NOWAIT");
             }
             else
                 FoxCmd.AppCmd(cmd);
 
             try
             {
-                if (form.Events.directory != FoxCmd.App.DefaultFilePath)
+                dir = FoxCmd.App.DefaultFilePath;
+                if (form.Events.directory != dir)
                 {
-                    if (form.Events.directory != FoxCmd.App.DefaultFilePath)
-                        Directory.SetCurrentDirectory(form.Events.directory);
+                    Directory.SetCurrentDirectory(dir);
                 }
+                form.Directory = dir;
+                form.Caption = dir;
             }
             catch (Exception ex)
             {
@@ -425,10 +468,10 @@ namespace VfpProj.Native
                     cmd = "ACTIVATE WINDOW Project";
                 else
                     if (wi.text.StartsWith("Properties"))
-                        cmd = "ACTIVATE WINDOW Properties";
-                    else
+                    cmd = "ACTIVATE WINDOW Properties";
+                else
                         if (!wi.text.ToLower().Contains("data session"))
-                            cmd = "ACTIVATE WINDOW \"" + wi.text + "\"";
+                    cmd = "ACTIVATE WINDOW \"" + wi.text + "\"";
                 if (cmd.Length > 0)
                     FoxCmd.AppCmd(cmd);
             }
