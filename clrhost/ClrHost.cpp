@@ -5,11 +5,7 @@
 
 #import "mscorlib.tlb" raw_interfaces_only	no_smart_pointers high_property_prefixes("_get","_put","_putref") 
 
-using namespace mscorlib;
-//using namespace System;
-//using namespace System::Security;
-//using namespace System::Security::Policy;
-
+using namespace mscorlib; 
 
 CComPtr<ICorRuntimeHost>	spRuntimeHost = NULL;
 CComPtr<_AppDomain>			spDefAppDomain = NULL;
@@ -18,12 +14,12 @@ CComPtr<_Object>            spDefObject = NULL;
 BSTR ClrVersion = NULL;
 
 //EXPORTS
-//DllMain              @1
-//ClrLoad		       @105
-//ClrUnload			   @106
-//ClrCreateInstance    @108
+//DllMain				  @1
+//ClrLoad				  @105
+//ClrUnload				  @106
 //ClrCreateInstanceFrom   @109
 //SetClrVersion			  @110
+
 DWORD WINAPI SetClrVersion(char *version);
 DWORD WINAPI ClrLoad(char *ErrorMessage, DWORD *dwErrorSize);
 DWORD WINAPI ClrCreateInstance(char *AssemblyName, char *className, char *ErrorMessage, DWORD *dwErrorSize);
@@ -58,10 +54,6 @@ DWORD WINAPI SetError(HRESULT hr, char *ErrorMessage)
 	strcpy_s(ErrorMessage, 1, "");
 	return 0;
 }
-
-// Interop.VisualFoxpro
-// Visual Foxpro 8.0 Type Library
-// {00A19611-D8FC-4A3E-A95F-FEA211444BF7}\8.0\0\tlbimp
 
 /// Starts up the CLR and creates a Default AppDomain
 DWORD WINAPI ClrLoad(char *ErrorMessage, DWORD *dwErrorSize)

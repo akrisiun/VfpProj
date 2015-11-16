@@ -36,6 +36,10 @@ namespace VfpProj
 
             var list = new List<string>();
             var cfFile = System.AppDomain.CurrentDomain.BaseDirectory + @"cmd.cfg";
+            var cfgCmd = System.Configuration.ConfigurationManager.AppSettings["loadcmd"];
+            if (!string.IsNullOrWhiteSpace(cfgCmd) && File.Exists(cfgCmd))
+                cfFile = Path.GetFullPath(cfgCmd);
+
             string[] commands = null;
             if (File.Exists(cfFile))
             {

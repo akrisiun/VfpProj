@@ -25,3 +25,4 @@ Lib/VfpProj.exe
 
 VfpProj/App.config
 Lib/VfpProj.exe.config
+*.cfg
