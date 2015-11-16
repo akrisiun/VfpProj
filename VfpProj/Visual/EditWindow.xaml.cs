@@ -38,7 +38,14 @@ namespace VfpEdit
             Icon = MainWindow.PrgIco; //  BitmapFrame.Create(iconUri);
 
             fileName = string.Empty;
-            InitializeComponent();
+
+            // InitializeComponent();
+            if (!_contentLoaded)
+            {
+                _contentLoaded = true;
+                System.Uri resourceLocater = new System.Uri(MainWindow.Dll + ";component/visual/editwindow.xaml", System.UriKind.Relative);
+                System.Windows.Application.LoadComponent(this, resourceLocater);
+            }
             PostLoad();
         }
 
@@ -62,6 +69,13 @@ namespace VfpEdit
         void buttonOpen_Click(object sender, RoutedEventArgs e)
         {
             string dir = txtPath.Text.Trim();
+            if (File.Exists(dir))
+            {
+                fileName = dir;
+                OpenFile();
+                return;
+            }
+
             if (Directory.Exists(dir))
                 Directory.SetCurrentDirectory(dir);
 

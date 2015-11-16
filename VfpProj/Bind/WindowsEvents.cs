@@ -201,7 +201,10 @@ namespace VfpProj.Native
         void buttonModi_MouseClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             if (e.RightButton == System.Windows.Input.MouseButtonState.Pressed)
-                edit = (Application.Current as CsApp).ShowEditWindow(Form.txtFile.Text);
+            {
+                e.Handled = true;
+                edit = CsApp.Instance.ShowEditWindow(Form.txtFile.Text);
+            }
         }
 
         void cmdModi_Click(object sender, EventArgs e)
