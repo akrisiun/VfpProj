@@ -68,9 +68,9 @@ namespace Vfp
                     if (csForm.CheckAccess())
                         form.events.AfterRendered();
                     else if (form.events == null)
-                        form.Dispatcher.Invoke(() => form.ReLoad());
+                        form.Dispatcher.Invoke(new Action(() => form.ReLoad()));
                     else
-                        form.Dispatcher.Invoke(() => form.events.AfterRendered());
+                        form.Dispatcher.Invoke(new Action(() => form.events.AfterRendered()));
                 }
             }
             catch (Exception ex)

@@ -120,9 +120,11 @@ namespace VfpProj
                 {
                     if (Form.Dispatcher.CheckAccess())
                         return Form.txtFile.GetValue(TextBox.TextProperty) as string;
+#if NET45
                     else
-                        return Form.Dispatcher.Invoke<string>(() =>
-                            Form.txtFile.GetValue(TextBox.TextProperty) as string);
+                        return Form.Dispatcher.Invoke<string>(new Action(() =>
+                            Form.txtFile.GetValue(TextBox.TextProperty) as string));
+#endif
                 }
                 return null;
             }
@@ -149,14 +151,14 @@ namespace VfpProj
                     if (Form.Dispatcher.CheckAccess())
                         Form.Hide();
                     else
-                        Form.Dispatcher.Invoke(() => Form.Hide());
+                        Form.Dispatcher.Invoke(new Action(() => Form.Hide()));
                 }
                 else if (Form.IsVisible != value && value)
                 {
                     if (Form.Dispatcher.CheckAccess())
                         Form.Show();
                     else
-                        Form.Dispatcher.Invoke(() => Form.Show());
+                        Form.Dispatcher.Invoke(new Action(() => Form.Show()));
                 }
             }
 
@@ -172,9 +174,13 @@ namespace VfpProj
             if (el.Dispatcher.CheckAccess())
                 return (T)Convert.ChangeType(el.GetValue(dp), typeof(T));
 
+#if !NET45
+            return default(T);
+#else 
             return el.Dispatcher.Invoke<T>(() =>
                    (T)Convert.ChangeType(el.GetValue(dp), typeof(T))
                 );
+#endif
         }
 
         public static void SetValueAsync<T>(FrameworkElement el, DependencyProperty dp, T value)
@@ -186,9 +192,9 @@ namespace VfpProj
                 el.SetValue(dp, value);
 
             else
-                el.Dispatcher.Invoke(() =>
+                el.Dispatcher.Invoke(new Action(() =>
                     el.SetValue(dp, value)
-                );
+                ));
         }
 
         #endregion

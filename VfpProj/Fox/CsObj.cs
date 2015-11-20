@@ -78,10 +78,10 @@ namespace VfpProj
                     wpfForm.Focus();
                 }
                 else
-                    wpfForm.Dispatcher.Invoke(() =>
+                    wpfForm.Dispatcher.Invoke(new Action(() =>
                     {
                         wpfForm.Show();
-                    });
+                    }));
 
                 var hWnd = (IntPtr)app.hWnd;
                 if (wpfForm.IsRendered && !wpfForm.events.IsBound)
