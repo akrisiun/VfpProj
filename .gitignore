@@ -28,3 +28,5 @@ Lib/VfpProj.exe.config
 *.cfg
 VsIntegration/
 VfpClient/
+SrcFox/
+fll/GdiPlus/vfp2c32/

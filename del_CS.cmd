@@ -4,4 +4,7 @@ del /s *.pdb
 del /s *.vshost.exe.manifest
 del /s *.vshost.exe.config
 del /s *.vshost.exe
+del /s *.bsc 
+del /s *.ilk 
+del /s *.exp 
 @PAUSE
