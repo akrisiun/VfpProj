@@ -56,9 +56,9 @@ namespace Vfp
             try
             {
                 CsApp.Ref();
-                FoxCmd.SetApp(app);
                 form = CsApp.Instance.Window ?? new MainWindow();
 
+                FoxCmd.SetApp(app);
                 if (app != null)
                 {
                     FoxCmd.SetVar();

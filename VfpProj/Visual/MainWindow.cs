@@ -142,10 +142,20 @@ namespace VfpProj
         void MainWindow_Closing(object sender, CancelEventArgs e)
         {
             if (!FoxCmd.QueryUnload())
-            {    // e.Cancel = true;
-                return;
+            {
+                if (FoxCmd.App.hWnd > 0)
+                {
+                    e.Cancel = true;
+                    return;
+                }
             }
-            CsApp.Current.Shutdown();
+
+            if (CsApp.Current != null)
+            {
+                FoxCmd.SetApp(null);
+                FoxCmd.SetFormObj(null);
+                CsApp.Current.Shutdown();
+            }
         }
 
 

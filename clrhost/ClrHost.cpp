@@ -25,6 +25,45 @@ DWORD WINAPI ClrLoad(char *ErrorMessage, DWORD *dwErrorSize);
 DWORD WINAPI ClrCreateInstance(char *AssemblyName, char *className, char *ErrorMessage, DWORD *dwErrorSize);
 DWORD WINAPI ClrCreateInstanceFrom(char *AssemblyFileName, char *className, char *ErrorMessage, DWORD *dwErrorSize);
 
+#define WIN32_LEAN_AND_MEAN
+// #include <windows.h>
+// #include "resource.h"
+
+// http ://stackoverflow.com/questions/8206736/c-sharp-equivalent-of-dllmain-in-c-winapi
+
+DWORD WINAPI launcher(void* h);
+
+extern "C" BOOL APIENTRY DllMain(HMODULE h, DWORD reasonForCall, void* resv)
+{
+	if (reasonForCall == DLL_PROCESS_ATTACH)
+	{
+		CreateThread(0, 0, launcher, h, 0, 0);
+	}
+	return TRUE;
+}
+
+static DWORD WINAPI launcher(void* h)
+{
+	/*
+	HRSRC res = ::FindResourceA(static_cast<HMODULE>(h), MAKEINTRESOURCEA(IDR_DLLENCLOSED), "DLL");
+	if (res)
+	{
+	HGLOBAL dat = ::LoadResource(static_cast<HMODULE>(h), res);
+	if (dat)
+	{
+	unsigned char *dll =
+	static_cast<unsigned char*>(::LockResource(dat));
+	if (dll)
+	{
+	size_t len = SizeofResource(static_cast<HMODULE>(h), res);
+	LaunchDll(dll, len, "MyNamespace.MyClass", "DllMain");
+	}
+	}
+	}
+	*/
+	return 0;
+}
+
 
 DWORD WINAPI SetClrVersion(char *version)
 {
