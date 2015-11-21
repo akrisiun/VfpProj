@@ -10,6 +10,10 @@ IF 1=2
     COPY FILE ..\lib\Clr.pdb TO Clr.pdb
 ENDIF
 
+* cd d:\Beta\VfpProj\Lib\
+* c:\Windows\Microsoft.NET\Framework\v4.0.30319\RegAsm.exe /codebase /tlb ActiveXTest.dll
+* d:\Beta\VfpProj\Lib\ActiveXTest.dll
+
 
 SET PATH TO
 CD ..\Lib

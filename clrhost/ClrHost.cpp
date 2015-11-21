@@ -28,8 +28,7 @@ DWORD WINAPI ClrCreateInstanceFrom(char *AssemblyFileName, char *className, char
 #define WIN32_LEAN_AND_MEAN
 // #include <windows.h>
 // #include "resource.h"
-
-// http ://stackoverflow.com/questions/8206736/c-sharp-equivalent-of-dllmain-in-c-winapi
+// http://stackoverflow.com/questions/8206736/c-sharp-equivalent-of-dllmain-in-c-winapi
 
 DWORD WINAPI launcher(void* h);
 
@@ -251,3 +250,31 @@ DWORD WINAPI ClrCreateInstanceFrom(char *AssemblyFileName, char *className, char
 	return (DWORD)pDisp.p;
 }
 
+
+// initializing_mixed_assemblies.cpp
+// compile with: /clr /LD 
+#pragma once
+#include <stdio.h>
+#include <windows.h>
+struct __declspec(dllexport) A {
+    A() {
+        System::Diagnostics::Trace::WriteLine("Module ctor initializing based on global instance of class.\n");
+    }
+
+    void Test() {
+        printf_s("Test called so linker does not throw away unused object.\n");
+    }
+};
+
+#pragma unmanaged
+// Global instance of object
+A obj;
+
+/*
+extern "C"
+BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved) {
+    // Remove all managed code from here and put it in constructor of A.
+    return true;
+}
+
+*/
