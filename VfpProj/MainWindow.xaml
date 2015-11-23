@@ -30,7 +30,8 @@
                         <ColumnDefinition />
                         <ColumnDefinition Width="22"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Name="titleBar" Margin="2 3 0 0" Background="Silver" 
+                    <TextBlock x:Name="titleBar"  x:FieldModifier="public"
+                               Margin="2 3 0 0" Background="Silver" 
                             VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                             Text="VfpProj"
                             Foreground="White" FontWeight="Bold" FontSize="14" />
@@ -59,14 +60,22 @@
                 </ContentControl>
             </DockPanel>
 
-            <Rectangle Name="topLeft" Fill="Silver" />
-            <Rectangle Name="top" Fill="Silver" Grid.Column="1" />
-            <Rectangle Name="topRight" Fill="Silver" Grid.Column="2" />
-            <Rectangle Name="right" Fill="Silver" Grid.Row="1" Grid.Column="2" />
-            <Rectangle Name="bottomRight" Fill="Silver" Grid.Row="2" Grid.Column="2" />
-            <Rectangle Name="bottom" Fill="Silver" Grid.Row="2" Grid.Column="1" />
-            <Rectangle Name="bottomLeft" Fill="Silver" Grid.Row="2" />
-            <Rectangle Name="left" Fill="Silver" Grid.Row="1" />
+            <Rectangle x:Name="topLeft" x:FieldModifier="public"
+                       Fill="Silver" />
+            <Rectangle x:Name="top" x:FieldModifier="public"
+                       Fill="Silver" Grid.Column="1" />
+            <Rectangle x:Name="topRight" x:FieldModifier="public"
+                       Fill="Silver" Grid.Column="2" />
+            <Rectangle x:Name="right" x:FieldModifier="public"
+                       Fill="Silver" Grid.Row="1" Grid.Column="2" />
+            <Rectangle x:Name="bottomRight" x:FieldModifier="public"
+                       Fill="Silver" Grid.Row="2" Grid.Column="2" />
+            <Rectangle x:Name="bottom" x:FieldModifier="public"
+                       Fill="Silver" Grid.Row="2" Grid.Column="1" />
+            <Rectangle x:Name="bottomLeft" x:FieldModifier="public"
+                       Fill="Silver" Grid.Row="2" />
+            <Rectangle x:Name="left" x:FieldModifier="public"
+                       Fill="Silver" Grid.Row="1" />
         </Grid>
     </Border>
 </Window>

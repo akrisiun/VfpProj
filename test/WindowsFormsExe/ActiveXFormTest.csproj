@@ -80,9 +80,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\ComControl\AcriveXSourceCode\ActiveXTest.csproj">
       <Project>{8fb729db-0c2c-4967-887a-7022b1f0add1}</Project>
       <Name>ActiveXTest</Name>

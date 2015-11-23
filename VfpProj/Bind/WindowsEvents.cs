@@ -98,7 +98,7 @@ namespace VfpProj.Native
 
             if (!CsObj.Instance.IsLockForm)
             {
-                FoxCmd.DefPosition(Form);
+                FoxCmd.DefPositionLoad(Form);
                 FormFocus(Form);
             }
         }

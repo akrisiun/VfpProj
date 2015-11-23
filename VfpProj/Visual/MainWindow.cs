@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -34,13 +35,19 @@ namespace VfpProj
             txtFile = this.cmdPanel.txtFile;
             comboCfg = this.cmdPanel.comboCfg;
 
-            var list = new List<string>();
             var cfFile = System.AppDomain.CurrentDomain.BaseDirectory + @"cmd.cfg";
-            var cfgCmd = System.Configuration.ConfigurationManager.AppSettings["loadcmd"];
+            ReadCfg(cfFile);
+        }
+
+        public void ReadCfg(string cfFile)
+        {
+            var cfgCmd = ConfigurationManager.AppSettings["loadcmd"];
             if (!string.IsNullOrWhiteSpace(cfgCmd) && File.Exists(cfgCmd))
                 cfFile = Path.GetFullPath(cfgCmd);
 
             string[] commands = null;
+            var list = new List<string>();
+
             if (File.Exists(cfFile))
             {
                 commands = File.ReadAllLines(cfFile);
@@ -57,6 +64,29 @@ namespace VfpProj
 
             IsRendered = false;
             this.ContentRendered += MainWindow_ContentRendered;
+
+            FoxCmd.DefPosition(this);
+
+            // <add key="formTop" value="0" />
+            // <add key="formLeft" value="0" />
+            var cfg_formTop = ConfigurationManager.AppSettings["formTop"];
+            var int_formTop  = ToInt(cfg_formTop);
+            if (int_formTop.HasValue)
+                this.SetValue(Window.TopProperty, (double)int_formTop);
+            var cfg_formLeft = ConfigurationManager.AppSettings["formLeft"];
+            var int_formLeft = ToInt(cfg_formLeft);
+            if (int_formLeft.HasValue)
+                this.SetValue(Window.LeftProperty, (double)int_formLeft);
+        }
+        
+        static int? ToInt(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return null;
+            int intValue = 0;
+            if (Int32.TryParse(value, out intValue))
+                return intValue;
+            return null;
         }
 
         private void ComboCfg_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -146,6 +176,7 @@ namespace VfpProj
                 if (FoxCmd.App.hWnd > 0)
                 {
                     e.Cancel = true;
+                    FoxCmd.AppCmd("ON SHUTDOWN; QUIT");
                     return;
                 }
             }

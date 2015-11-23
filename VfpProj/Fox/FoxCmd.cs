@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Windows;
 using System.Windows.Forms.Integration;
@@ -123,6 +124,7 @@ namespace VfpProj
             bool isBound = FormObj.IsBound();
             try
             {
+                var oldDir = App.DefaultFilePath;
                 foreach (string cmdItem in cmdList)
                 {
                     var cmdTrim = cmdItem.Trim(new[] { ' ', '\n', '\r', '\t' });
@@ -131,6 +133,11 @@ namespace VfpProj
                     App.DoCmd(cmdTrim);
                 }
                 dir = App.DefaultFilePath;
+                var caption = App.Caption;
+                if (oldDir != dir 
+                    && !string.IsNullOrWhiteSpace(caption) && caption.Substring(1, 1) == ":"
+                    && Directory.Exists(caption))
+                    App.Caption = dir;
 
                 ocs_form = App.Eval("IIF(TYPE(\"_SCREEN.ocs_form.text\") != 'C', 0, _SCREEN.ocs_form)");
                 if (ocs_form == null || (ocs_form as int?) == null)
@@ -364,10 +371,21 @@ namespace VfpProj
 
         public static void DefPosition(MainWindow form)
         {
-            form.ShowInTaskbar = true;
-            form.Top = -5;
-            form.Left = SystemParameters.PrimaryScreenWidth / 2;
-            form.Topmost = true;
+            var isSet = form.GetValue(Window.TopProperty);
+            if (!Double.NaN.Equals(isSet))
+                return;
+
+            form.SetValue(Window.ShowInTaskbarProperty, true);
+            // form.SetValue(Window.TopProperty, -5);
+            form.SetValue(Window.LeftProperty, SystemParameters.PrimaryScreenWidth / 2);
+            form.SetValue(Window.TopmostProperty, true);
+        }
+
+        public static void DefPositionLoad(MainWindow form)
+        {
+            var isSet = form.GetValue(Window.TopProperty);
+            if (Double.NaN.Equals(isSet))
+                form.Top = -5;
         }
 
         public static bool QueryUnload()
