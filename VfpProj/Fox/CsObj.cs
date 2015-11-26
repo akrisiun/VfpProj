@@ -5,14 +5,20 @@ using System.ComponentModel;
 using System.Text;
 using System.Xml.Linq;
 using VisualFoxpro;
+using Microsoft.Win32;
+using System.Windows;
+using System.Reflection;
+using System.Security.Permissions;
 
 namespace VfpProj
 {
-
-    [Guid("c155b373-563f-433f-8fcf-18fd98100013")]
-    [ClassInterface(ClassInterfaceType.AutoDispatch), ProgId("VfpProj.CsObj")]
+    [ProgId("VfpProj.CsObj"), Guid("c155b373-563f-433f-8fcf-18fd98100013")]
+    [ClassInterface(ClassInterfaceType.AutoDispatch)]
     [ComVisible(true)]
     public sealed class CsObj : _Events, IComponent, IDisposable
+#if DLL
+            , VfpProj.UnsafeNativeMethods.IViewObject
+#endif
     {
         static CsObj() { }
         public static CsObj Instance { get; private set; }
@@ -25,6 +31,7 @@ namespace VfpProj
             Instance = this;
             cnt++;
         }
+
         public CsObj GetInstance() { return this; }
 
         public _Form CmdForm { get { return FoxCmd.FormObj as _Form; } }
@@ -192,8 +199,46 @@ namespace VfpProj
 
         public void Dispose() { Instance = null; }
         ISite IComponent.Site { get; set; }
+
 #pragma warning disable 0067
         public event EventHandler Disposed;
+
+#if DLL
+
+        public int Draw(int dwDrawAspect, int lindex, IntPtr pvAspect, UnsafeNativeMethods.tagDVTARGETDEVICE ptd, 
+            IntPtr hdcTargetDev, IntPtr hdcDraw, UnsafeNativeMethods.COMRECT lprcBounds, 
+            UnsafeNativeMethods.COMRECT lprcWBounds, IntPtr pfnContinue, int dwContinue)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int GetColorSet(int dwDrawAspect, int lindex, IntPtr pvAspect, 
+            UnsafeNativeMethods.tagDVTARGETDEVICE ptd, IntPtr hicTargetDev, UnsafeNativeMethods.tagLOGPALETTE ppColorSet)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int Freeze(int dwDrawAspect, int lindex, IntPtr pvAspect, IntPtr pdwFreeze)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int Unfreeze(int dwFreeze)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetAdvise(int aspects, int advf, System.Runtime.InteropServices.ComTypes.IAdviseSink pAdvSink)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void GetAdvise(int[] paspects, int[] advf, System.Runtime.InteropServices.ComTypes.IAdviseSink[] pAdvSink)
+        {
+            throw new NotImplementedException();
+        }
+#endif
+
 
     }
 

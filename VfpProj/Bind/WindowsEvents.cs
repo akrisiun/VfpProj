@@ -296,7 +296,9 @@ namespace VfpProj.Native
             }
             catch (Exception) { }
 
-            Form.txtFile.Text = directory;
+            var txt = Form.txtFile.Text;
+            if (string.IsNullOrWhiteSpace(txt) || txt[1] == ':')
+                Form.txtFile.Text = directory;
         }
 
         #endregion

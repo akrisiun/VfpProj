@@ -15,20 +15,26 @@ namespace VfpProj
         [ComVisible(true), DispId(0x60020000)]
         _Form Form(FoxApplication app);
 
-        [ComVisible(true), DispId(0x60020003)]
+        [ComVisible(true), DispId(0x60030000)]
+        FoxApplication App { get; }
+
+        [ComVisible(true), DispId(0x60030001)]
+        CsObj GetInstance();
+
+        [ComVisible(true), DispId(0x60020001)]
         bool IsLockForm { get; set; }
 
-        [ComVisible(true), DispId(0x60020004)]
-        CsObj GetInstance();
+        [ComVisible(true), DispId(0x60020002)]
+        IntPtr hWnd { get; set; }
+
+        [ComVisible(true), DispId(0x60020003)]
+        string Name { get; }
 
         //[ComVisible(true), DispId(0x60020004)]
         //_Form CmdForm { get; }
 
         [ComVisible(true), DispId(0x60020030)]
         _Form Show(FoxApplication app);
-
-        [ComVisible(true), DispId(0x60020001)]
-        FoxApplication App { get; }
 
         [ComVisible(true), DispId(0x60020011)]
         string DoCmd(string cmd);
@@ -62,12 +68,6 @@ namespace VfpProj
 
         [ComVisible(true), DispId(0x60020026)]
         string SetProperty(IntPtr ptr, string property);
-
-        [ComVisible(true), DispId(0x60020002)]
-        IntPtr hWnd { get; set; }
-
-        [ComVisible(true), DispId(0x60020003)]
-        string Name { get; }
 
     }
 

@@ -94,7 +94,6 @@ namespace VfpProj
             if (e.AddedItems.Count == 0)
                 return;
 
-            //  var comboCfg = sender as ComboBox;
             txtFile.Text = e.AddedItems[0] as string;
         }
 

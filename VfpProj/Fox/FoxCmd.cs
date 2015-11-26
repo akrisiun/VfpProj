@@ -128,8 +128,6 @@ namespace VfpProj
                 foreach (string cmdItem in cmdList)
                 {
                     var cmdTrim = cmdItem.Trim(new[] { ' ', '\n', '\r', '\t' });
-                    if (isBound)
-                        FormObj.SetText(cmdTrim);
                     App.DoCmd(cmdTrim);
                 }
                 dir = App.DefaultFilePath;
@@ -161,7 +159,8 @@ namespace VfpProj
 
             if (FoxCmd.FormObj.Events != null)
             {
-                FoxCmd.FormObj.SetText(dir);
+                if (!isBound)
+                    FoxCmd.FormObj.SetText(dir);
                 FoxCmd.FormObj.Events.directory = dir;
             }
         }

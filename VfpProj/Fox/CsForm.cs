@@ -6,12 +6,15 @@ using System.Windows.Interop;
 using System.ComponentModel;
 using IO = System.IO;
 using Vfp;
+using System.Text;
+using System.Security.Permissions;
+using Microsoft.Win32;
+using System.Reflection;
 
 namespace VfpProj
 {
-    [Guid("c155b373-563f-433f-8fcf-18fd98100014")]
-    [ClassInterface(ClassInterfaceType.AutoDual)] // .AutoDispatch)]
-    [ProgId("VfpProj.Form")]
+    [ClassInterface(ClassInterfaceType.AutoDual)]
+    [ProgId("VfpProj.Form"), Guid("c155b373-563f-433f-8fcf-18fd98100014")]
     [ComVisible(true)]
     public class CsForm : _Form, IComponent, IDisposable
     {
@@ -235,6 +238,112 @@ namespace VfpProj
         {
             get { return ValueAsync<bool>(Form, Window.TopmostProperty, false); }
             set { SetValueAsync<bool>(Form, Window.TopmostProperty, value); }
+        }
+
+        #endregion
+
+        #region Registry
+
+        ///	<summary>
+        ///	Register the class as a	control	and	set	it's CodeBase entry
+        ///	</summary>
+        ///	<param name="key">The registry key of the control</param>
+        [ComRegisterFunction()]
+        public static void RegisterClass(string key)
+        {
+            StringBuilder sb = new StringBuilder(key);
+            sb.Replace(@"HKEY_CLASSES_ROOT\", "");
+
+            var subkey = sb.ToString();
+            RegistryKey k = null;
+            try
+            {
+                k = Registry.ClassesRoot.OpenSubKey(subkey, true);
+
+                RegistryKey ctrl = k.CreateSubKey("Control");
+                ctrl.Close();
+
+                // Next create the CodeBase entry - needed if	not	string named and GACced.
+                RegistryKey inprocServer32 = k.OpenSubKey("InprocServer32", true);
+                inprocServer32.SetValue("CodeBase", Assembly.GetExecutingAssembly().CodeBase);
+                inprocServer32.Close();
+
+                k.Close();
+                MessageBox.Show("Registered " + subkey);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+
+        public static void RegisterClass2(string key)
+        {
+            StringBuilder sb = new StringBuilder(key);
+
+            sb.Replace(@"HKEY_CLASSES_ROOT\", "");
+            var subkey = sb.ToString();
+            var keyToAssertPermissionFor = key;
+            RegistryKey k = null;
+
+            new RegistryPermission(RegistryPermissionAccess.Read, keyToAssertPermissionFor).Assert(); // BlessedAssert
+            try
+            {
+                k = Registry.ClassesRoot.OpenSubKey(subkey);
+                RegistryPermission.RevertAssert();
+
+                var keyToAssertControl = key + "\\Control";
+                new RegistryPermission(RegistryPermissionAccess.AllAccess, keyToAssertControl).Assert(); // BlessedAssert
+
+                RegistryKey ctrl = k.CreateSubKey("Control");
+                ctrl.Close();
+
+                var keyToAssertInprocServer32 = key + "\\InprocServer32";
+                new RegistryPermission(RegistryPermissionAccess.AllAccess, keyToAssertInprocServer32).Assert(); // BlessedAssert
+
+                // Next create the CodeBase entry	- needed if	not	string named and GACced.
+                RegistryKey inprocServer32 = k.OpenSubKey("InprocServer32", true);
+                inprocServer32.SetValue("CodeBase", Assembly.GetExecutingAssembly().CodeBase);
+                inprocServer32.Close();
+                // Finally close the main	key
+                k.Close();
+
+                MessageBox.Show("Registered");
+
+            }
+            finally
+            {
+                RegistryPermission.RevertAssert();
+            }
+
+        }
+
+        ///	<summary>
+        ///	Called to unregister the control
+        ///	</summary>
+        ///	<param name="key">Tke registry key</param>
+        [ComUnregisterFunction()]
+        public static void UnregisterClass(string key)
+        {
+            StringBuilder sb = new StringBuilder(key);
+            sb.Replace(@"HKEY_CLASSES_ROOT\", "");
+
+            // Open	HKCR\CLSID\{guid} for write	access
+            RegistryKey k = Registry.ClassesRoot.OpenSubKey(sb.ToString(), true);
+
+            // Delete the 'Control'	key, but don't throw an	exception if it	does not exist
+            k.DeleteSubKey("Control", false);
+
+            // Next	open up	InprocServer32
+            //RegistryKey	inprocServer32 = 
+            k.OpenSubKey("InprocServer32", true);
+
+            // And delete the CodeBase key,	again not throwing if missing
+            k.DeleteSubKey("CodeBase", false);
+
+            // Finally close the main key
+            k.Close();
+            MessageBox.Show("UnRegistered");
         }
 
         #endregion
