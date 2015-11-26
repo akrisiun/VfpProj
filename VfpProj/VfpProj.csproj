@@ -155,7 +155,9 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <None Include="App.config.md" />
+    <None Include="App.config.md">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="vfp8.snk" />
     <AppDesigner Include="Properties\" />
   </ItemGroup>
