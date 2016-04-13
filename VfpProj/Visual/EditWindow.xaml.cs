@@ -24,20 +24,20 @@ namespace VfpEdit
     public partial class EditWindow : Window
     {
         const string filter = "code files|*.prg;*.cs;.x*;*.csproj;*.css;*.js;*.aspx|all files|*.*";
-        string fileName;
-        HighlightingManager defManager;
-        FoldingManager foldManager;
-        XmlFoldingStrategy xmlStrategy;
-        
-        BraceFoldingStrategy csStrategy;
-        public Forms.TextBox txtPath;
+        public string FileName { get; set; }
+        public Forms.TextBox txtPath { get; set; }
+
+        internal HighlightingManager defManager;
+        internal FoldingManager foldManager;
+        internal XmlFoldingStrategy xmlStrategy;
+        internal BraceFoldingStrategy csStrategy;
 
         public EditWindow()
         {
             // Uri iconUri = new Uri("pack://application:,,,/PRG.ICO", UriKind.RelativeOrAbsolute);
             Icon = MainWindow.PrgIco; //  BitmapFrame.Create(iconUri);
 
-            fileName = string.Empty;
+            FileName = string.Empty;
 
             // InitializeComponent();
             if (!_contentLoaded)
@@ -60,10 +60,19 @@ namespace VfpEdit
             xmlStrategy = new XmlFoldingStrategy();
             csStrategy = new BraceFoldingStrategy();
             editor.TextArea.IndentationStrategy = new DefaultIndentationStrategy();
-            foldManager = null; // FoldingManager.Install(editor.TextArea);
+            foldManager = null;
 
             defManager = HighlightingManager.Instance;
             editor.SyntaxHighlighting = defManager.GetDefinitionByExtension(".cs");
+
+            TextDrop.Bind(this);
+
+            this.buttonProj.Click += buttonProj_Click;
+        }
+
+        void buttonProj_Click(object sender, RoutedEventArgs e)
+        {
+            this.col3.Width = new GridLength(200.0);
         }
 
         void buttonOpen_Click(object sender, RoutedEventArgs e)
@@ -71,8 +80,8 @@ namespace VfpEdit
             string dir = txtPath.Text.Trim();
             if (File.Exists(dir))
             {
-                fileName = dir;
-                OpenFile();
+                FileName = dir;
+                TextRead.Open(this);
                 return;
             }
 
@@ -91,51 +100,11 @@ namespace VfpEdit
             if (result != true)
                 return;
 
-            fileName = dlg.FileName.Replace(".PRG", ".prg");
-            txtPath.Text = fileName;
-            OpenFile();
-
+            FileName = dlg.FileName.Replace(".PRG", ".prg");
+            txtPath.Text = FileName;
+            TextRead.Open(this);
         }
 
-        public void OpenFile()
-        {
-            string fileName = txtPath.Text;
-            FileInfo f = new FileInfo(fileName);
-            if (!f.Exists)
-                return;
-            Title = Path.GetFileName(fileName) + " " + Path.GetDirectoryName(fileName);
-
-            Directory.SetCurrentDirectory(Path.GetDirectoryName(fileName));
-
-            if (foldManager != null)
-                FoldingManager.Uninstall(foldManager);
-
-            try
-            {
-                using (var stream = FileReader.OpenFile(fileName, Encoding.GetEncoding(1257)))
-                {
-                    editor.Text = stream.ReadToEnd();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("File " + fileName + " error\n" + ex);
-            }
-
-            string ext = Path.GetExtension(fileName);
-            editor.SyntaxHighlighting = defManager.GetDefinitionByExtension(ext);
-            var doc = editor.Document;
-            var area = editor.TextArea;
-            foldManager = FoldingManager.Install(area);
-
-            if (ext.Contains(".x") || ext.Contains(".a") || ext.Contains(".csproj"))
-                xmlStrategy.UpdateFoldings(foldManager, doc);
-            else
-                csStrategy.UpdateFoldings(foldManager, doc);
-
-            // int firstError = -1;
-            // foldManager.UpdateFoldings(this.foldStrategy.CreateNewFoldings(doc, out firstError), firstError);
-        }
     }
 
 }

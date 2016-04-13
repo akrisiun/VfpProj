@@ -22,9 +22,9 @@ namespace VfpProj.Native
         public MainWindow Form
         {
             [DebuggerStepThrough]
-            get
-            { return form.Form; }
+            get { return form.Form; }
         }
+
         public OpenFileDialog dlg;
         public string directory;
         public string file;
@@ -161,7 +161,7 @@ namespace VfpProj.Native
             }
 
             Trace.Write("form Focus");
-            form1.txtFile.GotFocus += (s,e) => AfterFocus(hWnd);
+            form1.txtFile.GotFocus += (s, e) => AfterFocus(hWnd);
 
             if (form.CheckAccess())
                 form1.txtFile.Focus();
@@ -204,6 +204,12 @@ namespace VfpProj.Native
             {
                 e.Handled = true;
                 edit = CsApp.Instance.ShowEditWindow(Form.txtFile.Text);
+                if (edit == null)
+                    return;
+
+                edit.Left = form.Left;
+                if (form.Top < 200)
+                    edit.Top = 80 + form.Top;
             }
         }
 
@@ -418,7 +424,7 @@ namespace VfpProj.Native
                     FoxCmd.AppCmd("MODI COMM " + cmd + " NOWAIT");
                 else
                     if (ext == ".pjx")
-                    FoxCmd.AppCmd("MODI PROJ " + cmd + " NOWAIT");
+                        FoxCmd.AppCmd("MODI PROJ " + cmd + " NOWAIT");
             }
             else
                 FoxCmd.AppCmd(cmd);
@@ -473,10 +479,10 @@ namespace VfpProj.Native
                     cmd = "ACTIVATE WINDOW Project";
                 else
                     if (wi.text.StartsWith("Properties"))
-                    cmd = "ACTIVATE WINDOW Properties";
-                else
+                        cmd = "ACTIVATE WINDOW Properties";
+                    else
                         if (!wi.text.ToLower().Contains("data session"))
-                    cmd = "ACTIVATE WINDOW \"" + wi.text + "\"";
+                            cmd = "ACTIVATE WINDOW \"" + wi.text + "\"";
                 if (cmd.Length > 0)
                     FoxCmd.AppCmd(cmd);
             }

@@ -87,7 +87,7 @@ namespace VfpProj
             if (file.Length > 0)
             {
                 winEdit.txtPath.Text = file;
-                winEdit.OpenFile();
+                TextRead.Open(winEdit);
             }
 
             // Uri iconUri = new Uri("pack://application:,,,/PRG.ico", UriKind.RelativeOrAbsolute);
