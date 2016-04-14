@@ -10,11 +10,19 @@ namespace VfpEdit
         {
             w.editor.Tag = w;
             w.editor.AllowDrop = true;
-            w.editor.PreviewDragOver += (s, e) => EhDragOver(s, e);
-            w.editor.PreviewDrop += (s, e) => EhDrop(s, e);
+            w.editor.PreviewDragOver += DragOver;
+            w.editor.PreviewDrop += Drop;
         }
 
-        static void EhDragOver(object sender, DragEventArgs args)
+        public static DragDropEffects DoDrag(this DependencyObject dragSource, string filePath)
+        {
+            string[] paths = new[] { filePath };
+            var ret = DragDrop.DoDragDrop(dragSource, new DataObject(DataFormats.FileDrop, paths),
+                      DragDropEffects.Copy);
+            return ret;
+        }
+
+        static void DragOver(object sender, DragEventArgs args)
         {
             args.Effects = DragDropEffects.Copy; // IsSingleFile(args) != null ?  : DragDropEffects.None;
 
@@ -22,7 +30,7 @@ namespace VfpEdit
             args.Handled = true;
         }
 
-        static void EhDrop(object sender, DragEventArgs args)
+        static void Drop(object sender, DragEventArgs args)
         {
             args.Handled = true;
 
