@@ -15,7 +15,7 @@
                               Width="440"/>
             <ColumnDefinition />
             <ColumnDefinition x:Name="col3" x:FieldModifier="public"
-                              Width="24" />
+                              Width="1" />
         </Grid.ColumnDefinitions>
 
         <WindowsFormsHost Grid.Column="0" x:Name="hostPath" 

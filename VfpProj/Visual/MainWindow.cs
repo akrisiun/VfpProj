@@ -19,17 +19,23 @@ namespace VfpProj
         public bool IsStart;
 
         public static BitmapFrame PrgIco;
+        // public static BitmapFrame PrjIco; // TODO
+
         public static string Dll { get; set; }
 
         public Button buttonCD { get; set; }
+        public Button buttonPrj { get; set; }
+
         public Button buttonModi { get; set; }
         public Button buttonDO { get; set; }
+
         public ComboBox comboCfg { get; set; }
         public TextBox txtFile { get; set; }
 
         public void InitValues()
         {
             buttonCD = this.cmdPanel.buttonCD;
+            buttonPrj = this.cmdPanel.buttonPrj;
             buttonModi = this.cmdPanel.buttonModi;
             buttonDO = this.cmdPanel.buttonDO;
             txtFile = this.cmdPanel.txtFile;

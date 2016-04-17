@@ -32,6 +32,8 @@ namespace VfpEdit
         internal XmlFoldingStrategy xmlStrategy;
         internal BraceFoldingStrategy csStrategy;
 
+        internal TreeView treeObj;
+
         public EditWindow()
         {
             // Uri iconUri = new Uri("pack://application:,,,/PRG.ICO", UriKind.RelativeOrAbsolute);
@@ -46,6 +48,7 @@ namespace VfpEdit
                 System.Uri resourceLocater = new System.Uri(MainWindow.Dll + ";component/visual/editwindow.xaml", System.UriKind.Relative);
                 System.Windows.Application.LoadComponent(this, resourceLocater);
             }
+            this.treeObj = tree;
             PostLoad();
         }
 

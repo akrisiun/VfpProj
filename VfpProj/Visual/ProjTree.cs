@@ -17,14 +17,13 @@ namespace VfpEdit
 
     public static class ProjTree
     {
-        public static void Load(EditWindow w, VisualFoxpro.IFoxProject proj, string file)
+        public static void Load(Window w, TreeView tree, VisualFoxpro.IFoxProject proj, string file)
         {
             if (proj == null)
                 return;
 
             string main = null;
             IList<ProjItem> list = null;
-            TreeView tree = w.tree;
             try
             {
                 main = proj.MainFile;

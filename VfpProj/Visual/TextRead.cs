@@ -8,58 +8,52 @@ using VfpProj;
 
 namespace VfpEdit
 {
+    public struct VfpFileInfo
+    {
+        public VisualFoxpro.IFoxProject vfpProj;
+        public FileInfo f;
+
+        public bool Success { get { return f != null && f.Exists && vfpProj != null; } } 
+        public string Ext {get {return f == null ? null : Path.GetExtension(f.Name).ToLower(); }}
+
+        public override string ToString()
+        {
+            return f.Name;
+        }
+    }
+
     public static class TextRead
     {
         public static void Open(this EditWindow w)
         { 
             string fileName = w.txtPath.Text;
-
-            VisualFoxpro.IFoxProject vfpProj = null;
-            FileInfo f = null;
+            var info = new VfpFileInfo();
             var editor = w.editor;
-            var foldManager = w.foldManager;
-            try
-            {
-                vfpProj = FoxCmd.App.ActiveProject;
-            }
-            catch { }
-            try
-            {
-                f = new FileInfo(fileName);
-                if (!f.Exists && vfpProj == null)
-                    return;
-            }
-            catch { }
 
-            string ext = "";
+            ReadVfpInfo(ref info, ref fileName, Open: (FileName) => 
+                {
+                    w.Title = Path.GetFileName(FileName) + " " + Path.GetDirectoryName(FileName);
+                    using (var stream = FileReader.OpenFile(FileName, Encoding.GetEncoding(1257)))
+                    {
+                        editor.Text = stream.ReadToEnd();
+                    }
+                }
+            );
+
+            if (!info.Success)
+                return; 
+
+            var foldManager = w.foldManager;
             if (foldManager != null)
                 FoldingManager.Uninstall(foldManager);
 
-            try
-            {
-                fileName = fileName ?? vfpProj.Name;
-                w.Title = Path.GetFileName(fileName) + " " + Path.GetDirectoryName(fileName);
-
-                Directory.SetCurrentDirectory(Path.GetDirectoryName(fileName));
-                ext = Path.GetExtension(fileName).ToUpperInvariant();
-                
-                using (var stream = FileReader.OpenFile(fileName, Encoding.GetEncoding(1257)))
-                {
-                    editor.Text = stream.ReadToEnd();
-                }
-            }
-            catch (Exception ex)
-            {
-                if (ext.Length > 0 && ext != ".PJX")
-                   MessageBox.Show("File " + fileName + " error\n" + ex);
-            }
-
+            var ext = info.Ext;
             if (ext == ".PJX" || ext.Length == 0 || fileName == null)
             {
-                if (vfpProj != null)
+                if (info.vfpProj != null)
                 {
-                    string projName = vfpProj.Name;
-                    ProjTree.Load(w, vfpProj, projName);
+                    string projName = info.vfpProj.Name;
+                    ProjTree.Load(w, w.tree, info.vfpProj, projName);
                 }
                 if (editor.Text.Length == 0)
                    return;
@@ -80,6 +74,43 @@ namespace VfpEdit
 
             // int firstError = -1;
             // foldManager.UpdateFoldings(this.foldStrategy.CreateNewFoldings(doc, out firstError), firstError);
+        }
+
+        public static void ReadVfpInfo(ref VfpFileInfo info, ref string fileName, Action<String> Open)
+        {
+            VisualFoxpro.IFoxProject vfpProj = null;
+            FileInfo f = null;
+
+            try
+            {
+                vfpProj = FoxCmd.App.ActiveProject;
+            }
+            catch { }
+            try
+            {
+                f = new FileInfo(fileName);
+                if (!f.Exists && vfpProj == null)
+                    return;
+            }
+            catch { }
+
+            string ext = "";
+
+            try
+            {
+                fileName = fileName ?? vfpProj.Name;
+
+                Directory.SetCurrentDirectory(Path.GetDirectoryName(fileName));
+                ext = Path.GetExtension(fileName).ToUpperInvariant();
+
+                Open(fileName);
+
+            }
+            catch (Exception ex)
+            {
+                if (ext.Length > 0 && ext != ".PJX")
+                    MessageBox.Show("File " + fileName + " error\n" + ex);
+            }
         }
     }
 }

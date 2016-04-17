@@ -25,6 +25,13 @@ namespace VfpProj.Native
             get { return form.Form; }
         }
 
+        public PrjWindow FormPrj
+        {
+            [DebuggerStepThrough]
+            get;
+            protected set;
+        }
+
         public OpenFileDialog dlg;
         public string directory;
         public string file;
@@ -34,10 +41,12 @@ namespace VfpProj.Native
         public EditWindow edit;
         public System.Windows.Controls.TextBox txtFile;
 
+        #region Init, Bind
         public WindowsEvents(MainWindow form)
         {
             this.form = form.FormObject;
             edit = null;
+            FormPrj = null;
 
             listWI = new Collection<NativeWndInfo>();
             directory = Directory.GetCurrentDirectory();
@@ -66,6 +75,7 @@ namespace VfpProj.Native
             frm.buttonModi.Click += buttonModi_Click;
             frm.buttonModi.MouseDown += buttonModi_MouseClick;
             frm.buttonCD.Click += cmdCD_Click;
+            frm.buttonPrj.Click += cmdPrj_Click;
 
             frm.Activated += form1_Enter;
             frm.MouseEnter += form1_MouseEnter;
@@ -81,6 +91,7 @@ namespace VfpProj.Native
 #endif
             frm.buttonDO.Click += (s, e) => DoCmd(form.Text);
         }
+        #endregion
 
         #region Render, Focus
 
@@ -307,6 +318,18 @@ namespace VfpProj.Native
                 Form.txtFile.Text = directory;
         }
 
+        void cmdPrj_Click(object sender, EventArgs e)
+        {
+            if (FormPrj == null || !FormPrj.IsLoaded)
+            {
+                FormPrj = null; // clear
+                FormPrj = new PrjWindow();
+                FormPrj.ShowInTaskbar = false;
+                FormPrj.Topmost = true;
+            }
+            FormPrj.Show();
+        }
+
         #endregion
 
         #region Focus Events
@@ -365,6 +388,7 @@ namespace VfpProj.Native
 
         #endregion
 
+        #region KeyDown
 #if NOWPF_TEXTBOX
         void txtFile_KeyDown(object sender, Forms.KeyEventArgs e)
         {
@@ -384,6 +408,8 @@ namespace VfpProj.Native
             }
         }
 
+        #endregion
+        
         public void DoCmd(string cmd)
         {
             string dir = form.Directory;
