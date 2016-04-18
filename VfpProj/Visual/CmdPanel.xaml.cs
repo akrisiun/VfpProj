@@ -23,6 +23,22 @@ namespace VfpProj.Visual
         public CmdPanel()
         {
             InitializeComponent();
+
+            // {"'The invocation of the constructor on type 'System.Windows.Controls.TextBox' 
+            // that matches the specified binding constraints threw an exception.' Line number '39' and line position '14'."}
+        }
+
+        public override void BeginInit()
+        {
+            // const uint InitPending = 0x00010000;
+            WriteInternalFlag(InternalFlags.InitPending, false);
+
+            base.BeginInit();
+        }
+
+        public override void EndInit()
+        {
+            base.EndInit();
         }
     }
 }

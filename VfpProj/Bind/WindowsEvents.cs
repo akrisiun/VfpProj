@@ -140,16 +140,6 @@ namespace VfpProj.Native
 
             try
             {
-                //if (hWnd == IntPtr.Zero)
-                //{
-                //    // FoxCmd.App = null;
-                //    if (FoxCmd.Attach(true))
-                //    {
-                //        app = FoxCmd.App;
-                //        FoxCmd.ShowForm(form1);
-                //    }
-                //    app.Application.Visible = true;
-                //}
                 if (app != null && app.DefaultFilePath != dir)
                 {
                     dir = app.DefaultFilePath;
@@ -172,10 +162,12 @@ namespace VfpProj.Native
             }
 
             Trace.Write("form Focus");
+#if !DEBUGFX
             form1.txtFile.GotFocus += (s, e) => AfterFocus(hWnd);
 
             if (form.CheckAccess())
                 form1.txtFile.Focus();
+#endif
         }
 
         public void AfterFocus(IntPtr? hWnd = null)

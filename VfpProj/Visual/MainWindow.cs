@@ -65,6 +65,9 @@ namespace VfpProj
             if (list.Count == 0)
                 list.Add("CLEAR ALL;CANCEL");
 
+            if (comboCfg == null)
+                return;
+
             comboCfg.ItemsSource = list;
             comboCfg.SelectionChanged += ComboCfg_SelectionChanged;
 

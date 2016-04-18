@@ -37,7 +37,8 @@
                     Background="WhiteSmoke"
                     VerticalAlignment="Top" HorizontalAlignment="Stretch" MinWidth="80">
             <TextBox x:Name="txtFile"
-                     Background="Transparent" Padding="3 2 0 0" BorderThickness="0" Text="loading.." />
+                     Background="Transparent" 
+                     Padding="3 2 0 0" BorderThickness="0" Text="loading.." />
         </StackPanel>
 
         <!--<WindowsFormsHost 

@@ -35,6 +35,7 @@ namespace VfpProj
                 // Resources/
                 iconUri = iconUri = new Uri("pack://application:,,," + Dll + ";component/PJX.ico", UriKind.RelativeOrAbsolute);
                 Icon = BitmapFrame.Create(iconUri);
+
             }
             catch (Exception) { }
 
@@ -43,6 +44,9 @@ namespace VfpProj
                 _contentLoaded = true;
                 System.Uri resourceLocater = new System.Uri(Dll + ";component/mainwindow.xaml", System.UriKind.Relative);
                 System.Windows.Application.LoadComponent(this, resourceLocater);
+
+                // Func<object> DefaultConstructor { get; set; }  invoke:
+                // new System.Windows.Baml2006.WpfKnownType().DefaultConstructor = null;
             }
 
             InitValues();
