@@ -5,16 +5,16 @@ using System.Runtime.InteropServices;
 using System.Security.Permissions;
 using System.Windows;
 
-[assembly: AssemblyTitle("VfpProj")]
+[assembly: AssemblyTitle("Folder")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("VfpProj")]
-[assembly: AssemblyCopyright("GNU open source, 2014 - 2016")]
+[assembly: AssemblyProduct("Folder")]
+[assembly: AssemblyCopyright("GNU open source, 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(true)]
-
+ 
 [assembly: NeutralResourcesLanguage("en-US", UltimateResourceFallbackLocation.MainAssembly)] // .Satellite)]
 [assembly: ThemeInfo(
     ResourceDictionaryLocation.None, 
