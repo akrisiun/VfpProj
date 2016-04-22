@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using Forms = System.Windows.Forms;
-using VfpEdit;
 using VfpInterop;
 using Folder;
 using System.Windows.Input;
@@ -41,7 +40,8 @@ namespace Folder.Native
         public System.Windows.Controls.TextBox txtFile;
 
         #region Init, Bind
-        public WindowsEvents(MainWindow form)
+        
+        public WindowsEvents(Window form)
         {
              
         }

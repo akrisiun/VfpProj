@@ -9,7 +9,8 @@ using System.IO;
 using System.Text;
 using Folder.Native;
 using System.Windows.Media.Imaging;
-using VfpEdit;
+using VfpProj;
+using Vfp;
 
 namespace Folder
 {
@@ -22,16 +23,16 @@ namespace Folder
         public FolderWindow()
         {
             // Uri iconUri = new Uri("pack://application:,,,/PRG.ICO", UriKind.RelativeOrAbsolute);
-            Icon = MainWindow.PrgIco; //  BitmapFrame.Create(iconUri);
-            if (MainWindow.Dll == null)
-                MainWindow.Dll = "Folder";
+            //Icon = MainWindow.PrgIco; //  BitmapFrame.Create(iconUri);
+            if (Startup.Dll == null)
+                Startup.Dll = "Folder";
 
             FileName = string.Empty;
             // InitializeComponent();
             if (!_contentLoaded)
             {
                 _contentLoaded = true;
-                System.Uri resourceLocater = new System.Uri(MainWindow.Dll + ";component/visual/folderwindow.xaml", System.UriKind.Relative);
+                System.Uri resourceLocater = new System.Uri(Startup.Dll + ";component/visual/folderwindow.xaml", System.UriKind.Relative);
                 System.Windows.Application.LoadComponent(this, resourceLocater);
             }
 
@@ -41,38 +42,18 @@ namespace Folder
 
         void PostLoad()
         {
-            txtPath = hostPath.Child as System.Windows.Forms.TextBox;
-            txtPath.Text = Directory.GetCurrentDirectory();
-            txtPath.SetFileAutoComplete();
+            Tree.Bind(this);
 
-            // TextDrop.Bind(this);
+            TextDrop.Bind(this, this.txtPath);
+            Tree.LoadFolder(this, txtPath.Text);
         }
-
-     
 
         void buttonOpen_Click(object sender, RoutedEventArgs e)
         {
             var w = this;
             string dir = txtPath.Text.Trim();
 
-            var info = new VfpFileInfo();
-
-            if (File.Exists(dir))
-            {
-                TextRead.ReadVfpInfo(ref info, ref dir, (f) => { 
-                
-                    }
-                );
-
-                FileName = dir;
-                return;
-            }
-
-            string projName = info.vfpProj.Name;
-            ProjTree.Load(w, w.tree, info.vfpProj, projName);
-
-            if (Directory.Exists(dir))
-                Directory.SetCurrentDirectory(dir); 
+            Tree.LoadFolder(this, dir);
         }
 
     }

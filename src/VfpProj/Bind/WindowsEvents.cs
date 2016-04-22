@@ -48,7 +48,7 @@ namespace VfpProj.Native
             FormPrj = null;
 
             listWI = new Collection<NativeWndInfo>();
-            directory = Directory.GetCurrentDirectory();
+            directory = FileSystem.CurrentDirectory;
             dlg = null;
             IsBound = false;
         }
@@ -104,7 +104,7 @@ namespace VfpProj.Native
             //Form.hostFile.Visibility = Visibility.Visible;
 
             //NativeAutocomplete.SetFileAutoComplete(textFile);
-            textFile.Text = Directory.GetCurrentDirectory() + "\\";
+            textFile.Text = FileSystem.CurrentDirectory + "\\";
 
             if (!CsObj.Instance.IsLockForm)
             {
@@ -162,7 +162,7 @@ namespace VfpProj.Native
                 Trace.WriteLine(ex.Message);
             }
 
-            dir = Directory.GetCurrentDirectory();
+            dir = FileSystem.CurrentDirectory;
             form1.events.directory = dir;
             if (form1.FormObject != null)
             {
@@ -192,7 +192,7 @@ namespace VfpProj.Native
 
         public void StartDir()
         {
-            if (FoxCmd.cfg_startDir.Length > 0 && !Directory.GetCurrentDirectory().Contains(FoxCmd.cfg_startDir))
+            if (FoxCmd.cfg_startDir.Length > 0 && !FileSystem.CurrentDirectory.Contains(FoxCmd.cfg_startDir))
             {
                 Directory.SetCurrentDirectory(FoxCmd.cfg_startDir);
                 FoxCmd.AppCmd("CD " + FoxCmd.cfg_startDir);
@@ -230,17 +230,17 @@ namespace VfpProj.Native
 
             //  dlg.SupportMultiDottedExtensions = true;
 
-            directory = Directory.GetCurrentDirectory();
+            directory = FileSystem.CurrentDirectory;
             this.file = Form.txtFile.Text;
             string path = Path.GetFullPath(this.file);
             if (path != null && !directory.StartsWith(path))
             {
                 try
                 {
-                    Directory.SetCurrentDirectory(path);
+                    FileSystem.CurrentDirectory = path;
                 }
                 catch (Exception) { }
-                directory = Directory.GetCurrentDirectory();
+                directory = FileSystem.CurrentDirectory;
             }
 
             dlg.InitialDirectory = directory;
@@ -287,7 +287,10 @@ namespace VfpProj.Native
             {
                 directory = FoxCmd.App.DefaultFilePath;
             }
-            catch (Exception) { directory = Directory.GetCurrentDirectory(); }
+            catch (Exception)
+            {
+                directory = FileSystem.CurrentDirectory;
+            }
 
 #if WPF_DLG
             // FileDialog dlg = new Microsoft.Win32.OpenFileDialog();
@@ -302,9 +305,10 @@ namespace VfpProj.Native
             var res = dlg.ShowDialog();
             if (res != Forms.DialogResult.OK)
                 return;
-            Directory.SetCurrentDirectory(dlg.SelectedPath);
+            
+            FileSystem.CurrentDirectory = dlg.SelectedPath;
 #endif
-            directory = Directory.GetCurrentDirectory();
+            directory = FileSystem.CurrentDirectory;
             try
             {
                 FoxCmd.App.DefaultFilePath = directory;
@@ -322,6 +326,10 @@ namespace VfpProj.Native
             if (FormPrj == null || !FormPrj.IsLoaded)
             {
                 FormPrj = null; // clear
+                var txtDir = Form.txtFile.Text;
+                if (txtDir.Length > 0 && Directory.Exists(txtDir))
+                    FileSystem.CurrentDirectory = txtDir;
+
                 FormPrj = new PrjWindow();
 
                 var mainWind = Application.Current.MainWindow;
@@ -332,6 +340,9 @@ namespace VfpProj.Native
                 FormPrj.ShowInTaskbar = false;
                 FormPrj.Topmost = true;
             }
+
+            Tree.LoadFolder(FormPrj, FormPrj.txtPath.Text);
+
             FormPrj.Show();
         }
 

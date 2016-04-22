@@ -44,14 +44,10 @@ namespace VfpProj
 
         void PostLoad()
         {
-            txtPath = hostPath.Child as System.Windows.Forms.TextBox;
-            txtPath.Text = Directory.GetCurrentDirectory();
-            txtPath.SetFileAutoComplete();
+            Tree.Bind(this);
 
-            // TextDrop.Bind(this);
+            TextDrop.BindPrjEdit(this, txtPath);
         }
-
-     
 
         void buttonOpen_Click(object sender, RoutedEventArgs e)
         {

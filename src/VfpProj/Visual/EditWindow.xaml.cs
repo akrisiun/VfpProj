@@ -57,7 +57,7 @@ namespace VfpProj
             buttonOpen.Click += buttonOpen_Click;
 
             txtPath = hostPath.Child as System.Windows.Forms.TextBox;
-            txtPath.Text = Directory.GetCurrentDirectory();
+            txtPath.Text = FileSystem.CurrentDirectory;
             txtPath.SetFileAutoComplete();
 
             xmlStrategy = new XmlFoldingStrategy();
@@ -68,7 +68,7 @@ namespace VfpProj
             defManager = HighlightingManager.Instance;
             editor.SyntaxHighlighting = defManager.GetDefinitionByExtension(".cs");
 
-            TextDrop.Bind(this);
+            TextDrop.BindEdit(this);
 
             this.buttonProj.Click += buttonProj_Click;
 
@@ -104,7 +104,7 @@ namespace VfpProj
             // Set filter for file extension and default file extension 
             dlg.DefaultExt = ".prg";
             dlg.Filter = filter;
-            dlg.InitialDirectory = Directory.GetCurrentDirectory();
+            dlg.InitialDirectory = FileSystem.CurrentDirectory;
 
             // Display OpenFileDialog by calling ShowDialog method 
             Nullable<bool> result = dlg.ShowDialog();

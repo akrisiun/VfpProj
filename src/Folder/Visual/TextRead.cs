@@ -3,9 +3,9 @@ using System;
 using System.IO;
 using System.Text;
 using System.Windows;
-using Folder; 
+using Folder;
 
-namespace VfpEdit
+namespace VfpProj
 {
     public struct VfpFileInfo
     {

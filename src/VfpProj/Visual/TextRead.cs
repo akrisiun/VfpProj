@@ -53,7 +53,7 @@ namespace VfpProj
                 if (info.vfpProj != null)
                 {
                     string projName = info.vfpProj.Name;
-                    ProjTree.Load(w, w.tree, info.vfpProj, projName);
+                    Tree.LoadPrj(w, w.tree, info.vfpProj, projName);
                 }
                 if (editor.Text.Length == 0)
                    return;

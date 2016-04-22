@@ -109,7 +109,6 @@
     </Compile>
     <Compile Include="Visual\ProjTree.cs" />
     <Compile Include="Visual\TextDrop.cs" />
-    <Compile Include="Visual\MainWindow.cs" />
     <Compile Include="Visual\TextRead.cs" />
     <Compile Include="Visual\VfpTabs.cs" />
     <Page Include="Visual\FolderWindow.xaml">

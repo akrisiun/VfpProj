@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Folder.Native;
+using IOFile;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -6,18 +8,77 @@ using System.Windows;
 using System.Windows.Controls;
 using VisualFoxpro;
 
-namespace VfpEdit
+namespace VfpProj
 {
-    public class ProjItem {
-        public string Name { get; set; }
-        public bool Exclude { get; set; }
-        public string Type { get; set; } // "P" - prg
+    public static class Tree
+    {
+        public static void Bind(this Folder.FolderWindow w)
+        {
+            w.txtPath = w.hostPath.Child as System.Windows.Forms.TextBox;
+            w.txtPath.Text = FileSystem.CurrentDirectory;
+            NativeAutocomplete.SetFileAutoComplete(w.txtPath);
+
+            var treeView = w.tree;
+            treeView.MouseMove += TreeViewDrag.treeView_MouseMove;
+            treeView.MouseLeftButtonUp += TreeViewDrag.treeView_MouseDown;
+            treeView.DragOver += TreeViewDrag.treeView_DragOver;
+        }
+
+        public static void LoadFolder(this Folder.FolderWindow w, string dir)
+        {
+            if (File.Exists(dir))
+            {
+                // project file
+                var info = new VfpFileInfo();
+
+                TextRead.ReadVfpInfo(ref info, ref dir, (f) =>
+                    {
+                    }
+                );
+                return;
+            }
+            else if (Directory.Exists(dir))
+                FileSystem.CurrentDirectory = dir;
+
+            string projName = FileSystem.CurrentDirectory;
+
+            FolderTree.LoadDir(w, w.tree, projName);
+        }
+
     }
-    
+
+    public static class FolderTree
+    {
+        public static void LoadDir(Window w, TreeView tree, string dir)
+        {
+            IEnumerable<IOFile.DirectoryEnum.FileDataInfo> list = null;
+            try
+            {
+                list = DirectoryEnum.ReadFilesInfo(dir, searchOption: SearchOption.TopDirectoryOnly);
+                var num = list.GetEnumerator();
+                if (num.MoveNext())
+                { 
+                    tree.Items.Clear();
+                    do
+                    {
+                        var item = num.Current;
+                        if (item.cFileName.StartsWith("."))
+                            continue;
+
+                        string filePrg = Path.GetFileName(item.cFileName);
+                        tree.Items.Add(filePrg);
+
+                    } while (num.MoveNext());
+                }
+            }
+            catch { }
+        }
+
+    }
 
     public static class ProjTree
     {
-        public static void Load(Window w, TreeView tree, VisualFoxpro.IFoxProject proj, string file)
+        public static void LoadPrj(Window w, TreeView tree, VisualFoxpro.IFoxProject proj, string file)
         {
             if (proj == null)
                 return;
@@ -48,12 +109,12 @@ namespace VfpEdit
             var list = new List<ProjItem>();
 
             IFoxPrjFiles files = proj.Files;
-            IEnumerator filesNum =  files.GetEnumerator();
+            IEnumerator filesNum = files.GetEnumerator();
             while (filesNum.MoveNext())
             {
                 dynamic elem = filesNum.Current;
 
-                var item = new ProjItem { Name = elem.Name, Exclude = elem.Exclude, Type = elem.Type};
+                var item = new ProjItem { Name = elem.Name, Exclude = elem.Exclude, Type = elem.Type };
                 list.Add(item);
             }
 
