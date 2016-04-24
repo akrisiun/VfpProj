@@ -98,10 +98,10 @@ namespace VfpProj
             if (!_isDragging && e.LeftButton == MouseButtonState.Pressed)
             {
                 _isDragging = true;
-                string[] paths = new string[] { treeView.SelectedValue as string };
+                string[] paths = new string[] { Path.GetFullPath(treeView.SelectedValue as string) };
 
                 DragDrop.DoDragDrop(treeView, new DataObject(DataFormats.FileDrop, paths),
-                    DragDropEffects.Copy);
+                    DragDropEffects.Link);
             }
         }
 
@@ -140,7 +140,22 @@ namespace VfpProj
                 targetTask.Wait();
                 if (targetTask.IsCompleted)
                 {
+                    e.Handled = true;
                 }
+
+                return;
+            }
+
+            var obj = e.Data as System.Windows.DataObject;
+            var formats = e.Data.GetFormats();
+            if (obj.GetDataPresent(DataFormats.FileDrop, true))
+            {
+                var list = obj.GetData(DataFormats.FileDrop, true) as string[];
+                if (list == null || list.Length == 0)
+                    return;
+                //  File drop
+                string firstFile = list[0];
+                e.Handled = true;
             }
         }
 

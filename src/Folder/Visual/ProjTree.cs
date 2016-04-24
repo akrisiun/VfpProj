@@ -22,6 +22,7 @@ namespace VfpProj
             treeView.MouseMove += TreeViewDrag.treeView_MouseMove;
             treeView.MouseLeftButtonUp += TreeViewDrag.treeView_MouseDown;
             treeView.DragOver += TreeViewDrag.treeView_DragOver;
+            treeView.Drop += TreeViewDrag.treeView_Drop;
         }
 
         public static void LoadFolder(this Folder.FolderWindow w, string dir)
@@ -62,7 +63,7 @@ namespace VfpProj
                     do
                     {
                         var item = num.Current;
-                        if (item.cFileName.StartsWith("."))
+                        if (IsIgnore(item.cFileName))
                             continue;
 
                         string filePrg = Path.GetFileName(item.cFileName);
@@ -74,6 +75,27 @@ namespace VfpProj
             catch { }
         }
 
+
+        public static bool IsIgnore(string fileName)
+        {
+            if (fileName.StartsWith("."))
+                return true;
+            var ext = Path.GetExtension(fileName);
+            if (ext.Length == 0)
+                return false;
+
+            ext = ext.ToLower();
+            if (ext == ".exe" || ext == ".dll" || ext == ".metagen"
+                || ext == ".fxp" || ext == ".obj"
+                || ext == ".cdx" || ext == ".fpt"
+                || ext == ".prt" || ext == ".sct" || ext == ".vct"
+                || ext == ".bsc" || ext == ".lib" || ext == ".exp"
+                || ext == ".sdf" || ext == ".suo"
+                || ext == ".pdb" || fileName.Contains(".vshost."))
+                return true;
+
+            return false;
+        }
     }
 
     public static class ProjTree

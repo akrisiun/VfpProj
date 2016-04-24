@@ -6,6 +6,8 @@
     <Grid x:Name="panelPrj" Margin="0,0,0,0" MinHeight="100" MinWidth="200">
         <Grid.RowDefinitions>
             <RowDefinition Height="26" />
+            <RowDefinition x:Name="row2" x:FieldModifier="public"
+                Height="24" />
             <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -27,9 +29,13 @@
         </WrapPanel>
 
         <DockPanel x:Name="dockProj"
-            Grid.Column="2" Grid.Row="1">
-            <TreeView x:Name="tree" x:FieldModifier="public">
-                <TreeViewItem>Item 1</TreeViewItem>
+            Grid.Column="2" Grid.Row="2">
+            <TreeView x:Name="tree" x:FieldModifier="public"
+                AllowDrop="True"
+                >
+                <TreeViewItem>
+                    Loading ..
+                </TreeViewItem>
             </TreeView>
         </DockPanel>
     </Grid>
