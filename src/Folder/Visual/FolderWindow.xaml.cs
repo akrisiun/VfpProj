@@ -11,6 +11,7 @@ using Folder.Native;
 using System.Windows.Media.Imaging;
 using VfpProj;
 using Vfp;
+using MultiSelect;
 
 namespace Folder
 {
@@ -18,7 +19,7 @@ namespace Folder
     {
         public string FileName { get; set; }
         public Forms.TextBox txtPath { get; set; }
-        internal TreeView treeObj;
+        internal MultiSelectTreeView treeObj;
 
         public FolderWindow()
         {

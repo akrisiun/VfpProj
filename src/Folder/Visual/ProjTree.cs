@@ -1,5 +1,6 @@
 ﻿using Folder.Native;
 using IOFile;
+using MultiSelect;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -50,7 +51,7 @@ namespace VfpProj
 
     public static class FolderTree
     {
-        public static void LoadDir(Window w, TreeView tree, string dir)
+        public static void LoadDir(Window w, MultiSelectTreeView tree, string dir)
         {
             IEnumerable<IOFile.DirectoryEnum.FileDataInfo> list = null;
             try

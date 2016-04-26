@@ -1,4 +1,5 @@
 ﻿using Folder;
+using MultiSelect;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -94,14 +95,17 @@ namespace VfpProj
         static bool _isDragging;
         public static void treeView_MouseMove(object sender, MouseEventArgs e)
         {
-            TreeView treeView = sender as TreeView;
-            if (!_isDragging && e.LeftButton == MouseButtonState.Pressed)
+            MultiSelectTreeView treeView = sender as MultiSelectTreeView;
+            if (treeView != null
+                && !_isDragging && e.LeftButton == MouseButtonState.Pressed)
             {
                 _isDragging = true;
-                string[] paths = new string[] { Path.GetFullPath(treeView.SelectedValue as string) };
 
-                DragDrop.DoDragDrop(treeView, new DataObject(DataFormats.FileDrop, paths),
-                    DragDropEffects.Link);
+                //TODO
+                //string[] paths = new string[] { Path.GetFullPath(treeView.SelectedValue as string) };
+
+                //DragDrop.DoDragDrop(treeView, new DataObject(DataFormats.FileDrop, paths),
+                //    DragDropEffects.Link);
             }
         }
 
