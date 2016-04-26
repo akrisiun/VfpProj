@@ -121,6 +121,15 @@ namespace VfpProj
             }
         }
 
+        static bool IsDragging(Point dragStartPoint, MouseEventArgs e)
+        {
+            var diff = e.GetPosition(null) - dragStartPoint;
+            return
+                e.LeftButton == MouseButtonState.Pressed &&
+                (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance ||
+                 Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance);
+        }
+
         public static void treeView_DragOver(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(typeof(Task)))

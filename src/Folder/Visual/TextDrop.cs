@@ -96,16 +96,25 @@ namespace VfpProj
         public static void treeView_MouseMove(object sender, MouseEventArgs e)
         {
             MultiSelectTreeView treeView = sender as MultiSelectTreeView;
+            if (_isDragging && e.LeftButton == MouseButtonState.Released)
+                _isDragging = false;
+
             if (treeView != null
-                && !_isDragging && e.LeftButton == MouseButtonState.Pressed)
+                && !_isDragging && e.LeftButton == MouseButtonState.Pressed
+                && treeView.SelectedItems.Count > 0)
             {
+                var SelectedItems = treeView.SelectedItems;
                 _isDragging = true;
+                if (Mouse.Captured != treeView)
+                    Mouse.Capture(treeView, CaptureMode.Element);
 
-                //TODO
                 //string[] paths = new string[] { Path.GetFullPath(treeView.SelectedValue as string) };
+                string[] paths = new string[SelectedItems.Count];
+                for(int i = 0; i < SelectedItems.Count; i++)
+                    paths[i] = Path.GetFullPath(SelectedItems[i] as string);
 
-                //DragDrop.DoDragDrop(treeView, new DataObject(DataFormats.FileDrop, paths),
-                //    DragDropEffects.Link);
+                DragDrop.DoDragDrop(treeView, new DataObject(DataFormats.FileDrop, paths),
+                    DragDropEffects.Link);
             }
         }
 
@@ -114,6 +123,10 @@ namespace VfpProj
             if (_isDragging && e.LeftButton == MouseButtonState.Released)
             {
                 _isDragging = false;
+                // ReleaseMouseCapture 
+                if (Mouse.Captured != null)
+                    Mouse.Capture(null, CaptureMode.None);
+
                 e.Handled = true;
             }
         }
@@ -132,20 +145,23 @@ namespace VfpProj
 
         public static void treeView_Drop(object sender, DragEventArgs e)
         {
-            var treeView = sender as TreeView;
+            if (Mouse.Captured != null)
+                Mouse.Capture(null, CaptureMode.None);
+
+            var treeView = sender as MultiSelectTreeView;
             if (treeView == null)
                 return;
             if (e.Data.GetDataPresent(typeof(Task)))
             {
                 Task sourceTask = (Task)e.Data.GetData(typeof(Task));
-                Task<TreeViewItem> targetTask = GetItemAtLocation<Task<TreeViewItem>>(treeView, MouseUtilities.GetMousePosition());
+                //Task<TreeViewItem> targetTask = GetItemAtLocation<Task<TreeViewItem>>(treeView, MouseUtilities.GetMousePosition());
 
-                // Code to move the item in the model is placed here...
-                targetTask.Wait();
-                if (targetTask.IsCompleted)
-                {
-                    e.Handled = true;
-                }
+                //// Code to move the item in the model is placed here...
+                //targetTask.Wait();
+                //if (targetTask.IsCompleted)
+                //{
+                //    e.Handled = true;
+                //}
 
                 return;
             }

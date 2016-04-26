@@ -279,7 +279,7 @@ namespace System.Windows.Automation.Peers
 
 		void ISelectionItemProvider.Select()
 		{
-			((MultiSelectTreeViewItem) Owner).ParentTreeView.Selection.SelectCore((MultiSelectTreeViewItem) Owner);
+			((MultiSelectTreeViewItem) Owner).ParentTreeView.Selection.SelectCore((MultiSelectTreeViewItem) Owner, true);
 		}
 
 		#endregion Explicit interface methods

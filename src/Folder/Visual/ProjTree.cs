@@ -24,6 +24,18 @@ namespace VfpProj
             treeView.MouseLeftButtonUp += TreeViewDrag.treeView_MouseDown;
             treeView.DragOver += TreeViewDrag.treeView_DragOver;
             treeView.Drop += TreeViewDrag.treeView_Drop;
+
+            w.buttonProj.Click += (s, e) => GoUp(w, w.buttonProj);
+        }
+
+        public static void GoUp(this Folder.FolderWindow w, Button btn)
+        {
+            var dir = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + "..";
+            var fullDir = Path.GetFullPath(dir);
+            Directory.SetCurrentDirectory(fullDir);
+
+            w.txtPath.Text = Directory.GetCurrentDirectory();
+            LoadFolder(w, w.txtPath.Text);
         }
 
         public static void LoadFolder(this Folder.FolderWindow w, string dir)

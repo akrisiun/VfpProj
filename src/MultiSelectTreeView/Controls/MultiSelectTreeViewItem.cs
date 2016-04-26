@@ -640,6 +640,26 @@ namespace MultiSelect
 			//System.Diagnostics.Debug.WriteLine(Environment.StackTrace);
 		}
 
+        //private Point _dragStartPoint;  
+    
+        //private bool IsDragGesture(Point point)
+        //{
+        //    var horizontalMove = Math.Abs(point.X - _dragStartPoint.X);
+        //    var verticalMove = Math.Abs(point.Y - _dragStartPoint.Y);
+        //    var hGesture = horizontalMove >
+        //            SystemParameters.MinimumHorizontalDragDistance;
+        //    var vGesture = verticalMove >
+        //            SystemParameters.MinimumVerticalDragDistance;
+        //    return (hGesture | vGesture);
+        //}  
+
+        //static T FindAncestor<T>(DependencyObject dependencyObject) where T : DependencyObject
+        //{
+        //    var parent = VisualTreeHelper.GetParent(dependencyObject);
+        //    if (parent == null) return null;
+        //    return parent as T ?? FindAncestor<T>(parent);
+        //}  
+
 		protected override void OnMouseDown(MouseButtonEventArgs e)
 		{
 			//System.Diagnostics.Debug.WriteLine("MultiSelectTreeViewItem.OnMouseDown(Item = " + this.DisplayName + ", Button = " + e.ChangedButton + ")");
@@ -654,18 +674,36 @@ namespace MultiSelect
 
 			if (e.ChangedButton == MouseButton.Left)
 			{
-				ParentTreeView.Selection.Select(this);
+				ParentTreeView.Selection.Select(this, false);
 				e.Handled = true;
 			}
 			if (e.ChangedButton == MouseButton.Right)
 			{
 				if (!IsSelected)
 				{
-					ParentTreeView.Selection.Select(this);
+					ParentTreeView.Selection.Select(this, true);
 				}
 				e.Handled = true;
 			}
 		}
+
+        protected override void OnMouseUp(MouseButtonEventArgs e)
+        {
+            base.OnMouseUp(e);
+
+            FrameworkElement itemContent = (FrameworkElement)this.Template.FindName("headerBorder", this);
+            if (!itemContent.IsMouseOver)
+            {
+                // A (probably disabled) child item was really clicked, do nothing here
+                return;
+            }
+
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                (ParentTreeView.Selection as SelectionMultiple).Select(this, true);
+                e.Handled = true;
+            }
+        }
 
 		protected override void OnItemsChanged(NotifyCollectionChangedEventArgs e)
 		{

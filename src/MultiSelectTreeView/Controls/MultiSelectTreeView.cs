@@ -8,12 +8,15 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Markup;
 using System.Windows.Media;
+using System.Windows.Controls.Primitives;
 
 namespace MultiSelect
 {
-	public class MultiSelectTreeView : ItemsControl
+    public class MultiSelectTreeView : ItemsControl, IAddChild, IGeneratorHost, IContainItemStorage
 	{
 		#region Constants and Fields
 
@@ -185,7 +188,11 @@ namespace MultiSelect
 			}
 		}
 
-		/// <summary>
+        #endregion
+
+        #region Selection properties
+
+        /// <summary>
 		///    Gets the last selected item.
 		/// </summary>
 		public object LastSelectedItem
@@ -236,7 +243,7 @@ namespace MultiSelect
 		{
 			get
 			{
-				return (IList) GetValue(SelectedItemsProperty);
+                return (IList)GetValue(SelectedItemsProperty) ?? EmptyList(); // Cast<IList>(Selection);
 			}
 			set
 			{
@@ -244,7 +251,16 @@ namespace MultiSelect
 			}
 		}
 
-		internal ISelectionStrategy Selection { get; private set; }
+        public static List<object> EmptyList() { return _emptyList ?? (_emptyList = new List<object>());}
+        private static List<object> _emptyList;
+
+        public static IEnumerable Enumerate(IList SelectedItems) { return new ArrayList(SelectedItems); }
+        public static T Cast<T>(object value)
+        {
+            return default(T);
+        }
+
+        public ISelectionStrategy Selection { get; protected set; }
 
 		#endregion
 
@@ -259,10 +275,11 @@ namespace MultiSelect
 
 		public bool ClearSelection()
 		{
-			if (SelectedItems.Count > 0)
+            var selectedItems = this.SelectedItems;
+            if (selectedItems != null && selectedItems.Count > 0)
 			{
 				// Make a copy of the list and ignore changes to the selection while raising events
-				foreach (var selItem in new ArrayList(SelectedItems))
+				foreach (var selItem in Enumerate(selectedItems))
 				{
 					var e = new PreviewSelectionChangedEventArgs(false, selItem);
 					OnPreviewSelectionChanged(e);
@@ -272,7 +289,7 @@ namespace MultiSelect
 					}
 				}
 
-				SelectedItems.Clear();
+				selectedItems.Clear();
 			}
 			return true;
 		}
@@ -652,6 +669,7 @@ namespace MultiSelect
 					LastSelectedItem = last;
 					break;
 				case NotifyCollectionChangedAction.Remove:
+
 					foreach (var item in GetTreeViewItemsFor(e.OldItems))
 					{
 						item.IsSelected = false;
@@ -704,7 +722,7 @@ namespace MultiSelect
 						var lastNode = RecursiveTreeViewItemEnumerable(this, false).LastOrDefault();
 						if (lastNode != null)
 						{
-							Selection.Select(lastNode);
+							Selection.Select(lastNode, true);
 							e.Handled = true;
 						}
 						break;
@@ -713,7 +731,7 @@ namespace MultiSelect
 						var firstNode = RecursiveTreeViewItemEnumerable(this, false).FirstOrDefault();
 						if (firstNode != null)
 						{
-							Selection.Select(firstNode);
+							Selection.Select(firstNode, true);
 							e.Handled = true;
 						}
 						break;
@@ -809,5 +827,163 @@ namespace MultiSelect
 		}
 
 		#endregion
-	}
+
+        #region Implement IGeneratorHost, IContainItemStorage
+
+        public ItemCollection View
+        {
+            get { return this.Items; }
+        }
+
+        public bool IsItemItsOwnContainer(object item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public DependencyObject GetContainerForItem(object item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void PrepareItemContainer(DependencyObject container, object item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ClearContainerForItem(DependencyObject container, object item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsHostForItemContainer(DependencyObject container)
+        {
+            throw new NotImplementedException();
+        }
+
+        public GroupStyle GetGroupStyle(CollectionViewGroup group, int level)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetIsGrouping(bool isGrouping)
+        {
+            throw new NotImplementedException();
+        }
+
+        //public void StoreItemValue(object item, DependencyProperty dp, object value)
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+        //public object ReadItemValue(object item, DependencyProperty dp)
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+        //public void ClearItemValue(object item, DependencyProperty dp)
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+        public virtual void Clear()
+        {
+            this.Items.Clear();
+            lastFocusedItem = null;
+            this.LastSelectedItem = null;
+        }
+
+        #endregion
+    }
+}
+
+// make compatible with PresentationFramework.dll internal interfaces
+
+namespace System.Windows
+{
+    //non-internal 
+    public interface IGeneratorHost
+    {
+        /// <summary>
+        /// The view of the data
+        /// </summary>
+        ItemCollection View { get; }
+
+        /// <summary>
+        /// Return true if the item is (or should be) its own item container
+        /// </summary>
+        bool IsItemItsOwnContainer(object item);
+
+        /// <summary>
+        /// Return the element used to display the given item
+        /// </summary>
+        DependencyObject GetContainerForItem(object item);
+
+        /// <summary>
+        /// Prepare the element to act as the ItemUI for the corresponding item.
+        /// </summary>
+        void PrepareItemContainer(DependencyObject container, object item);
+
+        /// <summary>
+        /// Undo any initialization done on the element during GetContainerForItem and PrepareItemContainer
+        /// </summary>
+        void ClearContainerForItem(DependencyObject container, object item);
+
+        /// <summary>
+        /// Determine if the given element was generated for this host as an ItemUI.
+        /// </summary>
+        bool IsHostForItemContainer(DependencyObject container);
+
+        /// <summary>
+        /// Return the GroupStyle (if any) to use for the given group at the given level.
+        /// </summary>
+        GroupStyle GetGroupStyle(CollectionViewGroup group, int level);
+
+        /// <summary>
+        /// Communicates to the host that the generator is using grouping.
+        /// </summary>
+        void SetIsGrouping(bool isGrouping);
+
+        /// <summary>
+        /// The AlternationCount
+        /// <summary>
+        int AlternationCount { get; }
+    }
+
+    public interface IContainItemStorage
+    {
+        ///// <summary>
+        ///// Stores the given value in ItemValueStorage, associating it with the given item and DependencyProperty.
+        ///// </summary>
+        ///// <param name="item"></param>
+        ///// <param name="dp">DependencyProperty</param>
+        ///// <param name="value"></param>
+        //void StoreItemValue(object item, DependencyProperty dp, object value);
+
+        ///// <summary>
+        ///// Returns the value storaed gainst the given DependencyProperty and item.
+        ///// </summary>
+        ///// <param name="item"></param>
+        ///// <param name="dp"></param>
+        ///// <returns></returns>
+        //object ReadItemValue(object item, DependencyProperty dp);
+
+        ///// <summary>
+        ///// Clears the value in ItemValueStorage, associating it with the given item and DependencyProperty.
+        ///// </summary>
+        ///// <param name="item"></param>
+        ///// <param name="dp">DependencyProperty</param>
+        //void ClearItemValue(object item, DependencyProperty dp);
+
+        ///// <summary>
+        ///// Clears the given DependencyProperty starting at the current element including all nested storage bags.
+        ///// </summary>
+        ///// <param name="dp">DependencyProperty</param>
+        //void ClearValue(DependencyProperty dp);
+
+        /// <summary>
+        /// Clears the item storage on the current element entirely.
+        /// </summary>
+        void Clear();
+    }
+
 }
