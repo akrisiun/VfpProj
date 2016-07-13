@@ -62,6 +62,7 @@ namespace Kosmala.Michal.ActiveXTest
         public void Stop()
         {
             (this.Controls[1] as TextBox).Text = "Stop";
+            Close();
         }
 
         [ComVisible(true)]

@@ -1,56 +1,9 @@
 * SETV 
-* $Id: setv.prg,v 1.4 2008/02/12 10:56:45 andriusk Exp $
-* $Log: setv.prg,v $
-* Revision 1.4  2008/02/12 10:56:45  andriusk
-* APP version
-*
-* Revision 1.17  2006/03/15 14:15:33  andriusk
-* Geri pakeitimai 2006-03
-*
-* Revision 1.16  2005/05/06 11:24:59  andriusk
-* screen maximize with gedset.pos()
-*
-* Revision 1.15  2005/04/25 08:48:52  andriusk
-* APP_VERSION test/ Max | Norm screen menu
-*
-* Revision 1.14  2005/04/25 08:34:15  andriusk
-* APP_VERSION test/ Max | Norm screen menu
-*
-* Revision 1.13  2005/04/01 10:58:07  andriusk
-* SYS\Curs2Str
-*
-* Revision 1.12  2005/03/04 16:43:54  andriusk
-* Properties window Alt+F5
-*
-* Revision 1.11  2005/02/18 09:28:00  andriusk
-* ViewStru / Clean BaseObj vcx
-*
-* Revision 1.10  2004/11/29 12:31:55  andriusk
-* PrjVw2 call
-*
-* Revision 1.9  2004/11/26 14:59:41  andriusk
-* CopyDbc1.app call in menu
-*
-* Revision 1.8  2004/10/29 15:17:44  andriusk
-* not cleanup.prg clean, trans Pad 999 left
-*
-* Revision 1.7  2004/08/29 14:51:59  andriusk
-* trans left
-*
-* Revision 1.7  2004/08/18 10:00:19  andriusk
-* VFPROOT, DCBO,PCBO in menu
-*
-* Revision 1.6  2004/05/27 14:11:39  andriusk
-* PRJVW + window
-*
-* Revision 1.5  2004/05/25 15:23:52  andriusk
-* no message
-*
-* Revision 1.4  2004/05/21 15:52:08  andriusk
-* BrowPric
-*
-* Revision 1.3  2004/05/20 06:36:55  andriusk
-* Fix [] in macros, ".LITE" param
+* $Id: setv.prg,v 1.4 2008/02/12 10:56:45 andriusk Exp $ 
+
+* Revision 1.4  2008/02/12 10:56:45  andriusk  * APP version
+* Revision 1.10  2004/11/29 12:31:55 andriusk * PrjVw2 call
+* Revision 1.3  2004/05/20 06:36:55  andriusk  * Fix [] in macros, ".LITE" param
 
 * SETV **********************************************************8
 LPARAMETERS tExtra1, tExtra2  
@@ -203,8 +156,8 @@ IF TYPE("_SCREEN.appsetvname") = 'C' AND FILEV( "d:\Vfplib\sys\SetV.prg")
    DO ("d:\Vfplib\sys\SetV.prg") WITH ".LITE" 
 ENDIF 
 
-IF FILE("D:\Sanitex\Start.prg")
-   DO ("D:\Sanitex\Start")
+IF FILE("D:\webstack\Start.prg")
+   DO ("D:\webstack\Start")
 ENDIF 
 
 SET SYSMENU SAVE 
@@ -391,10 +344,10 @@ IF DEBUG_VERSION
     ON SELECTION BAR (ln1) OF popTools &lcCmd
 
     LOCAL lcCmd 
-    lcCmd = "DO d:\sanitex\start.prg" 
+    lcCmd = "DO d:\webstack\start.prg" 
     ln1 = ln1 +  1 
     DEFINE BAR       (ln1) OF popTools PROMPT "START Extend (Start)" ;
-                           SKIP FOR ! FILE("d:\sanitex\start.prg" ) 
+                           SKIP FOR ! FILE("d:\webstack\start.prg" ) 
     ON SELECTION BAR (ln1) OF popTools &lcCmd
 
     lcCmd = "DO c_base IN d:\vfplib\Prg\cleanup.prg" 

@@ -1,11 +1,11 @@
-* d:\beta\fcmd\vfpproj\xfilerw\lib.vcx
+* d:\webstack\vsix\vfpproj\vfp\xfilerw\lib.vcx
 **************************************************
-*-- Class Library:  d:\beta\fcmd\vfpproj\xfilerw\lib.vcx
+*-- Class Library:  d:\webstack\vsix\vfpproj\vfp\xfilerw\lib.vcx
 **************************************************
 
 
 **************************************************
-*-- Class:        d_memotext (d:\beta\fcmd\vfpproj\xfilerw\lib.vcx)
+*-- Class:        d_memotext (d:\webstack\vsix\vfpproj\vfp\xfilerw\lib.vcx)
 *-- ParentClass:  textbox
 *-- BaseClass:    textbox
 *
@@ -76,8 +76,8 @@ ENDDEFINE
 
 
 **************************************************
-*-- Class:        d_textbox (d:\beta\fcmd\vfpproj\xfilerw\lib.vcx)
-*-- ParentClass:  l_textbox (d:\beta\fcmd\vfpproj\xfilerw\lib.vcx)
+*-- Class:        d_textbox (d:\webstack\vsix\vfpproj\vfp\xfilerw\lib.vcx)
+*-- ParentClass:  l_textbox (d:\webstack\vsix\vfpproj\vfp\xfilerw\lib.vcx)
 *-- BaseClass:    textbox
 *-- Collate Source - Teksto ivedimas su Collate
 *
@@ -188,8 +188,8 @@ ENDDEFINE
 
 
 **************************************************
-*-- Class:        frmparameters (d:\beta\fcmd\vfpproj\xfilerw\lib.vcx)
-*-- ParentClass:  l_form2 (d:\beta\fcmd\vfpproj\xfilerw\lib.vcx)
+*-- Class:        frmparameters (d:\webstack\vsix\vfpproj\vfp\xfilerw\lib.vcx)
+*-- ParentClass:  l_form2 (d:\webstack\vsix\vfpproj\vfp\xfilerw\lib.vcx)
 *-- BaseClass:    form
 *
 DEFINE CLASS frmparameters AS l_form2
@@ -639,8 +639,8 @@ ENDDEFINE
 
 
 **************************************************
-*-- Class:        gc_textbox (d:\beta\fcmd\vfpproj\xfilerw\lib.vcx)
-*-- ParentClass:  l_textbox (d:\beta\fcmd\vfpproj\xfilerw\lib.vcx)
+*-- Class:        gc_textbox (d:\webstack\vsix\vfpproj\vfp\xfilerw\lib.vcx)
+*-- ParentClass:  l_textbox (d:\webstack\vsix\vfpproj\vfp\xfilerw\lib.vcx)
 *-- BaseClass:    textbox
 *-- grid control bazine klase
 *
@@ -734,7 +734,7 @@ ENDDEFINE
 
 
 **************************************************
-*-- Class:        l_checkbox (d:\beta\fcmd\vfpproj\xfilerw\lib.vcx)
+*-- Class:        l_checkbox (d:\webstack\vsix\vfpproj\vfp\xfilerw\lib.vcx)
 *-- ParentClass:  checkbox
 *-- BaseClass:    checkbox
 *-- Bazinë Check Box'o klasë
@@ -812,7 +812,7 @@ ENDDEFINE
 
 
 **************************************************
-*-- Class:        l_combobox (d:\beta\fcmd\vfpproj\xfilerw\lib.vcx)
+*-- Class:        l_combobox (d:\webstack\vsix\vfpproj\vfp\xfilerw\lib.vcx)
 *-- ParentClass:  combobox
 *-- BaseClass:    combobox
 *-- Bazinë Combo Box'o klasë
@@ -868,7 +868,7 @@ ENDDEFINE
 
 
 **************************************************
-*-- Class:        l_commandbutton (d:\beta\fcmd\vfpproj\xfilerw\lib.vcx)
+*-- Class:        l_commandbutton (d:\webstack\vsix\vfpproj\vfp\xfilerw\lib.vcx)
 *-- ParentClass:  commandbutton
 *-- BaseClass:    commandbutton
 *-- Bazinë Command Button'o klasë
@@ -927,7 +927,7 @@ ENDDEFINE
 
 
 **************************************************
-*-- Class:        l_container (d:\beta\fcmd\vfpproj\xfilerw\lib.vcx)
+*-- Class:        l_container (d:\webstack\vsix\vfpproj\vfp\xfilerw\lib.vcx)
 *-- ParentClass:  container
 *-- BaseClass:    container
 *-- Bazinë Container'io klasë
@@ -1012,7 +1012,7 @@ ENDDEFINE
 
 
 **************************************************
-*-- Class:        l_control (d:\beta\fcmd\vfpproj\xfilerw\lib.vcx)
+*-- Class:        l_control (d:\webstack\vsix\vfpproj\vfp\xfilerw\lib.vcx)
 *-- ParentClass:  control
 *-- BaseClass:    control
 *-- Bazinë Control'o klasë
@@ -1068,7 +1068,7 @@ ENDDEFINE
 
 
 **************************************************
-*-- Class:        l_custom (d:\beta\fcmd\vfpproj\xfilerw\lib.vcx)
+*-- Class:        l_custom (d:\webstack\vsix\vfpproj\vfp\xfilerw\lib.vcx)
 *-- ParentClass:  custom
 *-- BaseClass:    custom
 *-- Bazinë Custom klasë
@@ -1090,7 +1090,7 @@ ENDDEFINE
 
 
 **************************************************
-*-- Class:        l_editbox (d:\beta\fcmd\vfpproj\xfilerw\lib.vcx)
+*-- Class:        l_editbox (d:\webstack\vsix\vfpproj\vfp\xfilerw\lib.vcx)
 *-- ParentClass:  editbox
 *-- BaseClass:    editbox
 *-- Bazinë Edit Box'o klasë
@@ -1145,12 +1145,12 @@ ENDDEFINE
 
 
 **************************************************
-*-- Class:        l_form (d:\beta\fcmd\vfpproj\xfilerw\lib.vcx)
+*-- Class:        l_form (d:\webstack\vsix\vfpproj\vfp\xfilerw\lib.vcx)
 *-- ParentClass:  form
 *-- BaseClass:    form
 *-- Bazinë Form'os klasë
 *
-#INCLUDE "d:\beta\fcmd\vfpproj\xfilerw\setv.h"
+#INCLUDE "d:\webstack\vsix\vfpproj\vfp\xfilerw\setv.h"
 *
 DEFINE CLASS l_form AS form
 
@@ -1589,7 +1589,7 @@ ENDDEFINE
 
 
 **************************************************
-*-- Class:        l_form2 (d:\beta\fcmd\vfpproj\xfilerw\lib.vcx)
+*-- Class:        l_form2 (d:\webstack\vsix\vfpproj\vfp\xfilerw\lib.vcx)
 *-- ParentClass:  form
 *-- BaseClass:    form
 *-- Bazinë Form'os klasë 2
@@ -1890,7 +1890,7 @@ ENDDEFINE
 
 
 **************************************************
-*-- Class:        l_formset (d:\beta\fcmd\vfpproj\xfilerw\lib.vcx)
+*-- Class:        l_formset (d:\webstack\vsix\vfpproj\vfp\xfilerw\lib.vcx)
 *-- ParentClass:  formset
 *-- BaseClass:    formset
 *-- Bazinë Form Set'o klasë
@@ -1915,7 +1915,7 @@ ENDDEFINE
 
 
 **************************************************
-*-- Class:        l_grid (d:\beta\fcmd\vfpproj\xfilerw\lib.vcx)
+*-- Class:        l_grid (d:\webstack\vsix\vfpproj\vfp\xfilerw\lib.vcx)
 *-- ParentClass:  grid
 *-- BaseClass:    grid
 *-- Bazinë Grid'o klasë
@@ -2124,7 +2124,7 @@ ENDDEFINE
 
 
 **************************************************
-*-- Class:        l_image (d:\beta\fcmd\vfpproj\xfilerw\lib.vcx)
+*-- Class:        l_image (d:\webstack\vsix\vfpproj\vfp\xfilerw\lib.vcx)
 *-- ParentClass:  image
 *-- BaseClass:    image
 *-- Bazinë Image klasë
@@ -2178,7 +2178,7 @@ ENDDEFINE
 
 
 **************************************************
-*-- Class:        l_label (d:\beta\fcmd\vfpproj\xfilerw\lib.vcx)
+*-- Class:        l_label (d:\webstack\vsix\vfpproj\vfp\xfilerw\lib.vcx)
 *-- ParentClass:  label
 *-- BaseClass:    label
 *-- Bazinë Label'o klasë
@@ -2235,7 +2235,7 @@ ENDDEFINE
 
 
 **************************************************
-*-- Class:        l_line (d:\beta\fcmd\vfpproj\xfilerw\lib.vcx)
+*-- Class:        l_line (d:\webstack\vsix\vfpproj\vfp\xfilerw\lib.vcx)
 *-- ParentClass:  line
 *-- BaseClass:    line
 *-- Bazinë Line  klasë
@@ -2299,7 +2299,7 @@ ENDDEFINE
 
 
 **************************************************
-*-- Class:        l_listbox (d:\beta\fcmd\vfpproj\xfilerw\lib.vcx)
+*-- Class:        l_listbox (d:\webstack\vsix\vfpproj\vfp\xfilerw\lib.vcx)
 *-- ParentClass:  listbox
 *-- BaseClass:    listbox
 *-- Bazinë List Box'o klasë
@@ -2363,7 +2363,7 @@ ENDDEFINE
 
 
 **************************************************
-*-- Class:        l_listview (d:\beta\fcmd\vfpproj\xfilerw\lib.vcx)
+*-- Class:        l_listview (d:\webstack\vsix\vfpproj\vfp\xfilerw\lib.vcx)
 *-- ParentClass:  olecontrol
 *-- BaseClass:    olecontrol
 *-- OLEObject = C:\WINNT\System32\mscomctl.ocx
@@ -2429,7 +2429,7 @@ ENDDEFINE
 
 
 **************************************************
-*-- Class:        l_pageframe (d:\beta\fcmd\vfpproj\xfilerw\lib.vcx)
+*-- Class:        l_pageframe (d:\webstack\vsix\vfpproj\vfp\xfilerw\lib.vcx)
 *-- ParentClass:  pageframe
 *-- BaseClass:    pageframe
 *-- Bazinë Page Frame'o klasë
@@ -2489,7 +2489,7 @@ ENDDEFINE
 
 
 **************************************************
-*-- Class:        l_shape (d:\beta\fcmd\vfpproj\xfilerw\lib.vcx)
+*-- Class:        l_shape (d:\webstack\vsix\vfpproj\vfp\xfilerw\lib.vcx)
 *-- ParentClass:  shape
 *-- BaseClass:    shape
 *-- Bazinë Shape klasë
@@ -2555,7 +2555,7 @@ ENDDEFINE
 
 
 **************************************************
-*-- Class:        l_spinner (d:\beta\fcmd\vfpproj\xfilerw\lib.vcx)
+*-- Class:        l_spinner (d:\webstack\vsix\vfpproj\vfp\xfilerw\lib.vcx)
 *-- ParentClass:  spinner
 *-- BaseClass:    spinner
 *-- Bazinë Spinner'io klasë
@@ -2610,7 +2610,7 @@ ENDDEFINE
 
 
 **************************************************
-*-- Class:        l_textbox (d:\beta\fcmd\vfpproj\xfilerw\lib.vcx)
+*-- Class:        l_textbox (d:\webstack\vsix\vfpproj\vfp\xfilerw\lib.vcx)
 *-- ParentClass:  textbox
 *-- BaseClass:    textbox
 *-- Bazinë Text Box'o klasë
@@ -2666,7 +2666,7 @@ ENDDEFINE
 
 
 **************************************************
-*-- Class:        l_toolbar (d:\beta\fcmd\vfpproj\xfilerw\lib.vcx)
+*-- Class:        l_toolbar (d:\webstack\vsix\vfpproj\vfp\xfilerw\lib.vcx)
 *-- ParentClass:  toolbar
 *-- BaseClass:    toolbar
 *-- Bazinë Tool Bar'o klasë
@@ -2691,7 +2691,7 @@ ENDDEFINE
 
 
 **************************************************
-*-- Class:        l_treeview (d:\beta\fcmd\vfpproj\xfilerw\lib.vcx)
+*-- Class:        l_treeview (d:\webstack\vsix\vfpproj\vfp\xfilerw\lib.vcx)
 *-- ParentClass:  olecontrol
 *-- BaseClass:    olecontrol
 *-- OLEObject = C:\WINNT\System32\mscomctl.ocx
@@ -2757,7 +2757,7 @@ ENDDEFINE
 
 
 **************************************************
-*-- Class:        vcr (d:\beta\fcmd\vfpproj\xfilerw\lib.vcx)
+*-- Class:        vcr (d:\webstack\vsix\vfpproj\vfp\xfilerw\lib.vcx)
 *-- ParentClass:  container
 *-- BaseClass:    container
 *-- generic vcr buttons
