@@ -4,8 +4,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Windows;
-using System.Windows.Forms.Integration;
-using VfpInterop;
 using VisualFoxpro;
 
 namespace VfpProj

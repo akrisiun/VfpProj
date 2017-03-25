@@ -5,16 +5,15 @@ using System.ComponentModel;
 using System.Text;
 using System.Xml.Linq;
 using VisualFoxpro;
-using Microsoft.Win32;
-using System.Windows;
-using System.Reflection;
-using System.Security.Permissions;
+using System.Runtime.Serialization;
 
 namespace VfpProj
 {
     [ProgId("VfpProj.CsObj"), Guid("c155b373-563f-433f-8fcf-18fd98100013")]
     [ClassInterface(ClassInterfaceType.AutoDispatch)]
     [ComVisible(true)]
+    [Serializable]
+    [DataContract]
     public sealed class CsObj : _Events, IComponent, IDisposable
 #if DLL
             , VfpProj.UnsafeNativeMethods.IViewObject
@@ -34,17 +33,24 @@ namespace VfpProj
 
         public CsObj GetInstance() { return this; }
 
-        public _Form CmdForm { get { return FoxCmd.FormObj as _Form; } }
+        [DataMember]
+        public _Form CmdForm {
+            get { return FoxCmd.FormObj as _Form; }
+            set { FoxCmd.SetFormObj(value as CsForm ?? FoxCmd.FormObj); }
+        }
 
-        public string Name { get { return "VfpProj.CsObj." + cnt.ToString(); } }
+        [DataMember]
+        public string Name { get { return "VfpProj.CsObj." + cnt.ToString(); } set { } }
+
+        //[NonSerialized]
         public FoxApplication App { get { return FoxCmd.App as FoxApplication; } }
+        //[NonSerialized]
         public CsApp CSApp { get { return CsApp.Instance; } }
 
-        public IntPtr hWnd
-        {
+        [DataMember]
+        public IntPtr hWnd {
             get { return FoxCmd.hWnd; }
-            set
-            {
+            set {
                 FoxCmd.hWnd = value;
             }
         }

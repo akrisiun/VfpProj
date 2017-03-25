@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Shell;
-using System.Windows.Forms.Integration;
-using VfpProj;
 using System.Threading;
-using System.Windows.Media.Imaging;
 
 namespace VfpProj
 {
@@ -18,8 +14,7 @@ namespace VfpProj
         static CsApp() { } // debugger entry
 
         static CsApp startRef;
-        public static CsApp Instance
-        {
+        public static CsApp Instance {
             [DebuggerStepThrough]
             get { return startRef ?? Application.Current as CsApp; }
             set { startRef = value; }
@@ -59,12 +54,26 @@ namespace VfpProj
         {
             Vfp.Startup.Instance.LoadMain(null);
 
-            var app = new VisualFoxpro.FoxApplication();
-            app.Visible = true;
-            FoxCmd.SetApp(app);
-            FoxCmd.SetVar();
+            try
+            {
+                var app = new VisualFoxpro.FoxApplication();
+                app.Visible = true;
+                FoxCmd.SetApp(app);
+                FoxCmd.SetVar();
 
-            Vfp.Startup.Instance.Show(app);
+                var inst = Vfp.Startup.Instance;
+                inst.ShowThen(app, then: (app1) =>
+                {
+                    var screen = app1.Eval("_SCREEN");
+                    if (screen != null)
+                    {
+                        app1.DoCmd("_SCREEN.AddProperty('ocs', m.ocs)");
+                        app1.DoCmd("_SCREEN.ocs_form = m.ocs_form");
+                    }
+                }
+                );
+            }
+            catch (Exception ex) { MessageBox.Show(ex.Message); }
         }
 
         void App_Startup(object sender, StartupEventArgs e)

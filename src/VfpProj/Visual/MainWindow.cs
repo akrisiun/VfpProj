@@ -28,7 +28,9 @@ namespace VfpProj
 
         public Button buttonModi { get; set; }
         public Button buttonDO { get; set; }
+        public Button buttonWcf { get; set; }
 
+        public ComboBox comboPrj { get; set; }
         public ComboBox comboCfg { get; set; }
         public TextBox txtFile { get; set; }
 
@@ -40,6 +42,10 @@ namespace VfpProj
             buttonDO = this.cmdPanel.buttonDO;
             txtFile = this.cmdPanel.txtFile;
             comboCfg = this.cmdPanel.comboCfg;
+
+            buttonWcf = this.cmdPanel.buttonWcf;
+            comboPrj = this.cmdPanel.comboPrj;
+            comboPrj.Visibility = Visibility.Collapsed; // TODO
 
             var cfFile = System.AppDomain.CurrentDomain.BaseDirectory + @"cmd.cfg";
             ReadCfg(cfFile);
@@ -153,6 +159,13 @@ namespace VfpProj
                 ShadowDepth = 2
             }; */
             events.AfterRendered();
+
+            var inst = Vfp.Startup.Instance;
+            if (FoxCmd.App != null && inst != null && inst.Then != null)
+            {
+                inst.Then(FoxCmd.App);
+                inst.Then = null;
+            }
         }
 
         private static readonly Thickness MainBorderMaximizedPadding = new Thickness(13);

@@ -4,12 +4,10 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Forms = System.Windows.Forms;
-using VfpProj;
 using VfpInterop;
 
 namespace VfpProj.Native
@@ -18,14 +16,12 @@ namespace VfpProj.Native
     public class WindowsEvents : ISupportInitialize
     {
         CsForm form;
-        public MainWindow Form
-        {
+        public MainWindow Form {
             [DebuggerStepThrough]
             get { return form.Form; }
         }
 
-        public PrjWindow FormPrj
-        {
+        public PrjWindow FormPrj {
             [DebuggerStepThrough]
             get;
             protected set;
@@ -83,12 +79,23 @@ namespace VfpProj.Native
 
             frm.Topmost = true;
             frm.tabList.SelectionChanged += tabWI_IndexChanged;
+
 #if NOWPF_TEXTBOX
             //frm.txtFile.KeyDown += txtFile_KeyDown;
 #else
             frm.txtFile.KeyDown += txtFile_KeyDown;
 #endif
             frm.buttonDO.Click += (s, e) => DoCmd(form.Text);
+
+            frm.buttonWcf.Click += (s, e) => Wcf.VfpService.Instance.Bind();
+            var sets = System.Configuration.ConfigurationManager.AppSettings;
+            var baseAddress = sets.Get("baseAddress");
+            if (!string.IsNullOrWhiteSpace(baseAddress))
+            {
+                Wcf.VfpService.Instance.Bind();
+                if (Wcf.Host.Object != null)
+                    frm.buttonWcf.Visibility = Visibility.Hidden;
+            }
         }
         #endregion
 
@@ -130,7 +137,8 @@ namespace VfpProj.Native
         void FormFocus(MainWindow form1)
         {
             string dir = form1.events.directory;
-            if (CsObj.Instance.IsLockForm)
+            if (CsObj.Instance == null 
+                || CsObj.Instance.IsLockForm)
                 return;
 
             var app = FoxCmd.App;
@@ -305,7 +313,7 @@ namespace VfpProj.Native
             var res = dlg.ShowDialog();
             if (res != Forms.DialogResult.OK)
                 return;
-            
+
             FileSystem.CurrentDirectory = dlg.SelectedPath;
 #endif
             directory = FileSystem.CurrentDirectory;
@@ -325,6 +333,31 @@ namespace VfpProj.Native
         {
             if (FormPrj == null || !FormPrj.IsLoaded)
             {
+                if (VfpProj.Wcf.Host.Object != null)
+                {
+                    try
+                    {
+                        var service = VfpProj.Wcf.VfpServiceBehavior.CreateWebService(true);
+                        //  System.ServiceModel.Channels.ServiceChannelProxy
+                        var vfpService = service as  VfpProj.Wcf.VfpService;
+                        if (service != null)
+                        {
+                            service.Load(null);
+                            service.Load(CsObj.Instance);
+                        }
+
+                    } catch (Exception ex)
+                    {
+                        var msg = ex.Message;
+                        if (ex.InnerException != null)
+                            msg += ex.InnerException.Message;
+                        MessageBox.Show(msg);                        
+                    }
+
+                }
+
+
+
                 FormPrj = null; // clear
                 var txtDir = Form.txtFile.Text;
                 if (txtDir.Length > 0 && Directory.Exists(txtDir))
@@ -470,7 +503,7 @@ namespace VfpProj.Native
                     FoxCmd.AppCmd("MODI COMM " + cmd + " NOWAIT");
                 else
                     if (ext == ".pjx")
-                        FoxCmd.AppCmd("MODI PROJ " + cmd + " NOWAIT");
+                    FoxCmd.AppCmd("MODI PROJ " + cmd + " NOWAIT");
             }
             else
                 FoxCmd.AppCmd(cmd);
@@ -525,10 +558,10 @@ namespace VfpProj.Native
                     cmd = "ACTIVATE WINDOW Project";
                 else
                     if (wi.text.StartsWith("Properties"))
-                        cmd = "ACTIVATE WINDOW Properties";
-                    else
+                    cmd = "ACTIVATE WINDOW Properties";
+                else
                         if (!wi.text.ToLower().Contains("data session"))
-                            cmd = "ACTIVATE WINDOW \"" + wi.text + "\"";
+                    cmd = "ACTIVATE WINDOW \"" + wi.text + "\"";
                 if (cmd.Length > 0)
                     FoxCmd.AppCmd(cmd);
             }
