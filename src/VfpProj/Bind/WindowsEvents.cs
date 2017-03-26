@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Forms = System.Windows.Forms;
 using VfpInterop;
+using System.ServiceModel;
 
 namespace VfpProj.Native
 {
@@ -137,7 +138,7 @@ namespace VfpProj.Native
         void FormFocus(MainWindow form1)
         {
             string dir = form1.events.directory;
-            if (CsObj.Instance == null 
+            if (CsObj.Instance == null
                 || CsObj.Instance.IsLockForm)
                 return;
 
@@ -335,28 +336,30 @@ namespace VfpProj.Native
             {
                 if (VfpProj.Wcf.Host.Object != null)
                 {
+                    OperationContext ctx = null;
                     try
                     {
                         var service = VfpProj.Wcf.VfpServiceBehavior.CreateWebService(true);
-                        //  System.ServiceModel.Channels.ServiceChannelProxy
-                        var vfpService = service as  VfpProj.Wcf.VfpService;
                         if (service != null)
                         {
+                            // var htmlMsg = service.Index();
                             service.Load(null);
                             service.Load(CsObj.Instance);
                         }
 
-                    } catch (Exception ex)
+                    }
+                    catch (Exception ex)
                     {
                         var msg = ex.Message;
                         if (ex.InnerException != null)
                             msg += ex.InnerException.Message;
-                        MessageBox.Show(msg);                        
+                        MessageBox.Show(msg);
+                        //StatusDescriptionStrings
+                        //  internal const string HttpContentTypeMismatch = 
+                        // "Cannot process the message because the content type '{0}' was not the expected type '{1}'.";
                     }
 
                 }
-
-
 
                 FormPrj = null; // clear
                 var txtDir = Form.txtFile.Text;

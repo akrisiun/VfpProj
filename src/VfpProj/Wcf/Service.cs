@@ -1,23 +1,19 @@
 ﻿using System;
 using System.ServiceModel;
-//using System.Threading.Tasks;
-//using System.Threading;
-using System.Security.Cryptography.X509Certificates;
-using System.Net.Security;
 using System.Runtime.Serialization;
-using System.ServiceModel.Description;
+using System.ServiceModel.Web;
 using System.Threading.Tasks;
 using System.Diagnostics;
-using System.Collections;
 using System.Collections.Generic;
-// using System.Activities;
+using System.ServiceModel.Channels;
 
 namespace VfpProj.Wcf
 {
     // bindingConfiguration="BasicHttpBinding_IVfpService" contract="VfpProj.Wcf.IVfpService" name="BasicHttpBinding_IVfpService" />
     // VfpProj.Wcf.IVfpService
-
     // httpcfg set ssl -i 0.0.0.0:8080 -h b2fdd72d153ac0daa462ae26fe0902dfb7cfe670 -n LOCAL_MACHINE -c MY
+
+    #region Interfaces
 
     [ServiceContract]
     [ServiceKnownType(typeof(VfpService))]
@@ -32,6 +28,14 @@ namespace VfpProj.Wcf
         [OperationContract] IVfpData DoCompile(string file);
     }
 
+    [ServiceContract]
+    [ServiceKnownType(typeof(VfpIndex))]
+    public interface IVfpIndex
+    {
+        [OperationContract(Action = "*", ReplyAction = "*")]
+        Message Index();
+    }
+
     public interface IVfpData
     {
         [DataMember] string Name { get; set; }
@@ -44,30 +48,25 @@ namespace VfpProj.Wcf
         [DataMember] IList<KeyValuePair<string, object>> VFP { get; set; }
     }
 
-    public class VfpServiceBehavior
+    #endregion
+
+    [Serializable]
+    [DataContract]
+    public class VfpIndex : IVfpIndex
     {
-
-        // Note that the httpsGetEnabled is set to true. This means
-        /// <returns>The newly created client.</returns>
-
-        public static IVfpService CreateWebService(bool selfHosted)
+        // [OperationContract(Action = "*", ReplyAction = "*")]
+        public Message Index()
         {
-            var address = "http://localhost:9001/VfpService";
-            //: "http://localhost:51423/TimeWebService/TimeWebService.svc";
+            var context = WebOperationContext.Current;
+            context.OutgoingResponse.ContentType = "text/html";
+            var to = OperationContext.Current.RequestContext.RequestMessage.Headers.To;
 
-            BasicHttpBinding binding = new BasicHttpBinding(); // new WebHttpBinding()
-            binding.ReceiveTimeout = TimeSpan.FromSeconds(30);
-            binding.OpenTimeout = TimeSpan.FromSeconds(10);
-            var channelFactory = new ChannelFactory<IVfpService>(binding, address);
-            //channelFactory.Endpoint.Behaviors.Add(new WebHttpBehavior());
-
-            return channelFactory.CreateChannel();
+            return new LandingPageMessage();
         }
     }
 
     [Serializable]
-    [DataContract]
-    // [ServiceContract]
+    [DataContract] // no [ServiceContract]
     public class VfpService : IVfpService, IVfpData, IDisposable
     {
         public static VfpService Instance; // { get; set; }
@@ -149,6 +148,8 @@ namespace VfpProj.Wcf
             if (Debugger.IsAttached)
                 Debugger.Break();
 
+            var context = OperationContext.Current;
+
             Console.WriteLine("WCF: Load");
             if (obj != null)
                 Console.WriteLine(obj.ToString());
@@ -175,67 +176,11 @@ namespace VfpProj.Wcf
 
         public void Dispose()
         {
-           VfpError = null;
-           VFP = null;
+            VfpError = null;
+            VFP = null;
         }
     }
 
-    public static class Host
-    {
-        public static IVfpData UpdateValues(IVfpData obj, VisualFoxpro.FoxApplication app)
-        {
-            obj.StatusBar = app.StatusBar;
-            obj.Directory = app.DefaultFilePath;
-            obj.HWnd = app.hWnd;
-            obj.Name = app.Name;
-            obj.ActiveProject = null;
-            try { obj.ActiveProject = app.ActiveProject == null ? "" : app.ActiveProject.Name; }
-            catch { }
-
-            return obj;
-        }
-
-        public static ICommunicationObject Object { get; set; }
-
-        static bool ValidateCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
-        {
-            return true;
-        }
-
-        public static void Create()
-        {
-            ServiceHost svcHost = null;
-            System.Net.ServicePointManager.ServerCertificateValidationCallback += new
-                RemoteCertificateValidationCallback(ValidateCertificate);
-
-            try
-            {
-                var serviceUri = new Uri("http://localhost:9001/VfpService");
-
-                BasicHttpBinding binding = new BasicHttpBinding("BasicHttpBinding_IVfpService"); //  BasicHttpSecurityMode.Transport);
-                svcHost = new ServiceHost(typeof(VfpService), serviceUri);
-                ServiceMetadataBehavior mex = svcHost.Description.Behaviors.Find<ServiceMetadataBehavior>();
-                if (mex == null)
-                {
-                    mex = new ServiceMetadataBehavior();
-                    mex.HttpGetEnabled = true;
-                    mex.HttpsGetEnabled = false;
-                    svcHost.Description.Behaviors.Add(mex);
-                }
-
-                Object = svcHost;
-                svcHost.Open();
-                // Debugger.Log
-                Console.WriteLine("\nhttp://localhost:9001/VfpService");
-            }
-            catch (Exception eX)
-            {
-                svcHost = null;
-                System.Windows.Forms.MessageBox.Show("Service can not be started \n\nError Message [" + eX.Message + "]");
-                Object = null;
-            }
-        }
-    }
 }
 
 /*

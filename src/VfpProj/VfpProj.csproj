@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <!--$(MSBuildToolsVersion)-->
   <Import Project="$(MSBuildExtensionsPath)\14.0\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\14.0\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -10,11 +10,12 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>VfpProj</RootNamespace>
     <AssemblyName>VfpProj</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -77,24 +78,18 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
       <HintPath>..\..\Lib\Interop.VisualFoxpro.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.VisualStudio.ManagedInterfaces.WCF, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.VisualStudio.WCFReference.Interop, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Runtime.Remoting" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Net.Http.WebRequest" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
     <Reference Include="System.ServiceModel" />
-    <Reference Include="System.ServiceModel.Activities" />
-    <Reference Include="System.ServiceModel.Channels" />
-    <Reference Include="System.ServiceModel.Discovery" />
     <Reference Include="System.ServiceModel.Routing" />
-    <Reference Include="System.ServiceProcess" />
-    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
@@ -145,6 +140,9 @@
     <Compile Include="Visual\MainWindow.cs" />
     <Compile Include="Visual\TextRead.cs" />
     <Compile Include="Visual\VfpTabs.cs" />
+    <Compile Include="Wcf\Landing.cs" />
+    <Compile Include="Wcf\Host.cs" />
+    <Compile Include="Wcf\VfpServiceBehavior.cs" />
     <Compile Include="Wcf\Service.cs" />
     <Page Include="Visual\EditPanel.xaml">
       <SubType>Designer</SubType>
