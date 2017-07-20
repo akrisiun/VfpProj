@@ -9,7 +9,7 @@ using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
-using VfpProj;
+using VfpEdit;
 
 namespace VfpProj
 {

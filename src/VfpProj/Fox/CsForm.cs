@@ -10,27 +10,21 @@ using System.Text;
 using System.Security.Permissions;
 using Microsoft.Win32;
 using System.Reflection;
-using System.Runtime.Serialization;
 
 namespace VfpProj
 {
     [ClassInterface(ClassInterfaceType.AutoDual)]
     [ProgId("VfpProj.Form"), Guid("c155b373-563f-433f-8fcf-18fd98100014")]
     [ComVisible(true)]
-    [Serializable]
-    [DataContract]
     public class CsForm : _Form, IComponent, IDisposable
     {
         public MainWindow Form { get; private set; }
         public void SetForm(MainWindow form) { Form = form; }
-
         public bool CheckAccess() { return Form != null && Form.events != null && Form.Dispatcher.CheckAccess(); }
         public bool IsBound() { return Form != null && Form.events != null && Form.events.IsBound; }
 
         public _Events CsObject { get { return CsObj.Instance; } }
         public _Startup Instance { get { return Startup.Instance; } }
-
-        [DataMember]
         public Exception LastError { get; set; }
 
         public void Dispose() { Form = null; }
@@ -96,7 +90,6 @@ namespace VfpProj
             get { return _project; }
         }
 
-        // [NonSerialized]
         public Native.WindowsEvents Events { get { return Form == null ? null : Form.events; } }
 
         string _Form.Name { get { return "VfpProj._Form.CsForm"; } }

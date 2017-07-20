@@ -1,4 +1,4 @@
-﻿<Window x:Class="VfpProj.EditWindow"
+﻿<Window x:Class="VfpEdit.EditWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:avalonedit="clr-namespace:ICSharpCode.AvalonEdit;assembly=ICSharpCode.AvalonEdit"
@@ -15,7 +15,7 @@
                               Width="440"/>
             <ColumnDefinition />
             <ColumnDefinition x:Name="col3" x:FieldModifier="public"
-                              Width="1" />
+                              Width="24" />
         </Grid.ColumnDefinitions>
 
         <WindowsFormsHost Grid.Column="0" x:Name="hostPath" 
