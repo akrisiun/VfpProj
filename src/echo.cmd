@@ -1,0 +1,3 @@
+@ECHO Hello cmd
+
+@PAUSE

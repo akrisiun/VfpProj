@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+  <PropertyGroup>
+    <DeployVSTemplates Condition="'$(DeployVSTemplates)' == ''">false</DeployVSTemplates>
+    <GetVsixItemsToBundleDependsOn>$(GetVsixItemsToBundleDependsOn);Compile</GetVsixItemsToBundleDependsOn>
+    <DeployVsixExtensionFilesDependsOn>$(DeployVsixExtensionFilesDependsOn);Compile</DeployVsixExtensionFilesDependsOn>
+    <ExtensionsDeploymentSubPath Condition="'$(ExtensionsDeploymentSubPath)' == ''"
+                                 >Microsoft\VisualStudio\$(VSSDKTargetPlatformVersion)$(VSSDKTargetPlatformRegRootSuffix)\Extensions\</ExtensionsDeploymentSubPath>
+    <TargetVSVersion Condition="'$(TargetVSVersion)' == ''">$(VSSDKTargetPlatformVersion)</TargetVSVersion>
+    <DeployExtension Condition="'$(DeployExtension)' == ''">false</DeployExtension>
+    <CopyVsixExtensionFiles Condition="'$(CopyVsixExtensionFiles)'==''">false</CopyVsixExtensionFiles>
+    <CreateVsixContainer Condition="'$(CreateVsixContainer)' == ''">true</CreateVsixContainer>
+    <CopyVsixManifestToOutput 
+      Condition="'$(CopyVsixManifestToOutput)' == '' and ('$(CreateVsixContainer)' != 'false' or '$(DeployExtension)' != 'false' or '$(CopyVsixExtensionFiles)' != 'false')">true</CopyVsixManifestToOutput>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
+</Project>

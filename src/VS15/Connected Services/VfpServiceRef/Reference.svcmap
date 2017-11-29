@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="5781f28c-e21b-4724-94a3-d5bc692bf4dd" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="http://localhost:9001/VfpService" Protocol="http" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="VfpService3.xsd" MetadataType="Schema" ID="f743cf56-7e06-40bc-be91-fb7b5e4f051a" SourceId="1" SourceUrl="http://localhost:9001/VfpService?xsd=xsd4" />
+    <MetadataFile FileName="VfpService.wsdl" MetadataType="Wsdl" ID="36808f1f-7afd-4a84-8f0b-fff9d3cfccbe" SourceId="1" SourceUrl="http://localhost:9001/VfpService?wsdl" />
+    <MetadataFile FileName="VfpService.xsd" MetadataType="Schema" ID="b7b2588b-8e3c-44ef-8667-9377745df27c" SourceId="1" SourceUrl="http://localhost:9001/VfpService?xsd=xsd0" />
+    <MetadataFile FileName="VfpService1.xsd" MetadataType="Schema" ID="09a77831-f321-4e51-9c98-fca34ede9cee" SourceId="1" SourceUrl="http://localhost:9001/VfpService?xsd=xsd1" />
+    <MetadataFile FileName="VfpService2.xsd" MetadataType="Schema" ID="009e0010-93ef-4a27-bb52-d1efd1143914" SourceId="1" SourceUrl="http://localhost:9001/VfpService?xsd=xsd2" />
+    <MetadataFile FileName="VfpService.disco" MetadataType="Disco" ID="9f8fa6a3-8e2d-40ce-be63-7caf55f5aa59" SourceId="1" SourceUrl="http://localhost:9001/VfpService?disco" />
+    <MetadataFile FileName="VfpService4.xsd" MetadataType="Schema" ID="834e6de3-5038-4069-9d67-800d66a571e5" SourceId="1" SourceUrl="http://localhost:9001/VfpService?xsd=xsd3" />
+    <MetadataFile FileName="VfpService5.xsd" MetadataType="Schema" ID="afdf2985-81b9-4add-9351-2b47a8c2214a" SourceId="1" SourceUrl="http://localhost:9001/VfpService?xsd=xsd5" />
+    <MetadataFile FileName="VfpService51.xsd" MetadataType="Schema" ID="c579b7a5-fab3-40af-8ff2-1b09893e82f1" SourceId="1" SourceUrl="http://localhost:9001/VfpService?xsd=xsd6" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>
