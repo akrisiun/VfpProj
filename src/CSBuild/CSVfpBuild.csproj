@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net46</TargetFrameworks>
+    <RootNamespace>VfpBuild</RootNamespace>
+    <AssemblyName>CSVfpBuild</AssemblyName>
+    <ApplicationIcon />
+    <OutputType>Exe</OutputType>
+    <StartupObject />
+    <Platforms>x86</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Interop.vfpbuild.dll" />
+    <None Remove="vfpbuild.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <COMReference Include="vfpbuild.dll">
+      <Guid>423b693c-8eba-46d8-b3e0-31e5baadbc54</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>false</Isolated>
+      <EmbedInteropTypes>true</EmbedInteropTypes>
+      <Private>true</Private>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build.Framework" Version="15.1.1012" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.1.1012" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+</Project>

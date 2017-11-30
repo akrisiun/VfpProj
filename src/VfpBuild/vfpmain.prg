@@ -12,12 +12,19 @@
 
 DEFINE CLASS VfpBuild AS SESSION OLEPUBLIC
 
-  * PROTECTED 
   * PUBLIC oVfp AS VisualFoxpro.APPLICATION
   oVfp = .NULL.
+  uRetVal = .T.
+  DSID = 1
+  fBuildAll = .F.
+  lClose = .T.
+  cOutputName = ""
+  nBuildAction = 0
 
   * PUBLIC cProject AS STRING
   cProject = ""
+  cFolder = ""
+  LastError = .NULL.
 
   * PUBLIC cErrorMessage  as String
   cErrorMessage = ""
@@ -35,9 +42,84 @@ DEFINE CLASS VfpBuild AS SESSION OLEPUBLIC
   cWarningMessage_COMATTRIB[2] = "Build Warnings"
   cWarningMessage_COMATTRIB[3] = "cWarningMessage"
   cWarningMessage_COMATTRIB[4] = "String"
+  
+ FUNCTION Compile(cPrgFile AS STRING)
+ 
+    This.oVFP = CREATEOBJECT("VisualFoxpro.Application")
+    oVFP = this.oVFP
+        
+    IF TYPE("oVFP.hWnd") = 'N'
+       oVFP.DoCmd("COMPILE " + cPrjFile)
+       CloseVfp()
+    ELSE
+      _VFP.DoCmd("COMPILE " + cPrjFile)
+    ENDIF
+    
 
+ FUNCTION BuildPjx(cProjectFile AS STRING, cOutputName AS STRING)
+    
+    This.DSID = SET("Datasession")
+ 
+    LOCAL lcPath, lcDir as String, lOk AS Boolean
+    lcPath = FULLPATH(cProjectFile)
+    lcDir = ADDBS(JUSTPATH(lcPath))
+    
+    lOk = This.BuildProject(lcPath, cOutputName, 0, "", "", lcDir)
+    IF this.lClose
+       CloseVfp()
+    ENDIF  
+    
+    RETURN lOk 
 
- FUNCTION BuildProject(cProjectFile AS STRING, cOutputName AS STRING;
+ FUNCTION BuildVisible(lVisible as Boolean)
+    this.oVfp.Visible = EVL(lVisible, .T.)
+    
+ FUNCTION CreateApplication()
+    IF TYPE("This.oVFP.ProcessId") <> 'N'
+       This.oVFP = CREATEOBJECT("VisualFoxpro.Application")
+       this.oVFP.OLEServerBusyRaiseError = .F.
+    ENDIF
+    _SCREEN.AddProperty("oVFP", this.ovfp)
+
+ FUNCTION ApplicationMsg()
+    
+    LOCAL lcMsg as String
+    lcMsg = ""
+    TRY
+      lcMsg = this.oVfp.Eval("MESSAGE()")
+    CATCH
+    ENDTRY
+
+    RETURN lcMsg
+    
+ FUNCTION BuildExe(cProjectFile AS STRING, cOutputName AS STRING)
+ 
+    this.CreateApplication()
+
+    This.cProject = cProjectFile
+    
+    LOCAL lcMsg as String
+    lcMsg = ""
+    TRY
+
+      This.oVFP.DOCMD('MODIFY PROJECT "' + This.cProject + '" NOSHOW NOWAIT')
+      This.oVFP.DOCmd("BUILD EXE " + cOutputName + " FROM " + this.cProject + " RECOMPILE")
+      
+      lcMsg = This.oVFP.StatusBar
+      This.ErrorMsg(lcMsg) 
+            
+    CATCH
+
+      lcMsg = This.oVFP.StatusBar
+      This.ErrorMsg("Failed to open project " + This.cProject + " (KILLED)") 
+
+      lKilled = .T.
+    ENDTRY
+    
+    RETURN lcMsg
+    
+    
+ FUNCTION BuildProject(cProjectFile AS STRING, cOutputName AS STRING ;
   		, nBuildAction AS INTEGER, cVsProjectFile AS STRING, cBuildTime AS STRING, cBuildPath AS STRING) AS Boolean
 
     LOCAL cProjectPath AS STRING, ;
@@ -46,19 +128,33 @@ DEFINE CLASS VfpBuild AS SESSION OLEPUBLIC
       lKilled AS Boolean, ;
       cMissingFiles AS STRING, ;
       cFile AS STRING
+      
+    IF EMPTY(cProjectFile)
 
-    cProjectPath  = JUSTPATH(m.cVSProjectFile) + "\"
-    THIS.cProject      = m.cProjectPath + m.cProjectFile
-    cOutputPath   = ALLTRIM(m.cBuildPath)
+      This.ErrorMsg("Project .PJX error: " + TRANSFORM(cProjectFile))
+      RETURN .F.
+    ENDIF
+      
+    IF VARTYPE(m.cVSProjectFile) = 'C' AND ATC(":\", m.cVSProjectFile) > 0
+       cProjectPath  = JUSTPATH(m.cVSProjectFile) + "\"
+    ENDIF
+    
+    This.cFolder = JUSTPATH(cProjectFile) + "\"
+    IF EMPTY(This.cFolder)
+       This.cFolder = FULLPATH(".") + "\"
+    ENDIF
+    This.cProject = This.cFolder + JUSTFNAME(m.cProjectFile)
+    cOutputPath   = ADDBS(EVL(ALLTRIM(m.cBuildPath), this.cFolder))
+    
     lReturn       = .T.
     lKilled       = .F.
     cMissingFiles = ""
 
     * First we test to see if the project file exists
     *------------------------------------------------
-    IF NOT FILE(THIS.cProject)
+    IF NOT FILE(This.cProject)
 
-      THIS.cErrorMessage = "Project " + THIS.cProject + " does not exist"
+      This.ErrorMsg("Project " + This.cProject + " does not exist")
 
       RETURN .F.
 
@@ -66,13 +162,13 @@ DEFINE CLASS VfpBuild AS SESSION OLEPUBLIC
 
     * Next we make sure it isn't locked by another user
     *--------------------------------------------------
-    nHandle = FOPEN(THIS.cProject, 12)
+    nHandle = FOPEN(This.cProject, 12)
 
     FCLOSE(m.nHandle)
 
     IF m.nHandle < 0
 
-      THIS.cErrorMessage = "Project " + THIS.cProject + " is in use"
+      This.ErrorMsg("Project " + This.cProject + " is in use")
 
       RETURN .F.
 
@@ -80,18 +176,21 @@ DEFINE CLASS VfpBuild AS SESSION OLEPUBLIC
 
     * Check the project to see if all the files in the project exist
     *---------------------------------------------------------------
-    USE (THIS.cProject) IN 0 ALIAS MyProject
+    USE (This.cProject) IN 0 ALIAS MyProject
 
     SELECT MyProject
 
     IF EMPTY(MyProject.NAME) OR EMPTY(MyProject.HOMEDIR)
 
       REPLACE MyProject.NAME WITH m.cProjectFile + CHR(0), ;
-        MyProject.HOMEDIR WITH m.cProjectPath + CHR(0)
+           MyProject.HOMEDIR WITH m.cProjectPath + CHR(0)
 
     ENDIF
 
-    CD (m.cProjectPath)    && Most paths are relative (ex. "..\..\test.prg")
+    IF EMPTY(cProjectPath)
+       cProjectPath = this.cFolder
+    ENDIF
+    CD (m.cProjectPath)      && Most paths are relative (ex. "..\..\test.prg")
 
     * Delete records have been removed.  This will still cause
     * problems when the project hasn't been rebuilt in a long time.
@@ -112,13 +211,16 @@ DEFINE CLASS VfpBuild AS SESSION OLEPUBLIC
 
     IF NOT EMPTY(m.cMissingFiles)
 
-      THIS.cErrorMessage = "Project files were missing: " + m.cMissingFiles
+      This.ErrorMsg("Project files were missing: " + m.cMissingFiles) 
 
       RETURN .F.
 
     ENDIF
-
-    THIS.oVFP = CREATEOBJECT("VisualFoxpro.Application")
+    
+    IF TYPE("This.oVFP.ProcessId") <> 'N'
+       This.oVFP = CREATEOBJECT("VisualFoxpro.Application")
+       this.oVFP.OLEServerBusyRaiseError = .F.
+    ENDIF
 
     * This app will kill the vfp9.exe process if it hangs up
     * on a user dialog that we can't possibly respond to.
@@ -131,21 +233,26 @@ DEFINE CLASS VfpBuild AS SESSION OLEPUBLIC
       STRING  cDirectory, ;
       INTEGER nShowWindow
 
-    SHELLEXECUTE(_SCREEN.HWND, "OPEN", _VFP.SERVERNAME, TRANSFORM(THIS.oVfp.APPLICATION.PROCESSID) + " " + m.cBuildTime, SYS(2023), .F.)
+    TRY
+      SHELLEXECUTE(_SCREEN.HWND, "OPEN", _VFP.SERVERNAME,;
+                 TRANSFORM(This.oVfp.APPLICATION.PROCESSID) + " " + m.cBuildTime, SYS(2023), .F.)
+    CATCH
+        * ignore temp...
+    ENDTRY                 
 
     * Open the project
     *
-    * The only time this call should error is when opening the project
+    * The only time This call should error is when opening the project
     * causes a dialog box, hangs and is killed by KillProcess.exe.
     * Therefore, we don't need to call This.CloseVFP() in the CATCH.
     *-----------------------------------------------------------------
     TRY
 
-      THIS.oVFP.DOCMD('MODIFY PROJECT "' + THIS.cProject + '" NOSHOW NOWAIT')
+      This.oVFP.DOCMD('MODIFY PROJECT "' + This.cProject + '" NOSHOW NOWAIT')
 
     CATCH
 
-      THIS.cErrorMessage = "Failed to open project " + THIS.cProject + " (KILLED)"
+      This.ErrorMsg("Failed to open project " + This.cProject + " (KILLED)") 
 
       lKilled = .T.
 
@@ -159,7 +266,7 @@ DEFINE CLASS VfpBuild AS SESSION OLEPUBLIC
 
     TRY
 
-      cType = VARTYPE(THIS.oVFP.ACTIVEPROJECT.NAME)
+      cType = VARTYPE(This.oVFP.ACTIVEPROJECT.NAME)
 
     CATCH
 
@@ -167,9 +274,9 @@ DEFINE CLASS VfpBuild AS SESSION OLEPUBLIC
 
     IF m.cType <> "C"
 
-      THIS.cErrorMessage = "Failed to open project " + THIS.cProject
+      This.ErrorMsg("Failed to open project " + This.cProject) 
 
-      THIS.CloseVFP()
+      This.CloseVFP()
 
       RETURN .F.
 
@@ -188,17 +295,40 @@ DEFINE CLASS VfpBuild AS SESSION OLEPUBLIC
     * Since we'll be working from local files in all cases
     * we should "rebuild all" every time.
     *
-    * The only time this call should error is when the build hangs
+    * The only time This call should error is when the build hangs
     * on a Locate File dialog and is killed by KillProcess.exe.
     * Therefore, we don't need to call This.CloseVFP() in the CATCH.
     *-----------------------------------------------------------------
+    
+    LOCAL fBuildAll as Logical, fShowErr as Logical, lcMsg as String
+    
+    This.cOutputName = cOutputName
+    fBuildAll = This.fBuildAll
+    fShowErr = .T.
+    lcMsg = MESSAGE()
+    
+    * 1    BUILDACTION_REBUILD    (Default) Rebuilds the project
+    * 2    BUILDACTION_BUILDAPP    Creates an .app
+    * 3    BUILDACTION_BUILDEXE    Creates an .exe
+    * 4    BUILDACTION_BUILDDLL    Creates a .dll
+    * 5    BUILDACTION_BUILDMTDLL    Creates a multithreaded .dll
+    * https://msdn.microsoft.com/en-us/library/aa977366%28v=vs.71%29.aspx?f=255&MSPPError=-2147217396
+
     TRY
 
-      lReturn = THIS.oVFP.ACTIVEPROJECT.BUILD(m.cOutputPath + THIS.cOutputName, THIS.nBuildAction, .T., .F.)
+      * BUILD DLL c:\Sanitex\vfpbuild.dll FROM VfpBuild RECOMPILE
+      * BUILD EXE c:\Sanitex\vfpbuild.exe FROM VfpBuild RECOMPILE
+      
+      lReturn = This.oVFP.ACTIVEPROJECT.BUILD(m.cOutputPath + This.cOutputName,;
+                EVL(This.nBuildAction, 3), fBuildAll, fShowErr )
 
+      lcMsg = This.oVFP.StatusBar
+      
     CATCH
 
-      THIS.cErrorMessage = "Failed to build project "  + THIS.cProject + " (KILLED)"
+      lcMsg = This.oVFP.StatusBar
+      lcMsg = MESSAGE()
+      This.ErrorMsg("Failed " + lcMsg + " to build project "  + This.cProject + " (KILLED)")
 
       lKilled = .T.
 
@@ -210,7 +340,7 @@ DEFINE CLASS VfpBuild AS SESSION OLEPUBLIC
 
     ENDIF
 
-    cErrorFile = FORCEEXT(THIS.cProject, "err")
+    cErrorFile = FORCEEXT(This.cProject, "err")
 
     IF FILE(m.cErrorFile)
 
@@ -218,11 +348,11 @@ DEFINE CLASS VfpBuild AS SESSION OLEPUBLIC
       *----------------------------------------------
       IF m.lReturn
 
-        THIS.cWarningMessage = FILETOSTR(m.cErrorFile)
+        This.cWarningMessage = FILETOSTR(m.cErrorFile)
 
       ELSE
 
-        THIS.cErrorMessage = FILETOSTR(m.cErrorFile)
+        This.ErrorMsg(FILETOSTR(m.cErrorFile))
 
       ENDIF
 
@@ -230,33 +360,76 @@ DEFINE CLASS VfpBuild AS SESSION OLEPUBLIC
 
       IF m.lReturn = .F.
 
-        THIS.cErrorMessage = "Error building VFP project " + THIS.cProject
+        This.ErrorMsg("Error building VFP project " + This.cProject)
 
       ENDIF
 
     ENDIF
 
-    THIS.CloseVFP()
+    This.CloseVFP()
 
     RETURN m.lReturn
 
   ENDPROC
 
   FUNCTION SetVfp(oVfp as object)
-    THIS.oVfp = NVL(oVfp, _VFP)
+    This.oVfp = NVL(oVfp, _VFP)
 
   FUNCTION CloseVfp()
 
     * Manually close VFP here
     *------------------------
-    THIS.oVFP.QUIT()
-
-    THIS.oVFP = NULL
+    IF TYPE("oVFP.hWnd") = 'N'    
+       This.oVFP.QUIT()
+    ENDIF
+ 
+    This.oVFP = .NULL.
 
   ENDPROC
 
+  FUNCTION ErrorSet(err as Exception) AS Exception
 
+     this.LastError = err
+     RETURN this.LastError
+
+  FUNCTION ErrorMsg(msg as string) AS Exception
+
+     LOCAL err as Exception
+     err = NEWOBJECT("Exception")
+     err.Message = msg
+     
+     this.cErrorMessage = msg
+     this.LastError = err
+     RETURN this.LastError
+
+  PROTECTED FUNCTION ERROR(nError, cMethod, nLine) AS VOID
+
+    SET TEXTMERGE TO (JUSTPATH(_VFP.SERVERNAME) + "\ProjectBuilderErrors-" ;
+      + CHRTRAN(TRANSFORM(DATE()), "/", "-") + ".log") ADDITIVE NOSHOW
+
+    SET TEXTMERGE ON
+
+      \DateTime     : <<TRANSFORM(DATETIME())>>
+      \Error Number : <<TRANSFORM(m.nError)>>
+      \Method       : <<ALLTRIM(m.cMethod)>>
+      \Line Number  : <<TRANSFORM(nLine)>>
+      \Project      : <<This.cProject>>
+      \Message      : <<MESSAGE()>>
+      \ErrorParam   : <<SYS(2018)>>
+      \Current Line : <<IIF(VARTYPE(m.nLine) <> "N", 0, m.nLine)>>
+      \Stack Level  : <<MAX(1, ASTACKINFO(aCurStack) - 1)>>
+      \Line Contents: <aCurStack[This.nLevel, 6]>>
+      \
+
+    SET TEXTMERGE OFF
+
+    SET TEXTMERGE TO
+
+  ENDPROC
+  
+  *#######################################################################################
   FUNCTION INIT()
+  *#######################################################################################
 
     * See "Commands that Scope to a Data Session" in help for more info.
     *----------------------------------------------------------------------
@@ -272,32 +445,19 @@ DEFINE CLASS VfpBuild AS SESSION OLEPUBLIC
     SET BELL OFF
     SET LOGERRORS OFF
 
+    _SCREEN.AddProperty("IsConsole", .T.)
+    IF TYPE('_SCREEN.oVfp.processid') <> 'N'
+       _SCREEN.AddProperty("oVFP", this.ovfp)
+    ELSE 
+       This.ovfp = _SCREEN.oVfp
+    ENDIF
+    
+    This.DSID = SET("Datasession")    
+    This.fBuildAll = .F.
+    This.lClose = .T.
+
   ENDFUNC
-
-
-  PROTECTED FUNCTION ERROR(nError, cMethod, nLine) AS VOID
-
-    SET TEXTMERGE TO (JUSTPATH(_VFP.SERVERNAME) + "\ProjectBuilderErrors-" ;
-      + CHRTRAN(TRANSFORM(DATE()), "/", "-") + ".log") ADDITIVE NOSHOW
-
-    SET TEXTMERGE ON
-
-      \DateTime     : <<TRANSFORM(DATETIME())>>
-      \Error Number : <<TRANSFORM(m.nError)>>
-      \Method       : <<ALLTRIM(m.cMethod)>>
-      \Line Number  : <<TRANSFORM(nLine)>>
-      \Project      : <<THIS.cProject>>
-      \Message      : <<MESSAGE()>>
-      \ErrorParam   : <<SYS(2018)>>
-      \Current Line : <<IIF(VARTYPE(m.nLine) <> "N", 0, m.nLine)>>
-      \Stack Level  : <<MAX(1, ASTACKINFO(aCurStack) - 1)>>
-      \Line Contents: <aCurStack[THIS.nLevel, 6]>>
-      \
-
-    SET TEXTMERGE OFF
-
-    SET TEXTMERGE TO
-
-  ENDPROC
+  
 
 ENDDEFINE
+
