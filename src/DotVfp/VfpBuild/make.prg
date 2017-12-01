@@ -10,4 +10,4 @@ BUILD DLL c:\bin\vfpbuild.dll FROM VfpBuild RECOMPILE
 
 COPY FILE c:\bin\vfpbuild.dll TO .
 
-COPY FILE c:\bin\vfpbuild.dll TO d:\Beta\VfpX\vfplanguage\src\CSBuild\vfpbuild.dll
+COPY FILE c:\bin\vfpbuild.dll TO d:\Beta\VfpX\vfplanguage\src\DotVfp\bin\vfpbuild.dll
