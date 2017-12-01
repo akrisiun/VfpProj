@@ -1,0 +1,73 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- <TargetFrameworks>net461</TargetFrameworks>-->
+    <TargetFrameworks>netcoreapp2.0;net461</TargetFrameworks>
+
+    <RootNamespace>VfpBuild</RootNamespace>
+    <AssemblyName>DotVfp</AssemblyName>
+    <RuntimeIdentifiers>win10-x86</RuntimeIdentifiers>
+    <Platforms>x86</Platforms>
+    <PlatformTarget>x86</PlatformTarget>
+    
+    <ApplicationIcon />
+    <OutputType>Exe</OutputType>
+    <StartupObject />
+    <!--
+    <ConfigurationToBuild Include="Debug|x86">
+      <FlavorToBuild>Debug</FlavorToBuild>
+      <PlatformToBuild>x86</PlatformToBuild>
+    </ConfigurationToBuild> 
+    -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Interop.vfpbuild.dll" />
+    <None Remove="vfp8enu.DLL" />
+    <None Remove="vfpbuild.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <COMReference Include="vfpbuild.dll">
+      <Guid>613f254c-328c-4d9b-9e94-371f1bda253c</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>false</Isolated>
+    </COMReference>
+    <COMReference Include="VisualFoxpro.dll">
+      <Guid>00a19611-d8fc-4a3e-a95f-fea211444bf7</Guid>
+      <VersionMajor>8</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>false</Isolated>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build.Framework" Version="15.1.1012" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.1.1012" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.4.0" />
+    <PackageReference Include="System.Runtime" Version="4.3.0" />
+    <PackageReference Include="System.IO.FileSystem.Primitives" Version="4.3.0" />
+    <PackageReference Include="System.Collections" Version="4.3.0" />
+    <PackageReference Include="System.Diagnostics.Debug" Version="4.3.0" />
+    
+    <PackageReference Include="System.Threading" Version="4.3.0" />
+    <PackageReference Include="System.Threading.Tasks" Version="4.3.0" />
+    <PackageReference Include="System.Text.Encoding" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.Handles" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.InteropServices" Version="4.3.0" />
+    <PackageReference Include="System.Resources.ResourceManager" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.Extensions" Version="4.3.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="vfp8r.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="vfp8renu.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

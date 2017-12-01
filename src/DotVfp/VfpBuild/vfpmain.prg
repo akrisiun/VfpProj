@@ -17,6 +17,7 @@ DEFINE CLASS VfpBuild AS SESSION OLEPUBLIC
   uRetVal = .T.
   DSID = 1
   fBuildAll = .F.
+  fMissing = .F.
   lClose = .T.
   cOutputName = ""
   nBuildAction = 0
@@ -45,12 +46,12 @@ DEFINE CLASS VfpBuild AS SESSION OLEPUBLIC
   
  FUNCTION Compile(cPrgFile AS STRING)
  
-    This.oVFP = CREATEOBJECT("VisualFoxpro.Application")
+    This.oVFP = NEWOBJECT("VisualFoxpro.Application")
     oVFP = this.oVFP
         
     IF TYPE("oVFP.hWnd") = 'N'
        oVFP.DoCmd("COMPILE " + cPrjFile)
-       CloseVfp()
+       this.CloseVfp()
     ELSE
       _VFP.DoCmd("COMPILE " + cPrjFile)
     ENDIF
@@ -66,18 +67,34 @@ DEFINE CLASS VfpBuild AS SESSION OLEPUBLIC
     
     lOk = This.BuildProject(lcPath, cOutputName, 0, "", "", lcDir)
     IF this.lClose
-       CloseVfp()
+       this.CloseVfp()
     ENDIF  
     
     RETURN lOk 
+
+ FUNCTION SetVisible(lVisible as Boolean)
+    
+    TRY
+        this.oVfp.Visible = .T.
+        this.oVfp.DoCmd("_SCREEN.Visible = .T.")
+        _VFP.Visible = .T.
+        _SCREEN.Visible = .T.
+    CATCH
+          This.ErrorMsg(MESSAGE()) 
+    ENDTRY
 
  FUNCTION BuildVisible(lVisible as Boolean)
     this.oVfp.Visible = EVL(lVisible, .T.)
     
  FUNCTION CreateApplication()
     IF TYPE("This.oVFP.ProcessId") <> 'N'
-       This.oVFP = CREATEOBJECT("VisualFoxpro.Application")
-       this.oVFP.OLEServerBusyRaiseError = .F.
+       This.oVFP = .NULL.
+       TRY
+          This.oVFP = NEWOBJECT("VisualFoxpro.Application")
+          This.oVFP.OLEServerBusyRaiseError = .F.
+       CATCH
+          This.ErrorMsg(MESSAGE()) 
+       ENDTRY
     ENDIF
     _SCREEN.AddProperty("oVFP", this.ovfp)
 
@@ -91,6 +108,48 @@ DEFINE CLASS VfpBuild AS SESSION OLEPUBLIC
     ENDTRY
 
     RETURN lcMsg
+    
+ FUNCTION DoCmd(tcExpr)    
+    LOCAL lRet
+    IF !ISNULL(this.oVfp) AND ATC(tcExpr, "this.") = 0
+       lRet = this.oVfp.DoCmd(tcExpr)
+    ELSE 
+       lRet = _VFP.Eval(tcExpr)
+    ENDIF
+
+    RETURN lRet
+    
+ FUNCTION Eval(tcExpr)    
+    LOCAL lRet
+    
+    IF !ISNULL(this.oVfp) AND ATC(tcExpr, "this.") = 0
+       lRet = this.oVfp.Eval(tcExpr)
+    ELSE 
+       lRet = _VFP.Eval(tcExpr)
+    ENDIF
+
+    RETURN lRet
+
+ FUNCTION Eval2(tcExpr, lcExpr1)    
+    LOCAL lRet
+
+    IF !ISNULL(this.oVfp) AND ATC(tcExpr, "this.") = 0
+       lRet = this.oVfp.Eval(tcExpr)
+    ELSE 
+       lRet = _VFP.Eval(tcExpr)
+    ENDIF
+
+    RETURN lRet
+
+ FUNCTION Eval3(tcExpr, lparam1, lparam2)    
+    LOCAL lRet
+    
+    IF !ISNULL(this.oVfp) AND ATC(tcExpr, "this.") = 0
+       lRet = this.oVfp.Eval(tcExpr)
+    ELSE 
+       lRet = _VFP.Eval(tcExpr)
+    ENDIF
+    RETURN lRet
     
  FUNCTION BuildExe(cProjectFile AS STRING, cOutputName AS STRING)
  
@@ -118,6 +177,15 @@ DEFINE CLASS VfpBuild AS SESSION OLEPUBLIC
     
     RETURN lcMsg
     
+ FUNCTION ActiveProject() as IFoxProject
+ 
+      LOCAL proj    
+      proj = .NULL.
+      TRY
+         proj = this.ovfp.Application.ActiveProject
+      CATCH
+      ENDTRY
+      RETURN proj
     
  FUNCTION BuildProject(cProjectFile AS STRING, cOutputName AS STRING ;
   		, nBuildAction AS INTEGER, cVsProjectFile AS STRING, cBuildTime AS STRING, cBuildPath AS STRING) AS Boolean
@@ -150,119 +218,11 @@ DEFINE CLASS VfpBuild AS SESSION OLEPUBLIC
     lKilled       = .F.
     cMissingFiles = ""
 
-    * First we test to see if the project file exists
-    *------------------------------------------------
-    IF NOT FILE(This.cProject)
+    IF !This.OpenPjx(This.cProject)
+        RETURN .F.
+    ENDIF 
 
-      This.ErrorMsg("Project " + This.cProject + " does not exist")
 
-      RETURN .F.
-
-    ENDIF
-
-    * Next we make sure it isn't locked by another user
-    *--------------------------------------------------
-    nHandle = FOPEN(This.cProject, 12)
-
-    FCLOSE(m.nHandle)
-
-    IF m.nHandle < 0
-
-      This.ErrorMsg("Project " + This.cProject + " is in use")
-
-      RETURN .F.
-
-    ENDIF
-
-    * Check the project to see if all the files in the project exist
-    *---------------------------------------------------------------
-    USE (This.cProject) IN 0 ALIAS MyProject
-
-    SELECT MyProject
-
-    IF EMPTY(MyProject.NAME) OR EMPTY(MyProject.HOMEDIR)
-
-      REPLACE MyProject.NAME WITH m.cProjectFile + CHR(0), ;
-           MyProject.HOMEDIR WITH m.cProjectPath + CHR(0)
-
-    ENDIF
-
-    IF EMPTY(cProjectPath)
-       cProjectPath = this.cFolder
-    ENDIF
-    CD (m.cProjectPath)      && Most paths are relative (ex. "..\..\test.prg")
-
-    * Delete records have been removed.  This will still cause
-    * problems when the project hasn't been rebuilt in a long time.
-    *--------------------------------------------------------------
-    SCAN FOR NOT DELETED()
-
-      cFile = ALLTRIM(CHRTRAN(MyProject.NAME, CHR(0), ""))
-
-      IF NOT FILE(m.cFile)
-
-        cMissingFiles = IIF(EMPTY(m.cMissingFiles), m.cFile, m.cMissingFiles + ", " + m.cFile)
-
-      ENDIF
-
-    ENDSCAN
-
-    USE IN MyProject
-
-    IF NOT EMPTY(m.cMissingFiles)
-
-      This.ErrorMsg("Project files were missing: " + m.cMissingFiles) 
-
-      RETURN .F.
-
-    ENDIF
-    
-    IF TYPE("This.oVFP.ProcessId") <> 'N'
-       This.oVFP = CREATEOBJECT("VisualFoxpro.Application")
-       this.oVFP.OLEServerBusyRaiseError = .F.
-    ENDIF
-
-    * This app will kill the vfp9.exe process if it hangs up
-    * on a user dialog that we can't possibly respond to.
-    *---------------------------------------------------------
-    DECLARE INTEGER ShellExecute IN SHELL32.DLL ;
-      INTEGER nWinHandle, ;
-      STRING  cOperation, ;
-      STRING  cFileName, ;
-      STRING  cParameters, ;
-      STRING  cDirectory, ;
-      INTEGER nShowWindow
-
-    TRY
-      SHELLEXECUTE(_SCREEN.HWND, "OPEN", _VFP.SERVERNAME,;
-                 TRANSFORM(This.oVfp.APPLICATION.PROCESSID) + " " + m.cBuildTime, SYS(2023), .F.)
-    CATCH
-        * ignore temp...
-    ENDTRY                 
-
-    * Open the project
-    *
-    * The only time This call should error is when opening the project
-    * causes a dialog box, hangs and is killed by KillProcess.exe.
-    * Therefore, we don't need to call This.CloseVFP() in the CATCH.
-    *-----------------------------------------------------------------
-    TRY
-
-      This.oVFP.DOCMD('MODIFY PROJECT "' + This.cProject + '" NOSHOW NOWAIT')
-
-    CATCH
-
-      This.ErrorMsg("Failed to open project " + This.cProject + " (KILLED)") 
-
-      lKilled = .T.
-
-    ENDTRY
-
-    IF m.lKilled = .T.
-
-      RETURN .F.
-
-    ENDIF
 
     TRY
 
@@ -316,9 +276,6 @@ DEFINE CLASS VfpBuild AS SESSION OLEPUBLIC
 
     TRY
 
-      * BUILD DLL c:\Sanitex\vfpbuild.dll FROM VfpBuild RECOMPILE
-      * BUILD EXE c:\Sanitex\vfpbuild.exe FROM VfpBuild RECOMPILE
-      
       lReturn = This.oVFP.ACTIVEPROJECT.BUILD(m.cOutputPath + This.cOutputName,;
                 EVL(This.nBuildAction, 3), fBuildAll, fShowErr )
 
@@ -334,10 +291,8 @@ DEFINE CLASS VfpBuild AS SESSION OLEPUBLIC
 
     ENDTRY
 
-    IF m.lKilled = .T.
-
-      RETURN .F.
-
+    IF m.lKilled
+       RETURN .F.
     ENDIF
 
     cErrorFile = FORCEEXT(This.cProject, "err")
@@ -371,6 +326,122 @@ DEFINE CLASS VfpBuild AS SESSION OLEPUBLIC
     RETURN m.lReturn
 
   ENDPROC
+  
+  FUNCTION OpenPjx(cProject as string) as Boolean
+    
+    This.cProject = cProject
+    
+    * First we test to see if the project file exists
+    *------------------------------------------------
+    IF NOT FILE(This.cProject)
+
+      This.ErrorMsg("Project " + This.cProject + " does not exist")
+
+      RETURN .F.
+
+    ENDIF
+
+    * Next we make sure it isn't locked by another user
+    *--------------------------------------------------
+    IF USED("MyProject")
+       USE IN MyProject
+    ENDIF
+   
+    IF TYPE("This.oVFP.ActiveProject.name") = 'C'
+       This.oVFP.DOCMD('_VFP.ActiveProject.Close()')
+    ENDIF
+        
+    nHandle = FOPEN(This.cProject, 12)
+
+    FCLOSE(m.nHandle)
+
+    IF m.nHandle < 0
+
+      This.ErrorMsg("Project " + This.cProject + " is in use")
+
+      RETURN .F.
+    ENDIF
+
+    * Check the project to see if all the files in the project exist
+    *---------------------------------------------------------------
+    
+    USE (This.cProject) IN 0 ALIAS MyProject
+
+    SELECT MyProject
+
+    IF EMPTY(MyProject.NAME) OR EMPTY(MyProject.HOMEDIR)
+
+      REPLACE MyProject.NAME WITH m.cProjectFile + CHR(0), ;
+           MyProject.HOMEDIR WITH m.cProjectPath + CHR(0)
+
+    ENDIF
+
+    IF EMPTY(cProjectPath)
+       cProjectPath = this.cFolder
+    ENDIF
+    CD (m.cProjectPath)      && Most paths are relative (ex. "..\..\test.prg")
+    
+    IF this.fMissing
+
+        * Delete records have been removed.  This will still cause
+        * problems when the project hasn't been rebuilt in a long time.
+        *--------------------------------------------------------------
+        SCAN FOR NOT DELETED()
+
+          cFile = ALLTRIM(CHRTRAN(MyProject.NAME, CHR(0), ""))
+
+          IF NOT FILE(m.cFile)
+
+            cMissingFiles = IIF(EMPTY(m.cMissingFiles), m.cFile, m.cMissingFiles + ", " + m.cFile)
+
+          ENDIF
+
+        ENDSCAN
+
+        USE IN MyProject
+
+        IF NOT EMPTY(m.cMissingFiles)
+           This.ErrorMsg("Project files were missing: " + m.cMissingFiles) 
+
+          RETURN .F.
+        ENDIF
+    ENDIF
+    IF USED("MyProject")
+       USE IN MyProject
+    ENDIF
+    
+    IF TYPE("This.oVFP.ProcessId") <> 'N'
+       This.oVFP = NEWOBJECT("VisualFoxpro.Application")
+       this.oVFP.OLEServerBusyRaiseError = .F.
+    ENDIF
+
+    * This app will kill the vfp9.exe process if it hangs up
+    *!*        TRY
+    *!*          * SHELLEXECUTE(_SCREEN.HWND, "OPEN", _VFP.SERVERNAME,;
+    *!*                     TRANSFORM(This.oVfp.APPLICATION.PROCESSID) + " " + m.cBuildTime, SYS(2023), .F.)
+
+    * Open the project
+    * The only time This call should error is when opening the project
+    * causes a dialog box, hangs and is killed by KillProcess.exe.
+    * Therefore, we don't need to call This.CloseVFP() in the CATCH.
+    *------------------------------------------------------------------------
+    TRY
+      This.oVFP.DOCMD('MODIFY PROJECT "' + This.cProject + '" NOSHOW NOWAIT')
+      
+      This.oVFP.DOCMD('CD (_VFP.ActiveProject.HomeDir)')
+      lKilled = .F.
+      
+    CATCH
+      This.ErrorMsg("Failed to open project " + This.cProject + " (KILLED)") 
+
+      lKilled = .T.
+    ENDTRY
+
+    IF m.lKilled
+       RETURN .F.
+    ENDIF
+    RETURN .T.
+    
 
   FUNCTION SetVfp(oVfp as object)
     This.oVfp = NVL(oVfp, _VFP)
@@ -379,12 +450,13 @@ DEFINE CLASS VfpBuild AS SESSION OLEPUBLIC
 
     * Manually close VFP here
     *------------------------
-    IF TYPE("oVFP.hWnd") = 'N'    
+    IF TYPE("This.oVFP.hWnd") = 'N'    
        This.oVFP.QUIT()
     ENDIF
  
     This.oVFP = .NULL.
-
+    _VFP.Quit()
+    
   ENDPROC
 
   FUNCTION ErrorSet(err as Exception) AS Exception
@@ -452,9 +524,14 @@ DEFINE CLASS VfpBuild AS SESSION OLEPUBLIC
        This.ovfp = _SCREEN.oVfp
     ENDIF
     
+    _VFP.OLEServerBusyRaiseError = .F.
+    SET Datasession TO 1 
     This.DSID = SET("Datasession")    
     This.fBuildAll = .F.
     This.lClose = .T.
+    IF USED("MyProject")
+       USE IN MyProject
+    ENDIF
 
   ENDFUNC
   

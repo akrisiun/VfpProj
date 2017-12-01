@@ -234,3 +234,11 @@ $RECYCLE.BIN/
 
 *.FXP
 .nuget/nuget.*
+src/CSBuild/vfp8enu.DLL
+vfp*.DLL
+vfp*.dll
+FOXUSER.*
+*.ERR
+DotVfp.exe
+src/DotVfp/VfpBuild/Microsoft.*.dll
+src/DotVfp/VfpBuild/System.*.dll
