@@ -108,7 +108,8 @@ namespace VfpProj.Native
             IntPtr hWnd = IntPtr.Zero;
             try
             {
-                hWnd = (IntPtr)FoxCmd.App.hWnd;
+                dynamic objApp = FoxCmd.App;
+                hWnd = (IntPtr)objApp.hWnd;
             }
             catch (Exception ex)
             {
@@ -123,25 +124,15 @@ namespace VfpProj.Native
             if (CsObj.Instance.IsLockForm)
                 return;
 
-            var app = FoxCmd.App;
+            dynamic appObj = FoxCmd.App;
             IntPtr hWnd = IntPtr.Zero;
             hWnd = RpcTest();
 
             try
             {
-                //if (hWnd == IntPtr.Zero)
-                //{
-                //    // FoxCmd.App = null;
-                //    if (FoxCmd.Attach(true))
-                //    {
-                //        app = FoxCmd.App;
-                //        FoxCmd.ShowForm(form1);
-                //    }
-                //    app.Application.Visible = true;
-                //}
-                if (app != null && app.DefaultFilePath != dir)
+                if (appObj != null && appObj.DefaultFilePath != dir)
                 {
-                    dir = app.DefaultFilePath;
+                    dir = appObj.DefaultFilePath;
                     Trace.WriteLine("Focus set dir=" + dir);
                     Directory.SetCurrentDirectory(dir);
 

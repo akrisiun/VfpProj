@@ -81,7 +81,8 @@ namespace VfpProj
 
         [DispId(0x60030002)]
         [ComVisible(true)]
-        FoxApplication App { get; set; }
+        // FoxApplication
+        dynamic App { get; set; }
 
         [ComVisible(true), DispId(0x60030022)]
         _Events CsObject { get; }

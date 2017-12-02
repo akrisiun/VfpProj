@@ -32,9 +32,14 @@ namespace VfpProj
 #pragma warning disable 0067
         public event EventHandler Disposed;
 
-        public VisualFoxpro.FoxApplication App
+        public dynamic App {
+            get { return _App as dynamic; }
+            set { _App = value; }
+        }
+
+        internal VisualFoxpro.FoxApplication _App
         {
-            get { return FoxCmd.App.Application; }
+            get { return FoxCmd.App as dynamic; }
             set
             {
                 if (value != null)

@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Shell;
-using System.Windows.Forms.Integration;
 using VfpEdit;
 using System.Threading;
-using System.Windows.Media.Imaging;
 
 namespace VfpProj
 {

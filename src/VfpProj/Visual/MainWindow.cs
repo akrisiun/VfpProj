@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
@@ -67,8 +64,6 @@ namespace VfpProj
 
             FoxCmd.DefPosition(this);
 
-            // <add key="formTop" value="0" />
-            // <add key="formLeft" value="0" />
             var cfg_formTop = ConfigurationManager.AppSettings["formTop"];
             var int_formTop  = ToInt(cfg_formTop);
             if (int_formTop.HasValue)

@@ -4,23 +4,28 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Windows;
-using System.Windows.Forms.Integration;
-using VfpInterop;
 using VisualFoxpro;
 
 namespace VfpProj
 {
     public static class FoxCmd
     {
-        public static FoxApplication App { get; private set; }
+        public static FoxApplication App {
+            [DebuggerStepThrough]
+            get;
+            private set;
+        }
+
         public static bool IsAlive(this FoxApplication app)
         {
             if (app == null && App == null)
                 return false;
             app = app ?? App;
             IntPtr hWnd = IntPtr.Zero;
-            try { hWnd = (IntPtr)app.hWnd; }
+            dynamic appObj = app;
+            try { hWnd = (IntPtr)appObj.hWnd; }
             catch (Exception) { App = null; }
+
             return hWnd != IntPtr.Zero;
         }
 
@@ -41,8 +46,20 @@ namespace VfpProj
             }
 
             var ocs = new CsObj();
-            App.DoCmd("PUBLIC m.ocs as VfpProj.CsObj");
-            App.SetVar("ocs", CsObj.Instance);
+            dynamic objApp = App;
+            objApp.DoCmd("PUBLIC m.ocs as VfpProj.CsObj");
+            try
+            {
+                object lpvarNumRows = CsObj.Instance;
+                objApp.SetVar("ocs", ref lpvarNumRows);
+
+                // result check:
+                var m_ocs = objApp.Eval("m.ocs");
+            }
+            catch (Exception ex) {
+                // server threw an exception. (Exception from HRESULT: 0x80010105(RPC_E_SERVERFAULT))
+                Trace.Write(ex.Message);
+            }
         }
 
         public static void SetFormObj(CsForm obj) { FormObj = obj; }
@@ -124,24 +141,26 @@ namespace VfpProj
             bool isBound = FormObj.IsBound();
             try
             {
-                var oldDir = App.DefaultFilePath;
+                dynamic AppObj = App;
+                var oldDir = AppObj.DefaultFilePath;
+
                 foreach (string cmdItem in cmdList)
                 {
                     var cmdTrim = cmdItem.Trim(new[] { ' ', '\n', '\r', '\t' });
-                    App.DoCmd(cmdTrim);
+                    AppObj.DoCmd(cmdTrim);
                 }
-                dir = App.DefaultFilePath;
-                var caption = App.Caption;
+                dir = AppObj.DefaultFilePath;
+                var caption = AppObj.Caption;
                 if (oldDir != dir 
                     && !string.IsNullOrWhiteSpace(caption) && caption.Substring(1, 1) == ":"
                     && Directory.Exists(caption))
                     App.Caption = dir;
 
-                ocs_form = App.Eval("IIF(TYPE(\"_SCREEN.ocs_form.text\") != 'C', 0, _SCREEN.ocs_form)");
+                ocs_form = AppObj.Eval("IIF(TYPE(\"_SCREEN.ocs_form.text\") != 'C', 0, _SCREEN.ocs_form)");
                 if (ocs_form == null || (ocs_form as int?) == null)
                 {
                     // SetVar();
-                    App.SetVar("ocs_form", FoxCmd.FormObj);
+                    AppObj.SetVar("ocs_form", FoxCmd.FormObj);
                     AppCmd("_SCREEN.AddProperty(\"ocs_form\", .null.)");
                     AppCmd("_SCREEN.Visible = .T.");
                     AppCmd("_SCREEN.ocs_form = m.ocs_form");
@@ -197,6 +216,7 @@ namespace VfpProj
 
             try
             {
+                dynamic objApp = App;
                 if (App == null && !VfpProj.CsApp.Instance.Window.IsStart)
                 {
                     if (Vfp.Startup.Instance.App != null)
@@ -206,15 +226,17 @@ namespace VfpProj
                         App = new VisualFoxpro.FoxApplication();
 
                     Vfp.Startup.Instance.App = App;
-                    App.SetVar("ocs", CsObj.Instance);
+                    objApp = App;
+                    objApp.SetVar("ocs", CsObj.Instance);
                 }
                 else
                     secondTime = false;
 
-                if (App != null)
+                objApp = App;
+                if (objApp != null)
                 {
-                    App.AutoYield = true;
-                    hWnd = (IntPtr)App.hWnd;
+                    objApp.AutoYield = true;
+                    hWnd = (IntPtr)objApp.hWnd;
                     SetHWnd();
                 }
 
@@ -262,14 +284,16 @@ namespace VfpProj
         {
             if (ocs == null)
                 return false;
+
+            dynamic objApp = App;
             if (FoxCmd.FormObj != null)
             {
                 TryDoCmd("PUBLIC m.ocs as VfpProj.CsObj");
-                App.SetVar("ocs", ocs);
+                objApp.SetVar("ocs", ocs);
             }
 
             dynamic ocs_form = null;
-            ocs_form = App.Eval("IIF(TYPE(\"_SCREEN.ocs_form\") = 'U', 0, _SCREEN.ocs_form)");
+            ocs_form = objApp.Eval("IIF(TYPE(\"_SCREEN.ocs_form\") = 'U', 0, _SCREEN.ocs_form)");
             if (ocs_form != null && ocs_form is CsForm && (ocs_form as CsForm).Visible)
                 FoxCmd.FormObj = ocs_form as CsForm;
 
@@ -295,8 +319,9 @@ namespace VfpProj
 
             StartCmd();
 
-            if (!App.Visible)
-                App.Visible = true;
+            objApp = App;
+            if (!objApp.Visible)
+                objApp.Visible = true;
 
             if (reload)
             {
@@ -318,17 +343,18 @@ namespace VfpProj
         public static void SetVar()
         {
             dynamic ocs_form = null;
-            ocs_form = App.Eval("IIF(TYPE(\"_SCREEN.ocs_form.Directory\") != 'C', 0, _SCREEN.ocs_form)");
+            dynamic objApp = App;
+            ocs_form = objApp.Eval("IIF(TYPE(\"_SCREEN.ocs_form.Directory\") != 'C', 0, _SCREEN.ocs_form)");
 
             if (ocs_form != null && ocs_form is _Form && FoxCmd.FormObj.Equals(ocs_form))
                 return;
 
             TryDoCmd("PUBLIC m.ocs as VfpProj.CsObj");
-            App.SetVar("ocs", CsObj.Instance);
+            objApp.SetVar("ocs", CsObj.Instance);
 
             // non COM visible class 'System.Windows.Window', the QueryInterface call will fail.
             TryDoCmd("PUBLIC m.ocs_form as VfpProj.Form");
-            App.SetVar("ocs_form", FoxCmd.FormObj);
+            objApp.SetVar("ocs_form", FoxCmd.FormObj);
             TryDoCmd("_SCREEN.AddProperty(\"ocs_form\", .null.)");
         }
 
