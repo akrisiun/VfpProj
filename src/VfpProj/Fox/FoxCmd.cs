@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using VisualFoxpro;
@@ -10,6 +11,8 @@ namespace VfpProj
 {
     public static class FoxCmd
     {
+        #region Ctor, properties
+
         public static FoxApplication App {
             [DebuggerStepThrough]
             get;
@@ -107,7 +110,9 @@ namespace VfpProj
             App = null;
         }
 
-        public static void TryDoCmd(string cmd)
+        #endregion
+
+        public static void TryDoCmd(string cmd, bool throwEx = true)
         {
             string[] cmdList = new string[] { cmd };
             if (cmd.Contains(";"))
@@ -122,8 +127,30 @@ namespace VfpProj
             }
             catch (Exception ex)
             {
+                Vfp.Startup.Instance.LastError = ex;
+                if (throwEx)
+                    AppMethods.Application_ThreadException(null, new ThreadExceptionEventArgs(ex));
+            }
+        }
+
+        public static object AppEval(string cmd)
+        {
+            object result = null;
+            try
+            {
+                dynamic AppObj = App;
+                result = AppObj.Eval(cmd);
+            }
+            catch (COMException ex)
+            {
+                Vfp.Startup.Instance.LastError = ex;
+            }
+            catch (Exception ex)
+            {
+                Vfp.Startup.Instance.LastError = ex;
                 AppMethods.Application_ThreadException(null, new ThreadExceptionEventArgs(ex));
             }
+            return result;
         }
 
         public static void AppCmd(string cmd)
@@ -150,7 +177,7 @@ namespace VfpProj
                 }
                 dir = AppObj.DefaultFilePath;
                 var caption = AppObj.Caption;
-                if (oldDir != dir 
+                if (oldDir != dir
                     && !string.IsNullOrWhiteSpace(caption) && caption.Substring(1, 1) == ":"
                     && Directory.Exists(caption))
                     App.Caption = dir;
@@ -165,8 +192,19 @@ namespace VfpProj
                     AppCmd("_SCREEN.ocs_form = m.ocs_form");
                 }
             }
+            catch (COMException ex)
+            {
+                Vfp.Startup.Instance.LastError = ex;
+                AppMethods.Application_ThreadException(null, new ThreadExceptionEventArgs(ex));
+            }
             catch (Exception ex)
             {
+                /* System.Runtime.InteropServices.ComTypes.ITypeInfo
+                   System.Runtime.InteropServices.ComTypes.ITypeLib
+                   at System.Dynamic.ComRuntimeHelpers.CheckThrowException(Int32 hresult, ExcepInfo & excepInfo, UInt32 argErr, String message)
+                   at CallSite.Target(Closure, CallSite, ComObject, String)
+                   https://github.com/mono/mono/blob/master/mcs/class/dlr/Runtime/Microsoft.Dynamic/ComRuntimeHelpers.cs
+                */
                 AppMethods.Application_ThreadException(null, new ThreadExceptionEventArgs(ex));
             }
 
@@ -207,6 +245,8 @@ namespace VfpProj
             return false;
         }
 
+        #region Form Attach, Hwnd, AssignForm
+
         public static bool Attach(bool secondTime = false)
         {
             if (secondTime)
@@ -221,11 +261,11 @@ namespace VfpProj
                         App = Vfp.Startup.Instance.App;
 
                     if (App == null)
-                        App = new VisualFoxpro.FoxApplication();
+                        App = AppMethods.CreateFoxApp() as VisualFoxpro.FoxApplication;
 
                     Vfp.Startup.Instance.App = App;
                     objApp = App;
-                    objApp.SetVar("ocs", CsObj.Instance);
+                    objApp?.SetVar("ocs", CsObj.Instance);
                 }
                 else
                     secondTime = false;
@@ -411,6 +451,8 @@ namespace VfpProj
                 form.Top = -5;
         }
 
+        #endregion
+
         public static bool QueryUnload()
         {
             int hWnd = 0;
@@ -438,4 +480,5 @@ namespace VfpProj
             return true;
         }
     }
+
 }

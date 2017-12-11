@@ -86,12 +86,12 @@ namespace VfpProj.Native
 #endif
             frm.buttonDO.Click += (s, e) => DoCmd(form.Text);
 
-            frm.buttonWcf.Click += (s, e) => Wcf.VfpService.Instance.Bind();
+            frm.buttonWcf.Click += (s, e) => Wcf.VfpWcf.Bind();
             var sets = System.Configuration.ConfigurationManager.AppSettings;
             var baseAddress = sets.Get("baseAddress");
             if (!string.IsNullOrWhiteSpace(baseAddress))
             {
-                Wcf.VfpService.Instance.Bind();
+                Wcf.VfpWcf.Bind();
                 if (Wcf.Host.Object != null)
                     frm.buttonWcf.Visibility = Visibility.Hidden;
             }
@@ -503,7 +503,22 @@ namespace VfpProj.Native
                     FoxCmd.AppCmd("MODI PROJ " + cmd + " NOWAIT");
             }
             else
-                FoxCmd.AppCmd(cmd);
+            {
+                bool isEval = false;
+                string evalStr = "";
+                // ? _VFP.StatusBar;
+                if (cmd[0] == '?')
+                {
+                    evalStr = cmd.Substring(1).TrimStart();
+                    isEval = true;
+                }
+
+                dynamic result = null;
+                if (isEval)
+                    result = FoxCmd.AppEval(evalStr);
+                else
+                    FoxCmd.AppCmd(cmd);
+            }
 
             IntPtr? hWnd = null;
             try

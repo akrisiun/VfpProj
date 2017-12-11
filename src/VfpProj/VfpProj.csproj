@@ -81,6 +81,10 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
       <HintPath>..\..\Lib\Interop.VisualFoxpro.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lib\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
@@ -119,6 +123,7 @@
     <Compile Include="Fox\CsDomain.cs" />
     <Compile Include="Fox\CsForm.cs" />
     <Compile Include="Fox\CsObj.cs" />
+    <Compile Include="Fox\FoxParse.cs" />
     <Compile Include="Fox\OleInterfaces.cs" />
     <Compile Include="Fox\FoxCmd.cs" />
     <Compile Include="Bind\WindowsEvents.cs" />
@@ -132,6 +137,7 @@
     <Compile Include="FS\Win32\Win32FileSystemEnumerableIterator.cs" />
     <Compile Include="FS\Win32\Win32FindFile.cs" />
     <Compile Include="FS\Win32\Win32Marshal.cs" />
+    <Compile Include="Native\Interopt.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Visual\CmdPanel.xaml.cs">
       <DependentUpon>CmdPanel.xaml</DependentUpon>

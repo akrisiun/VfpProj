@@ -2,14 +2,18 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Shell;
 using Vfp;
+using VfpProj.Wcf;
 
 namespace VfpProj
 {
     public static class AppMethods
     {
+        #region Startup
+
         public static void App_Startup(object sender, StartupEventArgs e)
         {
             App_StartupJumpList(sender, e);
@@ -105,6 +109,8 @@ namespace VfpProj
             }
         }
 
+        #endregion
+
         public static EditWindow ShowEditWindow(string file)
         {
             var winEdit = new EditWindow();
@@ -119,6 +125,22 @@ namespace VfpProj
             // winEdit.Icon = BitmapFrame.Create(iconUri);
             winEdit.Show();
             return winEdit;
+        }
+
+        public static void App_DoCmd(string cmd)
+        {
+            var app = Startup.Instance.App;
+            FoxCmd.TryDoCmd(cmd, throwEx: false);
+        }
+
+        public static void WcfBind()
+        {
+            var service = VfpWcf.Instance;
+
+            if (Host.Object != null)
+                return;
+
+            Task.Factory.StartNew(() => Host.Create());
         }
     }
 }

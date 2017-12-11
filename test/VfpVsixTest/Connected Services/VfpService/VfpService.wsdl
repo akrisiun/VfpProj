@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="http://tempuri.org/" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="VfpService" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://tempuri.org/Imports">
+      <xsd:import schemaLocation="http://localhost:9001/VfpService?xsd=xsd5" namespace="http://tempuri.org/" />
+      <xsd:import schemaLocation="http://localhost:9001/VfpService?xsd=xsd0" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import schemaLocation="http://localhost:9001/VfpService?xsd=xsd1" namespace="http://schemas.datacontract.org/2004/07/VfpProj.Wcf" />
+      <xsd:import schemaLocation="http://localhost:9001/VfpService?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/System.Collections.Generic" />
+      <xsd:import schemaLocation="http://localhost:9001/VfpService?xsd=xsd3" namespace="http://schemas.datacontract.org/2004/07/VfpProj" />
+      <xsd:import schemaLocation="http://localhost:9001/VfpService?xsd=xsd4" namespace="http://schemas.datacontract.org/2004/07/System" />
+      <xsd:import schemaLocation="http://localhost:9001/VfpService?xsd=xsd6" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="IVfpService_Load_InputMessage">
+    <wsdl:part name="parameters" element="tns:Load" />
+  </wsdl:message>
+  <wsdl:message name="IVfpService_Load_OutputMessage">
+    <wsdl:part name="parameters" element="tns:LoadResponse" />
+  </wsdl:message>
+  <wsdl:message name="IVfpService_Eval_InputMessage">
+    <wsdl:part name="parameters" element="tns:Eval" />
+  </wsdl:message>
+  <wsdl:message name="IVfpService_Eval_OutputMessage">
+    <wsdl:part name="parameters" element="tns:EvalResponse" />
+  </wsdl:message>
+  <wsdl:message name="IVfpService_DoCmd_InputMessage">
+    <wsdl:part name="parameters" element="tns:DoCmd" />
+  </wsdl:message>
+  <wsdl:message name="IVfpService_DoCmd_OutputMessage">
+    <wsdl:part name="parameters" element="tns:DoCmdResponse" />
+  </wsdl:message>
+  <wsdl:message name="IVfpService_DoCompile_InputMessage">
+    <wsdl:part name="parameters" element="tns:DoCompile" />
+  </wsdl:message>
+  <wsdl:message name="IVfpService_DoCompile_OutputMessage">
+    <wsdl:part name="parameters" element="tns:DoCompileResponse" />
+  </wsdl:message>
+  <wsdl:portType name="IVfpService">
+    <wsdl:operation name="Load">
+      <wsdl:input wsaw:Action="http://tempuri.org/IVfpService/Load" message="tns:IVfpService_Load_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IVfpService/LoadResponse" message="tns:IVfpService_Load_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="Eval">
+      <wsdl:input wsaw:Action="http://tempuri.org/IVfpService/Eval" message="tns:IVfpService_Eval_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IVfpService/EvalResponse" message="tns:IVfpService_Eval_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="DoCmd">
+      <wsdl:input wsaw:Action="http://tempuri.org/IVfpService/DoCmd" message="tns:IVfpService_DoCmd_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IVfpService/DoCmdResponse" message="tns:IVfpService_DoCmd_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="DoCompile">
+      <wsdl:input wsaw:Action="http://tempuri.org/IVfpService/DoCompile" message="tns:IVfpService_DoCompile_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IVfpService/DoCompileResponse" message="tns:IVfpService_DoCompile_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="CustomBinding_IVfpService" type="tns:IVfpService">
+    <wsdl:operation name="Load">
+      <wsdl:input />
+      <wsdl:output />
+    </wsdl:operation>
+    <wsdl:operation name="Eval">
+      <wsdl:input />
+      <wsdl:output />
+    </wsdl:operation>
+    <wsdl:operation name="DoCmd">
+      <wsdl:input />
+      <wsdl:output />
+    </wsdl:operation>
+    <wsdl:operation name="DoCompile">
+      <wsdl:input />
+      <wsdl:output />
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="VfpService">
+    <wsdl:port name="CustomBinding_IVfpService" binding="tns:CustomBinding_IVfpService" />
+  </wsdl:service>
+</wsdl:definitions>

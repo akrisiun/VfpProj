@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2015
-VisualStudioVersion = 14.0.0.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.27205.0
 MinimumVisualStudioVersion = 14.0.0.0
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VfpProj", "src\VfpProj\VfpProj.csproj", "{3118674E-D584-4B55-BF87-8730137E9066}"
 EndProject
@@ -15,6 +15,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Folder", "src\Folder\Folder.csproj", "{5FA72BBF-FB90-4607-B9C8-A1C7AEFB0417}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiSelectTreeView", "src\MultiSelectTreeView\MultiSelectTreeView.csproj", "{2854814F-EA3C-41D4-AA94-460C4694F430}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VfpLanguage15", "src\VS15\VfpLanguage15.csproj", "{ADE3EF15-69C4-48AC-ABE1-9C645C992558}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VfpVsixTest15", "test\VfpVsixTest\VfpVsixTest15.csproj", "{BD05E3C6-2818-498E-BAD3-AAFD047496F0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -65,8 +69,43 @@ Global
 		{2854814F-EA3C-41D4-AA94-460C4694F430}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{2854814F-EA3C-41D4-AA94-460C4694F430}.Release|Net40.ActiveCfg = Release|Any CPU
 		{2854814F-EA3C-41D4-AA94-460C4694F430}.Release|Win32.ActiveCfg = Release|Any CPU
+		{ADE3EF15-69C4-48AC-ABE1-9C645C992558}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADE3EF15-69C4-48AC-ABE1-9C645C992558}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADE3EF15-69C4-48AC-ABE1-9C645C992558}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{ADE3EF15-69C4-48AC-ABE1-9C645C992558}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{ADE3EF15-69C4-48AC-ABE1-9C645C992558}.Debug|Net40.ActiveCfg = Debug|Any CPU
+		{ADE3EF15-69C4-48AC-ABE1-9C645C992558}.Debug|Net40.Build.0 = Debug|Any CPU
+		{ADE3EF15-69C4-48AC-ABE1-9C645C992558}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{ADE3EF15-69C4-48AC-ABE1-9C645C992558}.Debug|Win32.Build.0 = Debug|Any CPU
+		{ADE3EF15-69C4-48AC-ABE1-9C645C992558}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADE3EF15-69C4-48AC-ABE1-9C645C992558}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ADE3EF15-69C4-48AC-ABE1-9C645C992558}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{ADE3EF15-69C4-48AC-ABE1-9C645C992558}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{ADE3EF15-69C4-48AC-ABE1-9C645C992558}.Release|Net40.ActiveCfg = Release|Any CPU
+		{ADE3EF15-69C4-48AC-ABE1-9C645C992558}.Release|Net40.Build.0 = Release|Any CPU
+		{ADE3EF15-69C4-48AC-ABE1-9C645C992558}.Release|Win32.ActiveCfg = Release|Any CPU
+		{ADE3EF15-69C4-48AC-ABE1-9C645C992558}.Release|Win32.Build.0 = Release|Any CPU
+		{BD05E3C6-2818-498E-BAD3-AAFD047496F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD05E3C6-2818-498E-BAD3-AAFD047496F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD05E3C6-2818-498E-BAD3-AAFD047496F0}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{BD05E3C6-2818-498E-BAD3-AAFD047496F0}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{BD05E3C6-2818-498E-BAD3-AAFD047496F0}.Debug|Net40.ActiveCfg = Debug|Any CPU
+		{BD05E3C6-2818-498E-BAD3-AAFD047496F0}.Debug|Net40.Build.0 = Debug|Any CPU
+		{BD05E3C6-2818-498E-BAD3-AAFD047496F0}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{BD05E3C6-2818-498E-BAD3-AAFD047496F0}.Debug|Win32.Build.0 = Debug|Any CPU
+		{BD05E3C6-2818-498E-BAD3-AAFD047496F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD05E3C6-2818-498E-BAD3-AAFD047496F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD05E3C6-2818-498E-BAD3-AAFD047496F0}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{BD05E3C6-2818-498E-BAD3-AAFD047496F0}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{BD05E3C6-2818-498E-BAD3-AAFD047496F0}.Release|Net40.ActiveCfg = Release|Any CPU
+		{BD05E3C6-2818-498E-BAD3-AAFD047496F0}.Release|Net40.Build.0 = Release|Any CPU
+		{BD05E3C6-2818-498E-BAD3-AAFD047496F0}.Release|Win32.ActiveCfg = Release|Any CPU
+		{BD05E3C6-2818-498E-BAD3-AAFD047496F0}.Release|Win32.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1DFCB353-7794-45B8-8125-EB76E3A457AC}
 	EndGlobalSection
 EndGlobal

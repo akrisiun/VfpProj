@@ -35,17 +35,17 @@ namespace VfpProj
         }
 
         [STAThread]
-        public static void Main()
+        public static void _Main()
         {
             VfpProj.CsApp app = new VfpProj.CsApp();
-            app._InitializeComponent();
+            app.InitializeComponent();
             app.Run();
         }
 
-#if !DOTNET
+#if DOTNET
 
         private bool _contentLoaded;
-        public void _InitializeComponent()
+        public void InitializeComponent()
         {
             if (_contentLoaded) return;
             _contentLoaded = true;
