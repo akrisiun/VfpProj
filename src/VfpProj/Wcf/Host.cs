@@ -3,6 +3,7 @@ using System.ServiceModel;
 using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
 using System.ServiceModel.Description;
+using System.Windows;
 
 namespace VfpProj.Wcf
 {
@@ -37,15 +38,30 @@ namespace VfpProj.Wcf
             try
             {
                 var serviceUri = new Uri("http://localhost:9001/VfpService");
+                //  var serviceUri = new Uri("http://localhost:9002/VfpService");
                 svcHost = new ServiceHost(typeof(VfpService), serviceUri);
 
                 svcHost = LandingPageMessage.FixHost(svcHost);
+
+                var find = svcHost.Description.Behaviors.FindAll<ServiceMetadataBehavior>();
+                ServiceMetadataBehavior smb = find == null || find.Count == 0 ? null 
+                    : find[0] as ServiceMetadataBehavior;
+                if (smb == null)
+                {
+                    smb = smb ?? new ServiceMetadataBehavior();
+                    smb.HttpGetEnabled = true;
+                    svcHost.Description.Behaviors.Add(smb);
+                }
+                else
+                    smb.HttpGetEnabled = true;
+
 
                 Object = svcHost;
                 svcHost.Open();
                 Console.WriteLine("\n" + serviceUri.ToString());
 
-                var serviceUri2 = new Uri("http://localhost:9001/VfpIndex");
+                //  var serviceUri2 = new Uri("http://localhost:9001/VfpIndex");
+                var serviceUri2 = new Uri("http://localhost:9001/Vfp");
                 var host2 = new ServiceHost(typeof(VfpIndex), serviceUri2);
                 host2 = LandingPageMessage.FixHost(host2);
                 host2.Open();
@@ -57,13 +73,17 @@ namespace VfpProj.Wcf
                 svcHost = null;
                 // HTTP could not register URL http://+:9001/VfpService/. 
                 // Your process does not have access rights to this namespace (see http://go.microsoft.com/fwlink/?LinkId=70353 for details).
+
                 // netsh http add urlacl url=http://+:9001/VfpService/
                 // netsh http add urlacl url=http://+:9001/VfpService/ user=DOMAIN\user  
+
                 // The ChannelDispatcher at 'http://localhost:9001/VfpService' with contract(s) '"IVfpService"' is unable to open its IChannelListener.
                 // The ChannelDispatcher at is unable to open its IChannelListener.
-                System.Windows.Forms.MessageBox.Show("Service can not be started \n\nError Message [" + eX.Message + "]");
+                MessageBox.Show("Service can not be started \n\nError Message [" + eX.Message + "]");
                 Object = null;
             }
+
+            // success?
         }
     }
 }

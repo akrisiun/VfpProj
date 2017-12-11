@@ -133,6 +133,16 @@ namespace VfpProj
             FoxCmd.TryDoCmd(cmd, throwEx: false);
         }
 
+        public static object App_DoEval(string expr)
+        {
+            var app = Startup.Instance.App;
+            if (expr == "_VFP")
+                return app;
+
+            return app == null || string.IsNullOrWhiteSpace(expr) ? null 
+                 : FoxCmd.AppEval(expr);
+        }
+
         public static void WcfBind()
         {
             var service = VfpWcf.Instance;

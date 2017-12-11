@@ -2,14 +2,15 @@
 using System.ServiceModel;
 using System.Runtime.Serialization;
 using System.ServiceModel.Web;
-using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.ServiceModel.Channels;
+using System.Dynamic;
 
 namespace VfpProj.Wcf
 {
-    // bindingConfiguration="BasicHttpBinding_IVfpService" contract="VfpProj.Wcf.IVfpService" name="BasicHttpBinding_IVfpService" />
+    // bindingConfiguration="BasicHttpBinding_IVfpService" contract="VfpProj.Wcf.IVfpService"   
+       // name="BasicHttpBinding_IVfpService" />
     // VfpProj.Wcf.IVfpService
     // httpcfg set ssl -i 0.0.0.0:8080 -h b2fdd72d153ac0daa462ae26fe0902dfb7cfe670 -n LOCAL_MACHINE -c MY
 
@@ -21,6 +22,8 @@ namespace VfpProj.Wcf
     [ServiceKnownType(typeof(CsForm))]
     public interface IVfpService
     {
+        // [OperationContract(Action = "*", ReplyAction = "*")]Message Index();
+
         [OperationContract] IVfpData Load(object obj);
         [OperationContract] IList<KeyValuePair<string, object>> Eval(object obj);
 
@@ -52,6 +55,7 @@ namespace VfpProj.Wcf
 
     [Serializable]
     [DataContract]
+    [ServiceBehavior(AddressFilterMode = AddressFilterMode.Any, IncludeExceptionDetailInFaults = true)]
     public class VfpIndex : IVfpIndex
     {
         // [OperationContract(Action = "*", ReplyAction = "*")]
@@ -60,18 +64,44 @@ namespace VfpProj.Wcf
             var context = WebOperationContext.Current;
             context.OutgoingResponse.ContentType = "text/html";
             var to = OperationContext.Current.RequestContext.RequestMessage.Headers.To;
+            var query = to.PathAndQuery.ToLower();
+
+            dynamic data = null;
+            if (query.Contains("/load") && FoxCmd.App != null)
+            {
+                data = new ExpandoObject();
+                var dataObj = VfpWcf.Instance.Load(FoxCmd.App);
+                data.data = dataObj;
+                data.Startup = Vfp.Startup.Instance;
+                // data.CsApp = CsApp.Instance;
+            }
+
+            return new LandingPageMessage() { Data = data as ExpandoObject };
 
             return new LandingPageMessage();
         }
     }
 
-    [Serializable]
-    [DataContract] // no [ServiceContract]
-    public class VfpService : IVfpService, IVfpData, IDisposable
+    public class VfpWcf
     {
         public static VfpService Instance; // { get; set; }
-        static VfpService() { Instance = Instance ?? new VfpService(); }
 
+        static VfpWcf() { Instance = Instance ?? new VfpService(); }
+
+        public static void Bind() {
+            AppMethods.WcfBind();
+        }
+    }
+
+    public class VfpServiceTest : VfpService
+    { }
+
+
+    [Serializable]
+    [DataContract] // no [ServiceContract]
+    [ServiceBehavior(AddressFilterMode = AddressFilterMode.Any, IncludeExceptionDetailInFaults =true)]
+    public class VfpService : IVfpService, IVfpData, IDisposable
+    {
         [DataMember] public string Name { [DebuggerStepThrough] get; set; }
         [DataMember] public string StatusBar { [DebuggerStepThrough] get; set; }
         [DataMember] public string Directory { [DebuggerStepThrough] get; set; }
@@ -82,7 +112,7 @@ namespace VfpProj.Wcf
 
         public VfpService()
         {
-            Instance = this;
+            VfpWcf.Instance = this;
         }
 
         public static Exception VfpError { [DebuggerStepThrough] get; set; }
@@ -93,6 +123,13 @@ namespace VfpProj.Wcf
                 Debugger.Break();
 
             var result = new List<KeyValuePair<string, object>>();
+            object value = null;
+
+            value = AppMethods.App_DoEval(obj as string);
+
+
+            var key = "0";
+            result.Add(new KeyValuePair<string, object>(key, value));
 
             return result;
         }
@@ -145,8 +182,8 @@ namespace VfpProj.Wcf
         // no [OperationContract]
         public IVfpData Load(object obj)
         {
-            if (Debugger.IsAttached)
-                Debugger.Break();
+            //if (Debugger.IsAttached)
+            //    Debugger.Break();
 
             var context = OperationContext.Current;
 
@@ -166,19 +203,12 @@ namespace VfpProj.Wcf
             return this as IVfpData;
         }
 
-        public void Bind()
-        {
-            if (Host.Object != null)
-                return;
-
-            Task.Factory.StartNew(() => Host.Create());
-        }
-
         public void Dispose()
         {
             VfpError = null;
             VFP = null;
         }
+        
     }
 
 }

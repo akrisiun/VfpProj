@@ -1,6 +1,9 @@
-﻿using System.ServiceModel;
+﻿using Newtonsoft.Json;
+using System.Dynamic;
+using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.ServiceModel.Description;
+using System.Text;
 using System.Xml;
 
 namespace VfpProj.Wcf
@@ -16,7 +19,8 @@ namespace VfpProj.Wcf
         public static ServiceHost FixHost(ServiceHost host)
         {
             host.Description.Behaviors.Remove<ServiceDebugBehavior>();
-
+            
+            /*
             ServiceMetadataBehavior mex = host.Description.Behaviors.Find<ServiceMetadataBehavior>();
             if (mex == null)
             {
@@ -28,7 +32,8 @@ namespace VfpProj.Wcf
                 host.Description.Behaviors.Add(mex);
             }
             //  mex.HttpGetEnabled = true;
-            //  host = VfpServiceBehavior.Set(host);
+            host = VfpServiceBehavior.Set(host);
+            */
 
             return host;
         }
@@ -55,16 +60,51 @@ namespace VfpProj.Wcf
             get { return this._headers.MessageVersion; }
         }
 
+        public ExpandoObject  Data { get; set; }
+
         protected override void OnWriteBodyContents(XmlDictionaryWriter writer)
         {
             writer.WriteStartElement("html");
             writer.WriteStartElement("head");
             writer.WriteStartElement("body");
 
-            writer.WriteRaw("<h3>VfpService</h3>");
-            writer.WriteStartElement("span");
-            writer.WriteString("WCF service is running.");
-            writer.WriteEndElement();
+            if (Data == null)
+            {
+                writer.WriteRaw("<h3>VfpService</h3>");
+                writer.WriteStartElement("span");
+                writer.WriteString("WCF service is running.");
+                writer.WriteEndElement();
+            }
+
+            if (Data != null)
+            {
+                var json = JsonConvert.SerializeObject(Data, 
+                    new JsonSerializerSettings { MaxDepth = 5 });
+                var html = json; // !
+                writer.WriteStartElement("span");
+                writer.WriteString("Data:");
+                writer.WriteRaw("<br/>");
+
+                    writer.WriteStartElement("pre");
+                    writer.WriteStartElement("code");
+                    writer.WriteRaw("<br/>");
+
+                        var xmlEn = new StringBuilder();
+                        xmlEn.Append(html); // System.Net.WebUtility.HtmlEncode(html);
+                        xmlEn.Replace("}", "}\n");
+                        xmlEn.Replace("[", "\n[");
+                        xmlEn.Replace("\",", "\",\n");
+                        json = xmlEn.ToString();
+
+                        writer.WriteRaw(xmlEn.ToString());
+
+                    // writer.WriteString("<br/></code></pre>");
+                    writer.WriteRaw("<br/>");
+                    writer.WriteEndElement();
+                    writer.WriteEndElement();
+
+                writer.WriteEndElement();
+            }
 
             writer.WriteEndElement();
             writer.WriteEndElement();

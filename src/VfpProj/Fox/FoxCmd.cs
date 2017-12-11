@@ -133,13 +133,13 @@ namespace VfpProj
             }
         }
 
-        public static object AppEval(string cmd)
+        public static object AppEval(string expr)
         {
             object result = null;
             try
             {
                 dynamic AppObj = App;
-                result = AppObj.Eval(cmd);
+                result = AppObj.Eval(expr);
             }
             catch (COMException ex)
             {

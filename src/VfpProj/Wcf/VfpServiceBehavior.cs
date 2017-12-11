@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Net.Http;
 using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
@@ -19,7 +18,7 @@ namespace VfpProj.Wcf
             var address = "http://localhost:9001/VfpService";
             BasicHttpBinding binding = new BasicHttpBinding();
 
-            // var binding = new CustomBinding();
+            //  var binding = new CustomBinding();
 
             binding.Name = "BasicHttpBinding_IVfpService";
             binding.ReceiveTimeout = TimeSpan.FromSeconds(5);

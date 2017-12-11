@@ -8,6 +8,7 @@ using VisualFoxpro;
 using Application = System.Windows.Application;
 using System.Runtime.InteropServices;
 using VfpProj.Wcf;
+using Newtonsoft.Json;
 
 namespace Vfp
 {
@@ -103,7 +104,9 @@ namespace Vfp
             set;
         }
 
+        [JsonIgnore]
         protected CsApp appCur;
+
         public Action<FoxApplication> Then {
             [DebuggerStepThrough]
             get;
