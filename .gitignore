@@ -276,3 +276,8 @@ foxuser.*
 ICSharpCode.AvalonEdit/
 
 Lib/ClrDebug/
+*.bsc
+Lib/GdiPlusDebug/
+Lib/Win32/
+*.dll.metagen
+*.exp

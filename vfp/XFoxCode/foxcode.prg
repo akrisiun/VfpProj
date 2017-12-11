@@ -1,8 +1,16 @@
 #INCLUDE FOXCODE.H
+
 *#############################################################
 LPARAMETERS cCmd, oFoxCode, parm3, parm4, parm5, parm6
 
 LOCAL oFxCdeScript,lcRetValue,lnLangOpt,lnParms, lnDSID, lcCurDir  
+
+IF VERSION(2) = 2 AND !FILE([typelibs.vcx])
+   CD (_VFP.ActiveProject.HomeDir)
+ENDIF
+* _FOXCODE default
+* %HOME%\appdata\roaming\microsoft\visual foxpro 8\foxcode.dbf
+* c:\users\andrius\appdata\roaming\microsoft\visual foxpro 8\foxcode.dbf
 
 lnParms= PCOUNT()
 lnDSID = SET("DATASESSION") 
@@ -1178,6 +1186,7 @@ PROCEDURE Destroy
 ENDPROC
 
 *#############################################################
+* DO GetInterface in foxCode
 PROCEDURE GetInterface()
     LOCAL lcData
     

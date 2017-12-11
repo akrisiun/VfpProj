@@ -33,5 +33,26 @@ namespace VfpProj
             if (!StartupMode)
                 Startup += AppMethods.App_Startup;
         }
+
+        [STAThread]
+        public static void Main()
+        {
+            VfpProj.CsApp app = new VfpProj.CsApp();
+            app._InitializeComponent();
+            app.Run();
+        }
+
+#if !DOTNET
+
+        private bool _contentLoaded;
+        public void _InitializeComponent()
+        {
+            if (_contentLoaded) return;
+            _contentLoaded = true;
+            var resourceLocater = new System.Uri("/VfpProj;component/csapp.xaml", System.UriKind.Relative);
+
+            Application.LoadComponent(this, resourceLocater);
+        }
+#endif
     }
 }

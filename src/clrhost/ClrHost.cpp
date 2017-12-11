@@ -76,7 +76,6 @@ DWORD WINAPI SetError(HRESULT hr, char *ErrorMessage)
 		size_t len = strlen(ErrorMessage);
 
 		LoadStringRC(hr & 0xffff, (LPWSTR)ErrorMessage, len / 2, 0);
-		// C4996 : 'LoadStringRC' : This API has been deprecated.Refer to http ://go.microsoft.com/fwlink/?LinkId=143720
 
 		// c:\Program Files(x86)\Microsoft Visual Studio 12.0\VC\include\stdio.h  sprintf_s
 		// sprintf((char *)ErrorMessage,"%ws",ErrorMessage);
@@ -128,7 +127,7 @@ DWORD WINAPI ClrLoad(char *ErrorMessage, DWORD *dwErrorSize)
 	strcpy_s(ErrorMessage, 50, "spRuntimeHost->GetDefaultDomain");
 	hr = spRuntimeHost->GetDefaultDomain(&pUnk1);
 	if (FAILED(hr)) 
-		return hr; 
+		return hr;
 
 	WCHAR domainId[50];
 	const size_t maxLen = 49;
@@ -265,3 +264,12 @@ struct __declspec(dllexport) A {
 #pragma unmanaged
 // Global instance of object
 // A obj;
+
+/*
+extern "C"
+BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved) {
+    // Remove all managed code from here and put it in constructor of A.
+    return true;
+}
+
+*/

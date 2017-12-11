@@ -330,7 +330,7 @@ namespace VfpProj.Native
             {
                 if (VfpProj.Wcf.Host.Object != null)
                 {
-                    OperationContext ctx = null;
+                    // OperationContext ctx = null;
                     try
                     {
                         var service = VfpProj.Wcf.VfpServiceBehavior.CreateWebService(true);
@@ -505,6 +505,7 @@ namespace VfpProj.Native
             else
                 FoxCmd.AppCmd(cmd);
 
+            IntPtr? hWnd = null;
             try
             {
                 dir = FoxCmd.App.DefaultFilePath;
@@ -514,6 +515,7 @@ namespace VfpProj.Native
                 }
                 form.Directory = dir;
                 form.Caption = dir;
+                hWnd = (IntPtr?)form.App?.hWnd;
             }
             catch (Exception ex)
             {
@@ -521,8 +523,8 @@ namespace VfpProj.Native
                 Trace.WriteLine(ex.Message);
             }
 
-            var hWnd = (IntPtr)form.App.hWnd;
-            WindowsTab.FillList(form, hWnd);
+            if (hWnd.HasValue)
+                WindowsTab.FillList(form, hWnd ?? IntPtr.Zero);
         }
 
         void tabWI_IndexChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)

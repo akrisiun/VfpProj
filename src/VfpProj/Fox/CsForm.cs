@@ -11,6 +11,7 @@ using System.Security.Permissions;
 using Microsoft.Win32;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Diagnostics;
 
 namespace VfpProj
 {
@@ -35,14 +36,20 @@ namespace VfpProj
 
         public void Dispose() { Form = null; }
         ISite IComponent.Site { get; set; }
+
 #pragma warning disable 0067
         public event EventHandler Disposed;
 
-        public VisualFoxpro.FoxApplication App
-        {
+        public dynamic App {
+            [DebuggerStepThrough]
+            get => Application;
+            set { Application = value; }
+        }
+
+        public VisualFoxpro.FoxApplication Application {
+            [DebuggerStepThrough]
             get { return FoxCmd.App.Application; }
-            set
-            {
+            set {
                 if (value != null)
                     FoxCmd.SetApp(value);
                 FoxCmd.Attach();
@@ -80,19 +87,16 @@ namespace VfpProj
         protected string _directory = string.Empty;
         protected string _project = string.Empty;
 
-        public string Directory
-        {
+        public string Directory {
             get { return _directory; }
-            set
-            {
+            set {
                 _directory = value;
                 if (!string.IsNullOrWhiteSpace(_directory) && IO.Directory.Exists(_directory))
                     IO.Directory.SetCurrentDirectory(_directory);
             }
         }
 
-        public string Project
-        {
+        public string Project {
             get { return _project; }
         }
 
@@ -103,10 +107,8 @@ namespace VfpProj
         public string Name { get { return "VfpProj.CsForm"; } }
 
         IntPtr? hWnd = null;
-        public IntPtr Handle
-        {
-            get
-            {
+        public IntPtr Handle {
+            get {
                 if (hWnd == null && Form != null)
                 {
                     var wih = new WindowInteropHelper(Form);
@@ -116,16 +118,13 @@ namespace VfpProj
             }
         }
 
-        public bool AlwaysOnTop
-        {
+        public bool AlwaysOnTop {
             get { return TopMost; }
             set { TopMost = value; }
         }
 
-        public string Text
-        {
-            get
-            {
+        public string Text {
+            get {
                 if (!IsDisposed)
                 {
                     if (Form.Dispatcher.CheckAccess())
@@ -138,8 +137,7 @@ namespace VfpProj
                 }
                 return null;
             }
-            set
-            {
+            set {
                 if (!IsDisposed)
                     SetValueAsync<string>(Form.txtFile, TextBox.TextProperty, value);
             }
@@ -151,11 +149,9 @@ namespace VfpProj
                 SetValueAsync<string>(Form.txtFile, TextBox.TextProperty, value);
         }
 
-        public bool Visible
-        {
+        public bool Visible {
             get { return (Form == null) ? false : Form.IsVisible; }
-            set
-            {
+            set {
                 if (Form.IsVisible != value && !value)
                 {
                     if (Form.Dispatcher.CheckAccess())
@@ -211,38 +207,32 @@ namespace VfpProj
 
         #region Form properties
 
-        public Int32 Width
-        {
+        public Int32 Width {
             get { return ValueAsync<Int32>(Form, FrameworkElement.WidthProperty, -1); }
             set { SetValueAsync<Double>(Form, FrameworkElement.WidthProperty, Convert.ToDouble(value)); }
         }
 
-        public string Caption
-        {
+        public string Caption {
             get { return ValueAsync<string>(Form, Window.TitleProperty, ""); }
             set { SetValueAsync<string>(Form, Window.TitleProperty, value); }
         }
 
-        public Int32 Height
-        {
+        public Int32 Height {
             get { return ValueAsync<Int32>(Form, FrameworkElement.HeightProperty, -1); }
             set { SetValueAsync<Double>(Form, FrameworkElement.HeightProperty, Convert.ToDouble(value)); }
         }
 
-        public Int32 Left
-        {
+        public Int32 Left {
             get { return ValueAsync<Int32>(Form, Window.LeftProperty, -1); }
             set { SetValueAsync<Double>(Form, Window.LeftProperty, Convert.ToDouble(value)); }
         }
 
-        public Int32 Top
-        {
+        public Int32 Top {
             get { return ValueAsync<Int32>(Form, Window.TopProperty, -1); }
             set { SetValueAsync<Double>(Form, Window.TopProperty, Convert.ToDouble(value)); }
         }
 
-        public bool TopMost
-        {
+        public bool TopMost {
             get { return ValueAsync<bool>(Form, Window.TopmostProperty, false); }
             set { SetValueAsync<bool>(Form, Window.TopmostProperty, value); }
         }
