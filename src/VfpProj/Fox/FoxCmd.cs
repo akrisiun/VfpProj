@@ -25,7 +25,6 @@ namespace VfpProj
             dynamic appObj = app;
             try { hWnd = (IntPtr)appObj.hWnd; }
             catch (Exception) { App = null; }
-
             return hWnd != IntPtr.Zero;
         }
 
@@ -123,7 +122,7 @@ namespace VfpProj
             }
             catch (Exception ex)
             {
-                VfpProj.CsApp.Application_ThreadException(null, new ThreadExceptionEventArgs(ex));
+                AppMethods.Application_ThreadException(null, new ThreadExceptionEventArgs(ex));
             }
         }
 
@@ -159,8 +158,8 @@ namespace VfpProj
                 ocs_form = AppObj.Eval("IIF(TYPE(\"_SCREEN.ocs_form.text\") != 'C', 0, _SCREEN.ocs_form)");
                 if (ocs_form == null || (ocs_form as int?) == null)
                 {
-                    // SetVar();
-                    AppObj.SetVar("ocs_form", FoxCmd.FormObj);
+                    // SetVar:
+                    App.SetVar("ocs_form", FoxCmd.FormObj);
                     AppCmd("_SCREEN.AddProperty(\"ocs_form\", .null.)");
                     AppCmd("_SCREEN.Visible = .T.");
                     AppCmd("_SCREEN.ocs_form = m.ocs_form");
@@ -168,7 +167,7 @@ namespace VfpProj
             }
             catch (Exception ex)
             {
-                VfpProj.CsApp.Application_ThreadException(null, new ThreadExceptionEventArgs(ex));
+                AppMethods.Application_ThreadException(null, new ThreadExceptionEventArgs(ex));
             }
 
             // An outgoing call cannot be made as the application is despatching an input-synchronous call.
@@ -189,7 +188,6 @@ namespace VfpProj
             string msg = "";
             try
             {
-                // dynamic x = app.Eval("IIF(TYPE(\"_SCREEN.ocs_form\") = 'U', 0, _SCREEN.ocs_form)");
                 if (!App.Visible)
                 {
                     App.Visible = true;

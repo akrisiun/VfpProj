@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <!--$(MSBuildToolsVersion)-->
   <Import Project="$(MSBuildExtensionsPath)\14.0\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\14.0\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>VfpProj</RootNamespace>
     <AssemblyName>VfpProj</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -37,14 +37,14 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\lib\</OutputPath>
+    <OutputPath>..\..\lib\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Prefer32Bit>false</Prefer32Bit>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
-    <LangVersion>7.1</LangVersion>
+    <LangVersion>7</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -63,22 +63,34 @@
     <StartupObject>VfpProj.CsApp</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>vfp8.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ICSharpCode.AvalonEdit">
-      <HintPath>..\..\Lib\ICSharpCode.AvalonEdit.dll</HintPath>
+    <Reference Include="ICSharpCode.AvalonEdit, Version=5.0.1.0, Culture=neutral, PublicKeyToken=9cc39be672370310, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\ICSharpCode.AvalonEdit.dll</HintPath>
     </Reference>
-    <Reference Include="Interop.VisualFoxpro">
-      <HintPath>..\..\Lib\Interop.VisualFoxpro.dll</HintPath>
+    <Reference Include="Interop.VisualFoxpro, Version=8.0.0.0, Culture=neutral, PublicKeyToken=edd8e90038c4334e, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
       <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\Lib\Interop.VisualFoxpro.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Net.Http.WebRequest" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceModel.Routing" />
+    <Reference Include="System.ServiceModel.Web" />
+    <Reference Include="System.Web.Services" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -99,26 +111,47 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AppMethods.cs" />
     <Compile Include="Avalon\BraceFoldingStrategy.cs" />
+    <Compile Include="Fox\CsDomain.cs" />
     <Compile Include="Fox\CsForm.cs" />
     <Compile Include="Fox\CsObj.cs" />
     <Compile Include="Fox\OleInterfaces.cs" />
     <Compile Include="Fox\FoxCmd.cs" />
     <Compile Include="Bind\WindowsEvents.cs" />
     <Compile Include="Bind\WindowsTab.cs" />
-    <Compile Include="Native\TypeLib.cs" />
+    <Compile Include="FS\DirectoryEnum.cs" />
+    <Compile Include="FS\ProjItem.cs" />
+    <Compile Include="FS\FileSystem.cs" />
+    <Compile Include="FS\Win32\Iterator.cs" />
+    <Compile Include="FS\Win32\PathHelpers.cs" />
+    <Compile Include="FS\Win32\Win32FileSystemEnumerableHelpers.cs" />
+    <Compile Include="FS\Win32\Win32FileSystemEnumerableIterator.cs" />
+    <Compile Include="FS\Win32\Win32FindFile.cs" />
+    <Compile Include="FS\Win32\Win32Marshal.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Visual\CmdPanel.xaml.cs">
       <DependentUpon>CmdPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Visual\PrjWindow.xaml.cs">
+      <DependentUpon>PrjWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Visual\ProjTree.cs" />
     <Compile Include="Visual\TextDrop.cs" />
     <Compile Include="Visual\MainWindow.cs" />
     <Compile Include="Visual\TextRead.cs" />
     <Compile Include="Visual\VfpTabs.cs" />
+    <Compile Include="Wcf\Landing.cs" />
+    <Compile Include="Wcf\Host.cs" />
+    <Compile Include="Wcf\VfpServiceBehavior.cs" />
+    <Compile Include="Wcf\Service.cs" />
     <Page Include="Visual\EditPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Visual\PrjWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Visual\EditWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -192,6 +225,9 @@
   <ItemGroup>
     <Resource Include="pjx.ico" />
     <Resource Include="prg.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

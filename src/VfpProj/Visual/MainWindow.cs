@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
 using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
@@ -16,21 +19,33 @@ namespace VfpProj
         public bool IsStart;
 
         public static BitmapFrame PrgIco;
+        // public static BitmapFrame PrjIco; // TODO
+
         public static string Dll { get; set; }
 
         public Button buttonCD { get; set; }
+        public Button buttonPrj { get; set; }
+
         public Button buttonModi { get; set; }
         public Button buttonDO { get; set; }
+        public Button buttonWcf { get; set; }
+
+        public ComboBox comboPrj { get; set; }
         public ComboBox comboCfg { get; set; }
         public TextBox txtFile { get; set; }
 
         public void InitValues()
         {
             buttonCD = this.cmdPanel.buttonCD;
+            buttonPrj = this.cmdPanel.buttonPrj;
             buttonModi = this.cmdPanel.buttonModi;
             buttonDO = this.cmdPanel.buttonDO;
             txtFile = this.cmdPanel.txtFile;
             comboCfg = this.cmdPanel.comboCfg;
+
+            buttonWcf = this.cmdPanel.buttonWcf;
+            comboPrj = this.cmdPanel.comboPrj;
+            comboPrj.Visibility = Visibility.Collapsed; // TODO
 
             var cfFile = System.AppDomain.CurrentDomain.BaseDirectory + @"cmd.cfg";
             ReadCfg(cfFile);
@@ -64,6 +79,8 @@ namespace VfpProj
 
             FoxCmd.DefPosition(this);
 
+            // <add key="formTop" value="0" />
+            // <add key="formLeft" value="0" />
             var cfg_formTop = ConfigurationManager.AppSettings["formTop"];
             var int_formTop  = ToInt(cfg_formTop);
             if (int_formTop.HasValue)
@@ -106,12 +123,17 @@ namespace VfpProj
             FoxCmd.SetFormObj(FormObject);
             FoxCmd.FormObj.SetForm(this);
 
-            events = new Native.WindowsEvents(this);
+            events = events ?? new Native.WindowsEvents(this);
 
             if (app != null)
+            {
                 FoxCmd.SetApp(app);
-            if (FoxCmd.Attach())
-                FoxCmd.AssignForm(this);
+                if (FoxCmd.Attach())
+                    FoxCmd.AssignForm(this);
+            }
+
+            if (IsLoadBorder)
+                return;
 
             var window = this; // NoBorder init
             Native.WpfNoBorder.Init(window, window.titleBar, window.topLeft, window.top, window.topRight,
@@ -126,22 +148,24 @@ namespace VfpProj
                 ContentRendered += MainWindow_ContentRendered;
 
             Closing += MainWindow_Closing;
+            IsLoadBorder = true;
         }
 
+        public bool IsLoadBorder { get; protected set; }
         public bool IsRendered { get; protected set; }
 
         void MainWindow_ContentRendered(object sender, EventArgs e)
         {
             IsRendered = true;
             // this.border.Effect = new DropShadowEffect();
-            /*
+            events?.AfterRendered();
+
+            var inst = Vfp.Startup.Instance;
+            if (FoxCmd.App != null && inst != null && inst.Then != null)
             {
-                Color = Color.FromRgb(0, 0, 0),
-                Direction = 270,
-                BlurRadius = 10,
-                ShadowDepth = 2
-            }; */
-            events.AfterRendered();
+                inst.Then(FoxCmd.App);
+                inst.Then = null;
+            }
         }
 
         private static readonly Thickness MainBorderMaximizedPadding = new Thickness(13);

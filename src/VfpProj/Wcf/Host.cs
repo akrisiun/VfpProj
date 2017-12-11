@@ -55,6 +55,12 @@ namespace VfpProj.Wcf
             catch (Exception eX)
             {
                 svcHost = null;
+                // HTTP could not register URL http://+:9001/VfpService/. 
+                // Your process does not have access rights to this namespace (see http://go.microsoft.com/fwlink/?LinkId=70353 for details).
+                // netsh http add urlacl url=http://+:9001/VfpService/
+                // netsh http add urlacl url=http://+:9001/VfpService/ user=DOMAIN\user  
+                // The ChannelDispatcher at 'http://localhost:9001/VfpService' with contract(s) '"IVfpService"' is unable to open its IChannelListener.
+                // The ChannelDispatcher at is unable to open its IChannelListener.
                 System.Windows.Forms.MessageBox.Show("Service can not be started \n\nError Message [" + eX.Message + "]");
                 Object = null;
             }

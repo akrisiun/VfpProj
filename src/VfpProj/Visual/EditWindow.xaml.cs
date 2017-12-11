@@ -16,7 +16,7 @@ using VfpProj.Native;
 using System.Windows.Media.Imaging;
 using VfpProj;
 
-namespace VfpEdit
+namespace VfpProj
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -32,6 +32,8 @@ namespace VfpEdit
         internal XmlFoldingStrategy xmlStrategy;
         internal BraceFoldingStrategy csStrategy;
 
+        internal TreeView treeObj;
+
         public EditWindow()
         {
             // Uri iconUri = new Uri("pack://application:,,,/PRG.ICO", UriKind.RelativeOrAbsolute);
@@ -46,6 +48,7 @@ namespace VfpEdit
                 System.Uri resourceLocater = new System.Uri(MainWindow.Dll + ";component/visual/editwindow.xaml", System.UriKind.Relative);
                 System.Windows.Application.LoadComponent(this, resourceLocater);
             }
+            this.treeObj = tree;
             PostLoad();
         }
 
@@ -54,7 +57,7 @@ namespace VfpEdit
             buttonOpen.Click += buttonOpen_Click;
 
             txtPath = hostPath.Child as System.Windows.Forms.TextBox;
-            txtPath.Text = Directory.GetCurrentDirectory();
+            txtPath.Text = FileSystem.CurrentDirectory;
             txtPath.SetFileAutoComplete();
 
             xmlStrategy = new XmlFoldingStrategy();
@@ -65,14 +68,22 @@ namespace VfpEdit
             defManager = HighlightingManager.Instance;
             editor.SyntaxHighlighting = defManager.GetDefinitionByExtension(".cs");
 
-            TextDrop.Bind(this);
+            TextDrop.BindEdit(this);
 
             this.buttonProj.Click += buttonProj_Click;
+
+            zeroWidth = new GridLength(0.0);
+            projWidth = new GridLength(200.0);
         }
+
+        GridLength zeroWidth, projWidth;  
 
         void buttonProj_Click(object sender, RoutedEventArgs e)
         {
-            this.col3.Width = new GridLength(200.0);
+            if (this.col3.Width.Value >= projWidth.Value)
+                this.col3.Width = zeroWidth;
+            else
+                this.col3.Width = projWidth;
         }
 
         void buttonOpen_Click(object sender, RoutedEventArgs e)
@@ -93,7 +104,7 @@ namespace VfpEdit
             // Set filter for file extension and default file extension 
             dlg.DefaultExt = ".prg";
             dlg.Filter = filter;
-            dlg.InitialDirectory = Directory.GetCurrentDirectory();
+            dlg.InitialDirectory = FileSystem.CurrentDirectory;
 
             // Display OpenFileDialog by calling ShowDialog method 
             Nullable<bool> result = dlg.ShowDialog();

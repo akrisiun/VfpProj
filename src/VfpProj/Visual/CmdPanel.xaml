@@ -14,8 +14,11 @@
             <ColumnDefinition Width="57"/>
             <ColumnDefinition Width="27"/>
             <ColumnDefinition Width="475*"/>
-            <ColumnDefinition Width="57"/>
-            <ColumnDefinition Width="41"/>
+            <ColumnDefinition Name="cboCmd"  Width="57"/>
+            <ColumnDefinition Name="colCD" Width="28"/>
+            <ColumnDefinition Name="colCbo" Width="32"/>
+            <ColumnDefinition Name="colPjx"  Width="28"/>
+            <ColumnDefinition Name="colWcf" Width="28"/>
         </Grid.ColumnDefinitions>
 
         <Button 
@@ -51,9 +54,29 @@
             Grid.Column="3" />
 
         <Button 
-            Name="buttonCD" Grid.Column="4"
-            Content="_Cd" Height="20" Panel.ZIndex="2"
+            Name="buttonCD" Grid.Column="4" x:FieldModifier="public"
+            Content="_Cd" Height="20" Width="26"
+            Panel.ZIndex="2"
             VerticalAlignment="Top" HorizontalAlignment="Left" 
-            Width="40" Margin="0 3 0 0" FontSize="9" />
+            Margin="0 3 0 0" FontSize="9" />
+        <ComboBox
+            Name="comboPrj" Grid.Column="5" x:FieldModifier="public"
+            >
+        </ComboBox>
+        <Button 
+            Name="buttonPrj" Grid.Column="6" x:FieldModifier="public"
+            Height="20" Width="26"
+            Panel.ZIndex="2"
+            VerticalAlignment="Top" HorizontalAlignment="Left" 
+            Margin="0 3 0 0" FontSize="9">Prj</Button>
+        <Button 
+            Name="buttonWcf" x:FieldModifier="public"
+            Grid.Column="7"
+            Height="20" Width="26"
+            Panel.ZIndex="2"
+            VerticalAlignment="Top" HorizontalAlignment="Left" 
+            Margin="0 3 0 0" FontSize="9">
+            Wcf
+        </Button>
     </Grid>
 </UserControl>

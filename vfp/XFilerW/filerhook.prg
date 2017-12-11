@@ -1,24 +1,32 @@
-*$Id: filerhook.prg,v 1.2 2006/05/10 06:33:20 andriusk Exp $
-* FilerHook
-*$Log: filerhook.prg,v $
+* filerhook.prg
+*
 *Revision 1.2  2006/05/10 06:33:20  andriusk
 *recompile, v3 class
-*
 *##############################################################################
 LPARAMETERS tcExtra1, tcExtra2
 
 #INCLUDE setv.h 
+#DEFINE ROOTDIR "d:\webstack\vsix\vfpproj\vfp\xfilerw\"
 
 DO ShowForm WITH tcExtra1, tcExtra2
 
 FUNCTION ShowForm(tcExtra1, tcExtra2) 
 
-SET PROCEDURE TO FilerHook ADDITIVE 
+PUBLIC gcHookPrg as string
 
+gcHookPrg = ROOTDIR + "filerhook.prg"
+SET PROCEDURE TO (gcHookPrg) ADDITIVE 
+SET CLASSLIB  TO (ROOTDIR + "lib.vcx")
+
+* MODIFY CLASS frmparameters OF lib.vcx
 ASSERT FILE("FilerW.scx")
 
-DO FORM FilerW Name filerw 
-* TODO NOSHOW 
+PUBLIC filerw  as Form
+
+DO FORM (ROOTDIR + "filerw.scx") Name filerw NOSHOW
+
+filerw.HookSet = gcHookPrg
+filerw.Show()
 
 FUNCTION GetMessage(tcMsgText, tnDlgType, tcTitle) 
 
