@@ -382,6 +382,8 @@ namespace VfpProj
         {
             dynamic ocs_form = null;
             dynamic objApp = App;
+            if (objApp == null)
+                return;
             ocs_form = objApp.Eval("IIF(TYPE(\"_SCREEN.ocs_form.Directory\") != 'C', 0, _SCREEN.ocs_form)");
 
             if (ocs_form != null && ocs_form is _Form && FoxCmd.FormObj.Equals(ocs_form))

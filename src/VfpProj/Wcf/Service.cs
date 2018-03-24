@@ -119,17 +119,21 @@ namespace VfpProj.Wcf
 
         public IList<KeyValuePair<string, object>> Eval(object obj)
         {
-            if (Debugger.IsAttached)
-                Debugger.Break();
-
             var result = new List<KeyValuePair<string, object>>();
             object value = null;
 
+            var key = obj as string ?? "0";
+            Vfp.Startup.Instance.LastError = null;
+
             value = AppMethods.App_DoEval(obj as string);
-
-
-            var key = "0";
             result.Add(new KeyValuePair<string, object>(key, value));
+
+            var err = Vfp.Startup.Instance.LastError;
+            if (err != null)
+                result.Add(new KeyValuePair<string, object>("Error", err));
+
+            if (key.StartsWith("_VFP.") && Debugger.IsAttached)
+                Debugger.Break();
 
             return result;
         }

@@ -31,16 +31,18 @@ namespace VfpLanguage
         public IList<ClassificationSpan> GetClassificationSpans(SnapshotSpan span)
         {
             IList<ClassificationSpan> list = new List<ClassificationSpan>();
-            string text = span.GetText();
+            string text = span.GetText().TrimStart();
+            if (text.Length == 0)
+                return list;
 
             // Comments
             Match commentMatch = PrgLanguage.CommentRegex.Match(text);
-            if (commentMatch.Success)
+            if (commentMatch.Success || '*'.Equals(text[0]))
             {
                 var result = new SnapshotSpan(span.Snapshot, span.Start + commentMatch.Index, commentMatch.Length);
                 list.Add(new ClassificationSpan(result, _comment));
 
-                if (commentMatch.Index == 0)
+                if (commentMatch.Index == 0 && commentMatch.Success)
                     return list;
             }
 

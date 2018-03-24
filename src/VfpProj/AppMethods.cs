@@ -50,6 +50,9 @@ namespace VfpProj
             }
             catch (COMException ex)
             {
+                // "Retrieving the COM class factory for component with CLSID {00A19610-D8FC-4A3E-A95F-FEA211444BF7} " +
+                //  Retrieving the COM class factory failed due to the following error: 800702e4 The requested operation requires elevation
+                //  dcomcnfg - 32
                 Startup.Instance.LastError = ex;
             }
 

@@ -47,6 +47,8 @@ namespace VfpLanguage
             if (_processing)
                 return;
 
+            // SnapshotPoint currentPoint = session.TextView.Caret.Position.BufferPosition - 1;
+
             _typedChar = '\0';
 
             if (e.Changes.Count == 1 && e.AfterVersion.ReiteratedVersionNumber > _bufferVersionWaterline)

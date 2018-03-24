@@ -1,14 +1,18 @@
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using VfpLanguage;
 using System.Diagnostics;
 using VfpProj.Wcf;
 using Xunit.Sdk;
+using System.ServiceModel;
+using System.Linq;
 
 namespace Vfp15Test
 {
+#if VSIX
+    using VfpLanguage;
+
     [TestClass]
-    public class UnitTestVfpService
+    public class UnitTestVfpLang
     {
         [TestMethod]
         public void Test_Init()
@@ -16,6 +20,13 @@ namespace Vfp15Test
             VfpLanguagePackage package = new VfpLanguagePackage();
             package.DoInit();
         }
+    }
+
+#endif
+
+    [TestClass]
+    public class UnitTestVfpService
+    {
 
         // var exe = @"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\devenv.exe";  
 
@@ -29,17 +40,22 @@ namespace Vfp15Test
                 return;
 
             var client = new Vfp15Test.VfpService.VfpServiceClient();
-            //  VfpServiceClient client = new VfpServiceClient();
             client.Endpoint.Address = new System.ServiceModel.EndpointAddress(baseAddress);
-
-            //  binding = "basicHttpBinding" : Content Type application/xml; charset=utf-8 was not supported by 
-            // Use the 'client' variable to call operations on the service.
+            var f = client.Endpoint.EndpointBehaviors.First();
             var vfp = client.Load(null);
 
+            var obj = client.WcfChannel;
+            var dir = client.Eval("_VFP.DefaultFilePath");
+            var err = dir.Length >= 2 ? dir[1].Value : null;
+
+            Console.WriteLine($"_VFP.DefaultFilePath= {dir}");
+
             var status = client.Eval("_VFP.StatusBar");
+            Console.WriteLine($"_VFP.StatusBar=\"{status}\";");
 
             //// Always close the client.
             client.Close();
+            Debugger.Break();
         }
 
         [TestMethod]
@@ -56,6 +72,6 @@ namespace Vfp15Test
                 var uri = baseAddressJson;
                 // http://localhost:9001/Vfp/Eval/?_VFP.StatusBar
         }
-
     }
 }
+

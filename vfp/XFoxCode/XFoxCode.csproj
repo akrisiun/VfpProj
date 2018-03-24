@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net45</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="**/*.BAK" />
+    <None Remove="**/*.bmp" />
+    <None Remove="**/*.msk" />
+    <None Remove="**/*.DBF" />
+    <None Remove="**/*.VCT" />
+    <None Remove="**/*.XML" />
+    <None Remove="ints.BAK" />
+    <None Remove="**/*.FXP" />
+  </ItemGroup>
+
+</Project>

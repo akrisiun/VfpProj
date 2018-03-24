@@ -362,7 +362,9 @@ namespace Vfp15Test.VfpService {
         public System.Threading.Tasks.Task<object> LoadAsync(object obj) {
             return base.Channel.LoadAsync(obj);
         }
-        
+
+        public Vfp15Test.VfpService.IVfpService WcfChannel { get => base.Channel; }
+
         public System.Collections.Generic.KeyValuePair<string, object>[] Eval(object obj) {
             return base.Channel.Eval(obj);
         }

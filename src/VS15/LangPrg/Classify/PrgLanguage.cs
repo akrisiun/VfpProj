@@ -32,7 +32,10 @@ namespace VfpLanguage
         //public static Regex LabelRegex { get { return _rLabel; } }
 
         public static Dictionary<string, string> Keywords {
-            get { return _keywords; }
+            get {
+                // _keywords = GetList();
+                return _keywords;
+            }
         }
 
         private static Regex GetKeywordRegex()
@@ -57,6 +60,7 @@ namespace VfpLanguage
                 {"LPARAMETERS", "" },
                 {"LPAR", "" },
                 {"CLASS", "" },
+                {"as", ""},
                 {"ADD", "" },
                 {"OBJECT", "" },
                 {"RELEASE", "" },

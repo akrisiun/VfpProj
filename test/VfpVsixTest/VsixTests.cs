@@ -1,19 +1,19 @@
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using VfpLanguage;
 using System.Diagnostics;
 
 namespace Vfp15Test
 {
+//    using VfpLanguage;
     [TestClass]
     public class VsixTests
     {
-        [TestMethod]
-        public void Test_Init()
-        {
-            VfpLanguagePackage package = new VfpLanguagePackage();
-            package.DoInit();
-        }
+        //[TestMethod]
+        //public void Test_Init()
+        //{
+        //    VfpLanguagePackage package = new VfpLanguagePackage();
+        //    package.DoInit();
+        //}
 
         [TestMethod]
         public void Test_Debug()

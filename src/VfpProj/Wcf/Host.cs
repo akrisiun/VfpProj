@@ -61,9 +61,12 @@ namespace VfpProj.Wcf
                 Console.WriteLine("\n" + serviceUri.ToString());
 
                 //  var serviceUri2 = new Uri("http://localhost:9001/VfpIndex");
-                var serviceUri2 = new Uri("http://localhost:9001/Vfp");
+
+                var serviceUri2 = new Uri("http://0.0.0.0:9001/Vfp");
                 var host2 = new ServiceHost(typeof(VfpIndex), serviceUri2);
                 host2 = LandingPageMessage.FixHost(host2);
+                var find2 = host2.Description.Behaviors.FindAll<ServiceMetadataBehavior>();
+
                 host2.Open();
 
                 Console.WriteLine("\n" + serviceUri2.ToString());
@@ -74,11 +77,18 @@ namespace VfpProj.Wcf
                 // HTTP could not register URL http://+:9001/VfpService/. 
                 // Your process does not have access rights to this namespace (see http://go.microsoft.com/fwlink/?LinkId=70353 for details).
 
+                // PS>
+                // netsh http add urlacl url = http://+:9001/Vfp/ user=$env:USERDOMAIN\$env:USERNAME
+                // netsh http add urlacl url = http://+:9002/Vfp/ user=$env:USERDOMAIN\$env:USERNAME
+
+                // netsh http add urlacl url=http://+:9002/VfpService/
                 // netsh http add urlacl url=http://+:9001/VfpService/
                 // netsh http add urlacl url=http://+:9001/VfpService/ user=DOMAIN\user  
 
                 // The ChannelDispatcher at 'http://localhost:9001/VfpService' with contract(s) '"IVfpService"' is unable to open its IChannelListener.
                 // The ChannelDispatcher at is unable to open its IChannelListener.
+
+                // HTTP could not register URL http://+:9002/Vfp/. Your process does not have access rights to this namespace (see http://go.microsoft.com/fwlink/?LinkId=70353 for details).
                 MessageBox.Show("Service can not be started \n\nError Message [" + eX.Message + "]");
                 Object = null;
             }
