@@ -5,6 +5,8 @@ using System.Net.Security;
 using System.ServiceModel.Description;
 using System.Windows;
 
+#if WCF 
+
 namespace VfpProj.Wcf
 {
     public static class Host
@@ -90,6 +92,7 @@ namespace VfpProj.Wcf
     }
 }
 
+#endregion
 /*
  * 
       <endpoint

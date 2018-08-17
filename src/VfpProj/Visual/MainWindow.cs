@@ -42,7 +42,7 @@ namespace VfpProj
             comboCfg = this.cmdPanel.comboCfg;
 
             buttonWcf = this.cmdPanel.buttonWcf;
-            buttonWcf.Visibility = Visibility.Collapsed;
+            buttonWcf.Visibility = Visibility.Hidden;   // .Collapsed;
             comboPrj = this.cmdPanel.comboPrj;
             comboPrj.Visibility = Visibility.Collapsed; // TODO
 

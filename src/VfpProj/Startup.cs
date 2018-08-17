@@ -7,7 +7,7 @@ using VfpProj;
 using VisualFoxpro;
 using Application = System.Windows.Application;
 using System.Runtime.InteropServices;
-using VfpProj.Wcf;
+//using VfpProj.Wcf;
 //using Newtonsoft.Json;
 
 namespace Vfp
@@ -25,11 +25,13 @@ namespace Vfp
         {
             appCur = null;
             App = null;
+#if WCF            
             if (Host.Object != null)
             {
                 Host.Object.Close();
                 Host.Object = null;
             }
+#endif
         }
 
         ISite IComponent.Site { get; set; }

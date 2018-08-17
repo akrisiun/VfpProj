@@ -1,5 +1,7 @@
 ﻿//using Newtonsoft.Json;
 // using System.Dynamic;
+#if WCF 
+
 using System.Collections.Generic;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
@@ -116,6 +118,7 @@ namespace VfpProj.Wcf
     }
 }
 
+#endif 
 
 /*
  * 

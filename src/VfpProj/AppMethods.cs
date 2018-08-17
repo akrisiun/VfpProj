@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using Vfp;
-using VfpProj.Wcf;
+// using VfpProj.Wcf;
 
 namespace VfpProj
 {
@@ -152,11 +152,12 @@ namespace VfpProj
 
         public static void WcfBind()
         {
+            /*
             var service = VfpWcf.Instance;
 
             if (Host.Object != null)
                 return;
-
+            */
             //  Task.Factory.StartNew(() => Host.Create());
         }
     }

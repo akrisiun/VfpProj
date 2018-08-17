@@ -9,7 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Forms = System.Windows.Forms;
 using VfpInterop;
-using System.ServiceModel;
+// using System.ServiceModel;
 
 namespace VfpProj.Native
 {
@@ -87,6 +87,7 @@ namespace VfpProj.Native
 #endif
             frm.buttonDO.Click += (s, e) => DoCmd(form.Text);
 
+#if WCF 
             frm.buttonWcf.Click += (s, e) => Wcf.VfpWcf.Bind();
             var sets = System.Configuration.ConfigurationManager.AppSettings;
             var baseAddress = sets.Get("baseAddress");
@@ -98,6 +99,7 @@ namespace VfpProj.Native
                 else 
                     frm.buttonWcf.Visibility = Visibility.Visible;
             }
+#endif             
         }
         #endregion
 
@@ -331,6 +333,7 @@ namespace VfpProj.Native
         {
             if (FormPrj == null || !FormPrj.IsLoaded)
             {
+#if WCF                
                 if (VfpProj.Wcf.Host.Object != null)
                 {
                     // OperationContext ctx = null;
@@ -357,6 +360,7 @@ namespace VfpProj.Native
                     }
 
                 }
+#endif
 
                 FormPrj = null; // clear
                 var txtDir = Form.txtFile.Text;
