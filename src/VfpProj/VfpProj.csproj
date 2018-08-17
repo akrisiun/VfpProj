@@ -147,9 +147,11 @@
     <Compile Include="Json\SimpleJson.cs" />
     <Compile Include="Native\Interopt.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="Visual\CmdPanelG.cs" />
     <Compile Include="Visual\CmdPanel.xaml.cs">
       <DependentUpon>CmdPanel.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Visual\PrjWindowG.cs" />
     <Compile Include="Visual\PrjWindow.xaml.cs">
       <DependentUpon>PrjWindow.xaml</DependentUpon>
     </Compile>
@@ -176,6 +178,7 @@
       <DependentUpon>CsApp.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MainWindowG.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -213,6 +216,7 @@
     <Resource Include="prg.ico" />
   </ItemGroup>
   <ItemGroup>
+    <!--
     <COMReference Include="VisualFoxpro">
       <Guid>{00A19611-D8FC-4A3E-A95F-FEA211444BF7}</Guid>
       <VersionMajor>8</VersionMajor>
@@ -222,6 +226,7 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
+    -->
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
