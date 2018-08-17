@@ -3,30 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              >
 
-    <JumpList.JumpList x:Uid="jumpList">
-        <JumpList ShowRecentCategory="True" 
-                  ShowFrequentCategory="True">
-
-            <!-- Adding a path 
-                  JumpItemsRejected="JumpList_JumpItemsRejected"
-                  JumpItemsRemovedByUser="JumpList_JumpItemsRemovedByUser"
-            <! - - Adding a Task to the default category - -
-            <JumpTask ApplicationPath="C:\Windows\Notepad.exe"
-                      Arguments="C:\Users\Alessandro\My Documents\LoremIpsum.txt"
-                      Description="The most common sample document"
-                      Title="Lorem Ipsum"/>
-
-            <JumpPath Path="C:\Users\Alessandro\My Documents\LoremIpsum.txt"/>
-            <JumpTask ApplicationPath="C:\Windows\Notepad.exe"
-                      CustomCategory="My documents"
-                      Arguments="C:\Users\Alessandro\My Documents\LoremIpsum.txt"
-                      Description="The most common sample document"
-                      Title="Lorem Ipsum"/>
-            -->            
-        </JumpList>
-    </JumpList.JumpList>
-
     <Application.Resources>
-         
     </Application.Resources>
 </Application>

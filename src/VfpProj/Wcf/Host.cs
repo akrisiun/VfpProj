@@ -14,9 +14,11 @@ namespace VfpProj.Wcf
             obj.StatusBar = app.StatusBar;
             obj.Directory = app.DefaultFilePath;
             obj.HWnd = app.hWnd;
-            obj.Name = app.Name;
             obj.ActiveProject = null;
-            try { obj.ActiveProject = app.ActiveProject == null ? "" : app.ActiveProject.Name; }
+            try {
+                // obj.Name = app.Name;
+                // obj.ActiveProject = app.ActiveProject == null ? "" : app.ActiveProject.Name; 
+            }
             catch { }
 
             return obj;

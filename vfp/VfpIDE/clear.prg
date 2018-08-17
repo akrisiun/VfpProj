@@ -1,4 +1,0 @@
-* Clear 
-
-CLEAR ALL
-CANCEL

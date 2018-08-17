@@ -1,16 +1,18 @@
 ﻿using System;
 using System.ServiceModel;
 using System.Runtime.Serialization;
-using System.ServiceModel.Web;
+//using System.ServiceModel.Web;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.ServiceModel.Channels;
-using System.Dynamic;
+// using System.Dynamic;
 
 namespace VfpProj.Wcf
 {
+    using ExpandoObject = Dictionary<string, object>;
+
     // bindingConfiguration="BasicHttpBinding_IVfpService" contract="VfpProj.Wcf.IVfpService"   
-       // name="BasicHttpBinding_IVfpService" />
+    // name="BasicHttpBinding_IVfpService" />
     // VfpProj.Wcf.IVfpService
     // httpcfg set ssl -i 0.0.0.0:8080 -h b2fdd72d153ac0daa462ae26fe0902dfb7cfe670 -n LOCAL_MACHINE -c MY
 
@@ -61,24 +63,24 @@ namespace VfpProj.Wcf
         // [OperationContract(Action = "*", ReplyAction = "*")]
         public Message Index()
         {
-            var context = WebOperationContext.Current;
-            context.OutgoingResponse.ContentType = "text/html";
-            var to = OperationContext.Current.RequestContext.RequestMessage.Headers.To;
-            var query = to.PathAndQuery.ToLower();
+            string query = "";
+            //var context = WebOperationContext.Current;
+            //context.OutgoingResponse.ContentType = "text/html";
+            //var to = OperationContext.Current.RequestContext.RequestMessage.Headers.To;
+            // query = to.PathAndQuery.ToLower();
 
-            dynamic data = null;
+            // dynamic 
+            ExpandoObject data = null;
             if (query.Contains("/load") && FoxCmd.App != null)
             {
                 data = new ExpandoObject();
                 var dataObj = VfpWcf.Instance.Load(FoxCmd.App);
-                data.data = dataObj;
-                data.Startup = Vfp.Startup.Instance;
+                data.Add("data", dataObj);
+                data.Add("Startup", Vfp.Startup.Instance);
                 // data.CsApp = CsApp.Instance;
             }
 
             return new LandingPageMessage() { Data = data as ExpandoObject };
-
-            return new LandingPageMessage();
         }
     }
 
@@ -172,7 +174,7 @@ namespace VfpProj.Wcf
                 app.DoCmd("ON ERROR _VFP.StatusBar = MESSAGE()");
                 app.DoCmd("COMPILE " + file);
 
-                StatusBar = app.Eval("_VFP.StatusBar");
+                StatusBar = app.Eval("_VFP.StatusBar") as string;
                 result = Host.UpdateValues(this, app);
             }
             catch (Exception ex) { VfpError = ex; }

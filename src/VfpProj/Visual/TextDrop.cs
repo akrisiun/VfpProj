@@ -7,19 +7,18 @@ using System.Windows.Media;
 using Forms = System.Windows.Forms;
 using FolderWindow = VfpProj.PrjWindow;
 using System.Windows.Input;
-using System.Threading.Tasks;
 
 namespace VfpProj
 {
     public static class TextDrop
     {
-        public static void BindEdit(this EditWindow w)
-        {
-            w.editor.Tag = w;
-            w.editor.AllowDrop = true;
-            w.editor.PreviewDragOver += DragOver;
-            w.editor.PreviewDrop += Drop;
-        }
+        //public static void BindEdit(this EditWindow w)
+        //{
+        //    w.editor.Tag = w;
+        //    w.editor.AllowDrop = true;
+        //    w.editor.PreviewDragOver += DragOver;
+        //    w.editor.PreviewDrop += Drop;
+        //}
 
         public static void BindPrjEdit(this PrjWindow w, Forms.TextBox txtFile)
         {
@@ -65,17 +64,17 @@ namespace VfpProj
 
             var fileToLoad = new StreamReader(fileName);
 
-            EditWindow w = (sender as FrameworkElement).Tag as EditWindow;
-            if (w == null)
-                return;
+            //EditWindow w = (sender as FrameworkElement).Tag as EditWindow;
+            //if (w == null)
+            //    return;
 
-            w.txtPath.Text = fileName;
-            try
-            {
-                w.editor.Text = fileToLoad.ReadToEnd();
-                fileToLoad.Close();
-            }
-            catch (Exception ex) { MessageBox.Show(ex.Message); }
+            //w.txtPath.Text = fileName;
+            //try
+            //{
+            //    w.editor.Text = fileToLoad.ReadToEnd();
+            //    fileToLoad.Close();
+            //}
+            //catch (Exception ex) { MessageBox.Show(ex.Message); }
         }
 
         // If the data object in args is a single file, this method will return the filename. Otherwise, it returns null.
@@ -132,11 +131,12 @@ namespace VfpProj
 
         public static void treeView_DragOver(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(typeof(Task)))
-            {
-                e.Effects = DragDropEffects.Move;
-            }
-            else if (e.Data.GetDataPresent(typeof(string[]))
+            //if (e.Data.GetDataPresent(typeof(Task)))
+            //{
+            //    e.Effects = DragDropEffects.Move;
+            //}
+            //else
+            if (e.Data.GetDataPresent(typeof(string[]))
                 || e.Data.GetData(DataFormats.FileDrop) != null)
             {
                 e.Effects = DragDropEffects.Link;
@@ -152,17 +152,18 @@ namespace VfpProj
             var treeView = sender as TreeView;
             if (treeView == null)
                 return;
-            if (e.Data.GetDataPresent(typeof(Task)))
-            {
-                Task sourceTask = (Task)e.Data.GetData(typeof(Task));
-                Task<TreeViewItem> targetTask = GetItemAtLocation<Task<TreeViewItem>>(treeView, MouseUtilities.GetMousePosition());
 
-                // Code to move the item in the model is placed here...
-                targetTask.Wait();
-                if (targetTask.IsCompleted)
-                {
-                }
-            }
+            //if (e.Data.GetDataPresent(typeof(Task)))
+            //{
+            //    Task sourceTask = (Task)e.Data.GetData(typeof(Task));
+            //    Task<TreeViewItem> targetTask = GetItemAtLocation<Task<TreeViewItem>>(treeView, MouseUtilities.GetMousePosition());
+
+            //    // Code to move the item in the model is placed here...
+            //    targetTask.Wait();
+            //    if (targetTask.IsCompleted)
+            //    {
+            //    }
+            //}
         }
 
         // Do a VisualTreeHelper.HitTest(reference,location) call, a visual gets returned that represents the control you clicked on. 

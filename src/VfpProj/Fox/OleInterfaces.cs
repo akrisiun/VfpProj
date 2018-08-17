@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using System.Windows.Interop;
-using System.ComponentModel;
 using System.Xml.Linq;
 using VfpProj.Native;
 using VisualFoxpro;
@@ -46,19 +44,19 @@ namespace VfpProj
         IntPtr EvalPtr(string expr);
 
         [ComVisible(true), DispId(0x60020014)]
-        string SetPtr(dynamic ptr);
+        string SetPtr(object ptr); // dynamic ptr);
 
         [ComVisible(true), DispId(0x60020020)]
         string SetIntPtr(IntPtr ptr);
 
-        [ComVisible(true), DispId(0x60020021)]
-        string SetFoxObj(IFoxObjects ptr);
+        //[ComVisible(true), DispId(0x60020021)]
+        //string SetFoxObj(IFoxObjects ptr);
 
-        [ComVisible(true), DispId(0x60020022)]
-        string SetFoxForms(IFoxForms ptr);
+        //[ComVisible(true), DispId(0x60020022)]
+        //string SetFoxForms(IFoxForms ptr);
 
-        [ComVisible(true), DispId(0x60020023)]
-        string SetProjects(IFoxProjects ptr);
+        //[ComVisible(true), DispId(0x60020023)]
+        //string SetProjects(IFoxProjects ptr);
 
         [ComVisible(true), DispId(0x60020024)]
         string GetXml(string command);
@@ -82,7 +80,8 @@ namespace VfpProj
         [DispId(0x60030002)]
         [ComVisible(true)]
         // FoxApplication
-        dynamic App { get; set; }
+        // dynamic 
+        object App { get; set; }
 
         [ComVisible(true), DispId(0x60030022)]
         _Events CsObject { get; }

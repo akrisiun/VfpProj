@@ -9,6 +9,15 @@ using System.Runtime.Serialization;
 
 namespace VfpProj
 {
+    public static class StrExt
+    {
+        public static bool IsNullOrWhiteSpace(this string str)
+        {
+            return (str == null || str.Length == 0 || str.TrimEnd().Length == 0);
+        }
+    }
+
+
     [ProgId("VfpProj.CsObj"), Guid("c155b373-563f-433f-8fcf-18fd98100013")]
     [ClassInterface(ClassInterfaceType.AutoDispatch)]
     [ComVisible(true)]
@@ -42,10 +51,14 @@ namespace VfpProj
         [DataMember]
         public string Name { get { return "VfpProj.CsObj." + cnt.ToString(); } set { } }
 
-        //[NonSerialized]
-        public FoxApplication App { get { return FoxCmd.App as FoxApplication; } }
-        //[NonSerialized]
-        public CsApp CSApp { get { return CsApp.Instance; } }
+        
+        public FoxApplication App {
+            // [NonSerialized]
+            get { return FoxCmd.App as FoxApplication; } }
+
+        public CsApp CSApp {
+            // [NonSerialized]
+            get { return CsApp.Instance; } }
 
         [DataMember]
         public IntPtr hWnd {
@@ -138,9 +151,9 @@ namespace VfpProj
             return refStr;
         }
 
-        public string SetPtr(dynamic ptr)
+        public string SetPtr(object ptr)
         {
-            if (ptr == null)
+            if (ptr as ObjectHandle == null)
                 return "SetPtr null";
 
             ObjectHandle handle = ptr as ObjectHandle;
@@ -163,27 +176,27 @@ namespace VfpProj
             return "Ptr =" + (ptr == IntPtr.Zero ? " 0 " : ptr.ToString());
         }
 
-        public string SetFoxObj(IFoxObjects ptr)
-        {
-            return "SetFoxObj =" + (ptr == null ? " null " : ptr.ToString());
-        }
+        //public string SetFoxObj(IFoxObjects ptr)
+        //{
+        //    return "SetFoxObj =" + (ptr == null ? " null " : ptr.ToString());
+        //}
 
 
-        public string SetFoxForms(IFoxForms ptr)
-        {
-            return "SetFoxForms: " + (ptr == null ? " null " : ptr.ToString());
-        }
+        //public string SetFoxForms(IFoxForms ptr)
+        //{
+        //    return "SetFoxForms: " + (ptr == null ? " null " : ptr.ToString());
+        //}
 
 
-        public string SetProjects(IFoxProjects ptr)
-        {
-            return "SetProjects: " + (ptr == null ? " null " : ptr.ToString());
-        }
+        //public string SetProjects(IFoxProjects ptr)
+        //{
+        //    return "SetProjects: " + (ptr == null ? " null " : ptr.ToString());
+        //}
 
 
         public string GetXml(string command)
         {
-            return string.IsNullOrWhiteSpace(command) ? string.Empty :
+            return command.IsNullOrWhiteSpace() ? string.Empty :
                    XElement.Parse(command).ToString();
         }
 

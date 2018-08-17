@@ -34,15 +34,7 @@ namespace VfpProj
                 Startup += AppMethods.App_Startup;
         }
 
-        [STAThread]
-        public static void _Main()
-        {
-            VfpProj.CsApp app = new VfpProj.CsApp();
-            app.InitializeComponent();
-            app.Run();
-        }
-
-#if DOTNET
+#if DOTNET40
 
         private bool _contentLoaded;
         public void InitializeComponent()

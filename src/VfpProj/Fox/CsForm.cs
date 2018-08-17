@@ -40,10 +40,10 @@ namespace VfpProj
 #pragma warning disable 0067
         public event EventHandler Disposed;
 
-        public dynamic App {
+        public object App {
             [DebuggerStepThrough]
             get => Application;
-            set { Application = value; }
+            set { Application = value as VisualFoxpro.FoxApplication ?? Application; }
         }
 
         public VisualFoxpro.FoxApplication Application {
@@ -91,7 +91,7 @@ namespace VfpProj
             get { return _directory; }
             set {
                 _directory = value;
-                if (!string.IsNullOrWhiteSpace(_directory) && IO.Directory.Exists(_directory))
+                if (!_directory.IsNullOrWhiteSpace() && IO.Directory.Exists(_directory))
                     IO.Directory.SetCurrentDirectory(_directory);
             }
         }
@@ -145,7 +145,7 @@ namespace VfpProj
 
         public void SetText(string value)
         {
-            if (!IsDisposed && !string.IsNullOrWhiteSpace(value) && value.Substring(1, 1) == ":")
+            if (!IsDisposed && !value.IsNullOrWhiteSpace() && value.Substring(1, 1) == ":")
                 SetValueAsync<string>(Form.txtFile, TextBox.TextProperty, value);
         }
 

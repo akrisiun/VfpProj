@@ -1,5 +1,6 @@
-﻿using Newtonsoft.Json;
-using System.Dynamic;
+﻿//using Newtonsoft.Json;
+// using System.Dynamic;
+using System.Collections.Generic;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.ServiceModel.Description;
@@ -8,6 +9,8 @@ using System.Xml;
 
 namespace VfpProj.Wcf
 {
+    using ExpandoObject = Dictionary<string, object>;
+
     //https://cgeers.wordpress.com/2011/09/04/replacing-the-you-have-created-a-service-message/
     // <binding name = "landingPage" >
     //  < textMessageEncoding messageVersion="None"/>
@@ -78,9 +81,9 @@ namespace VfpProj.Wcf
 
             if (Data != null)
             {
-                var json = JsonConvert.SerializeObject(Data, 
-                    new JsonSerializerSettings { MaxDepth = 5 });
-                var html = json; // !
+                //var json = JsonConvert.SerializeObject(Data, 
+                //    new JsonSerializerSettings { MaxDepth = 5 });
+                var html = ""; //  json; // !
                 writer.WriteStartElement("span");
                 writer.WriteString("Data:");
                 writer.WriteRaw("<br/>");
@@ -94,7 +97,7 @@ namespace VfpProj.Wcf
                         xmlEn.Replace("}", "}\n");
                         xmlEn.Replace("[", "\n[");
                         xmlEn.Replace("\",", "\",\n");
-                        json = xmlEn.ToString();
+                        // json = xmlEn.ToString();
 
                         writer.WriteRaw(xmlEn.ToString());
 

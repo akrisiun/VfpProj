@@ -2,9 +2,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Shell;
 using Vfp;
 using VfpProj.Wcf;
 
@@ -48,6 +46,14 @@ namespace VfpProj
             {
                 app = new VisualFoxpro.FoxApplication();
             }
+            catch (InvalidCastException ex)
+            {
+                Startup.Instance.LastError = ex;
+            }
+            catch (InvalidComObjectException ex)
+            {
+                Startup.Instance.LastError = ex;
+            }
             catch (COMException ex)
             {
                 Startup.Instance.LastError = ex;
@@ -58,7 +64,7 @@ namespace VfpProj
 
         public static void App_StartupJumpList(object sender, StartupEventArgs e)
         {
-            JumpList jumpList1 = JumpList.GetJumpList(CsApp.Current);
+            // JumpList jumpList1 = JumpList.GetJumpList(CsApp.Current);
 
             MainWindow window = new MainWindow();   // NoBorder 
 
@@ -83,7 +89,8 @@ namespace VfpProj
                 var app = CreateFoxApp() as VisualFoxpro.FoxApplication;
                 if (app != null)
                 {
-                    dynamic appObj = app;
+                    // dynamic 
+                    VisualFoxpro.FoxApplication appObj = app;
                     appObj.Visible = true;
                     FoxCmd.SetApp(app);
                     FoxCmd.SetVar();
@@ -111,21 +118,21 @@ namespace VfpProj
 
         #endregion
 
-        public static EditWindow ShowEditWindow(string file)
-        {
-            var winEdit = new EditWindow();
-            winEdit.ShowInTaskbar = true;
-            if (file.Length > 0)
-            {
-                winEdit.txtPath.Text = file;
-                TextRead.Open(winEdit);
-            }
+        //public static EditWindow ShowEditWindow(string file)
+        //{
+        //    var winEdit = new EditWindow();
+        //    winEdit.ShowInTaskbar = true;
+        //    if (file.Length > 0)
+        //    {
+        //        winEdit.txtPath.Text = file;
+        //        TextRead.Open(winEdit);
+        //    }
 
-            // Uri iconUri = new Uri("pack://application:,,,/PRG.ico", UriKind.RelativeOrAbsolute);
-            // winEdit.Icon = BitmapFrame.Create(iconUri);
-            winEdit.Show();
-            return winEdit;
-        }
+        //    // Uri iconUri = new Uri("pack://application:,,,/PRG.ico", UriKind.RelativeOrAbsolute);
+        //    // winEdit.Icon = BitmapFrame.Create(iconUri);
+        //    winEdit.Show();
+        //    return winEdit;
+        //}
 
         public static void App_DoCmd(string cmd)
         {
@@ -139,7 +146,7 @@ namespace VfpProj
             if (expr == "_VFP")
                 return app;
 
-            return app == null || string.IsNullOrWhiteSpace(expr) ? null 
+            return app == null || expr.IsNullOrWhiteSpace() ? null 
                  : FoxCmd.AppEval(expr);
         }
 
@@ -150,7 +157,7 @@ namespace VfpProj
             if (Host.Object != null)
                 return;
 
-            Task.Factory.StartNew(() => Host.Create());
+            //  Task.Factory.StartNew(() => Host.Create());
         }
     }
 }

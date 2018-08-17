@@ -24,7 +24,7 @@ namespace VfpProj
             IsStart = false;
 
             if (Dll == null)
-                Dll = "/VfpProj";
+                Dll = "/VfpProj2";
 
             Uri iconUri;
             try

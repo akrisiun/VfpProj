@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -101,7 +100,7 @@ namespace IOFile
         /// </summary>
         internal static int MakeHRFromErrorCode(int errorCode)
         {
-            Contract.Assert((0xFFFF0000 & errorCode) == 0, "This is an HRESULT, not an error code!");
+            // Contract.Assert((0xFFFF0000 & errorCode) == 0, "This is an HRESULT, not an error code!");
 
             return unchecked(((int)0x80070000) | errorCode);
         }

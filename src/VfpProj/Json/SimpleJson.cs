@@ -42,7 +42,8 @@ using System.Linq.Expressions;
 #endif
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-#if SIMPLE_JSON_DYNAMIC
+
+#if SIMPLE_JSON_DYNAMIC2
 using System.Dynamic;
 #endif
 using System.Globalization;
@@ -101,11 +102,11 @@ namespace SimpleJson
 #else
     public
 #endif
- class JsonObject :
-#if SIMPLE_JSON_DYNAMIC
- DynamicObject,
+    class JsonObject :
+#if SIMPLE_JSON_DYNAMIC2
+    DynamicObject,
 #endif
- IDictionary<string, object>
+    IDictionary<string, object>
     {
         /// <summary>
         /// The internal member dictionary.
@@ -328,7 +329,8 @@ namespace SimpleJson
             return SimpleJson.SerializeObject(this);
         }
 
-#if SIMPLE_JSON_DYNAMIC
+#if SIMPLE_JSON_DYNAMIC2
+
         /// <summary>
         /// Provides implementation for type conversion operations. Classes derived from the <see cref="T:System.Dynamic.DynamicObject"/> class can override this method to specify dynamic behavior for operations that convert an object from one type to another.
         /// </summary>

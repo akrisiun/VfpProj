@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
@@ -25,8 +26,9 @@ namespace VfpProj
                 return false;
             app = app ?? App;
             IntPtr hWnd = IntPtr.Zero;
-            dynamic appObj = app;
-            try { hWnd = (IntPtr)appObj.hWnd; }
+            try {
+                var appObj = app as VisualFoxpro.FoxApplication;
+                hWnd = (IntPtr)appObj.hWnd; }
             catch (Exception) { App = null; }
             return hWnd != IntPtr.Zero;
         }
@@ -48,12 +50,13 @@ namespace VfpProj
             }
 
             var ocs = new CsObj();
-            dynamic objApp = App;
-            objApp.DoCmd("PUBLIC m.ocs as VfpProj.CsObj");
             try
             {
+                var objApp = App;
+                objApp.DoCmd("PUBLIC m.ocs as VfpProj.CsObj");
+
                 object lpvarNumRows = CsObj.Instance;
-                objApp.SetVar("ocs", ref lpvarNumRows);
+                objApp.SetVar("ocs", lpvarNumRows);
 
                 // result check:
                 var m_ocs = objApp.Eval("m.ocs");
@@ -138,7 +141,8 @@ namespace VfpProj
             object result = null;
             try
             {
-                dynamic AppObj = App;
+                // dynamic 
+                var AppObj = App;
                 result = AppObj.Eval(expr);
             }
             catch (COMException ex)
@@ -163,11 +167,13 @@ namespace VfpProj
             if (cmd.Contains(";"))
                 cmdList = cmd.Split(new char[] { ';' });
 
-            dynamic ocs_form = null;
+            // dynamic 
+            object ocs_form = null;
             bool isBound = FormObj.IsBound();
             try
             {
-                dynamic AppObj = App;
+                // dynamic 
+                var AppObj = App;
                 var oldDir = AppObj.DefaultFilePath;
 
                 foreach (string cmdItem in cmdList)
@@ -178,7 +184,7 @@ namespace VfpProj
                 dir = AppObj.DefaultFilePath;
                 var caption = AppObj.Caption;
                 if (oldDir != dir
-                    && !string.IsNullOrWhiteSpace(caption) && caption.Substring(1, 1) == ":"
+                    && !caption.IsNullOrWhiteSpace() && caption.Substring(1, 1) == ":"
                     && Directory.Exists(caption))
                     App.Caption = dir;
 
@@ -186,7 +192,8 @@ namespace VfpProj
                 if (ocs_form == null || (ocs_form as int?) == null)
                 {
                     // SetVar:
-                    App.SetVar("ocs_form", FoxCmd.FormObj);
+                    object obj = FoxCmd.FormObj;
+                    App.SetVar("ocs_form",  obj);
                     AppCmd("_SCREEN.AddProperty(\"ocs_form\", .null.)");
                     AppCmd("_SCREEN.Visible = .T.");
                     AppCmd("_SCREEN.ocs_form = m.ocs_form");
@@ -254,28 +261,136 @@ namespace VfpProj
 
             try
             {
-                dynamic objApp = App;
+                // dynamic 
+                VisualFoxpro.Application objApp = App;
                 if (App == null && !VfpProj.CsApp.Instance.Window.IsStart)
                 {
                     if (Vfp.Startup.Instance.App != null)
                         App = Vfp.Startup.Instance.App;
 
+                    Assembly asm = null;
+                    Exception err = null;
+                    var vfpDLL = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "vfp8r.dll");
+
+                    Type objType1 = null;
+                    object obj1;
+                    object obj2;
+
                     if (App == null)
-                        App = AppMethods.CreateFoxApp() as VisualFoxpro.FoxApplication;
+                    {
+                        try
+                        {
+                            objType1 = Type.GetTypeFromProgID("VisualFoxpro.FoxApplication");
+                            objType1  = objType1 
+                               ?? Type.GetTypeFromCLSID(VfpGUID.FoxAppClass, server:null, 
+                                  throwOnError: false);
+
+                            var type2Obj = Type.GetTypeFromCLSID(VfpGUID.FoxApp, server: null,
+                                  throwOnError: false);
+
+                            obj1 = Activator.CreateInstance(objType1);
+                            App = obj1 as VisualFoxpro.FoxApplication; // Class;
+
+                            obj2 = Activator.CreateInstance(type2Obj);
+                            App = obj2 as VisualFoxpro.FoxApplication;
+
+                            // The module was expected to contain an assembly manifest.
+                            // asm = Assembly.LoadFrom(vfpDLL);
+                        }
+                        catch (Exception ex) {
+                            // Retrieving the COM class factory for component with CLSID {00A19612-D8FC-4A3E-A95F-FEA211444BF7}
+                            // COM class factory failed due to the following error: 80040154.
+                            err = ex;
+                        }
+                        if (App == null)
+                        {
+                            var App1 = AppMethods.CreateFoxApp() as VisualFoxpro.Application;
+                            if (App1 != null)
+                            {
+                                try
+                                {
+                                    App1.Caption = "Loading";
+                                    object obj = CsObj.Instance;
+                                    var SetVar1 = App1.GetType().GetMethod("SetVar");
+
+                                    if (SetVar1 != null)
+                                        App.SetVar("ocs", obj);
+                                    // VisualFoxpro.FoxApplicationClass.SetVar(System.String, System.Object)
+                                    // SetVar1.Invoke(App1, new object[] { "ocs", obj });
+                                    objApp = App1;
+                                    App1.Visible = true;
+                                    
+                                }
+                                catch (Exception ex) {
+                                    // memory corrupt
+                                    err = ex.InnerException ?? ex;
+                                }
+                                App = App1 as VisualFoxpro.FoxApplication;
+                            }
+                        }
+                    }
+
 
                     Vfp.Startup.Instance.App = App;
                     objApp = App;
-                    objApp?.SetVar("ocs", CsObj.Instance);
+                    //Unable to cast COM object of type 'VisualFoxpro.FoxApplicationClass'
+                    //    to interface type 'VisualFoxpro.Application'. 
+                    // This operation failed because the QueryInterface call on the COM component for the  interface with IID '{00A19612-D8FC-4A3E-A95F-FEA211444BF7}' 
+                    // failed due to the following error: Error loading type library/DLL. (Exception from HRESULT: 0x80029C4A (TYPE_E_CANTLOADLIBRARY)).
+
+                    var m = objApp.GetType().GetMethods();
+
+                    var getType = objApp.GetType().GetMethod("GetType");
+                    var setVar = objApp.GetType().GetMethod("SetVar");
+
+                    var type2 = getType.Invoke(objApp, null) as Type;
+                    var m2 = type2.GetMethods();
+                    var f2 = type2.GetProperties();
+                    var fStatus = type2.GetProperty("Caption");
+                    // { System.Runtime.Remoting.ObjRef CreateObjRef(System.Type)}
+                    //var CreateObjRef = type2.GetMethod("CreateObjRef");
+                    //  var objRef = CreateObjRef.Invoke(objApp, new object[] { type2 });
+                    // at VisualFoxpro.FoxApplicationClass.SetVar(String bstrVarName, Object & lpvarNumRows)
+                    try
+                    {
+                        fStatus.GetSetMethod().Invoke(objApp, new object[] { "setVar.." });
+                        // var caption = fStatus.GetGetMethod().Invoke(objApp, null);
+                        var caption = Marshal.GetComObjectData(objApp, "Caption");
+
+                        //  int QueryInterface(IntPtr pUnk, ref Guid iid, out IntPtr ppv);
+
+                        // int? lpvarNumRows = 1;
+                        object obj = CsObj.Instance;
+                        // [MarshalAs(UnmanagedType.Struct), In]
+                        // UnmanagedType.Struct
+
+                        objApp.SetVar("ocs", obj);
+                        setVar?.Invoke(objApp, new object[] { "ocs", obj });
+                        objApp.AutoYield = true;
+                        // objApp?.SetVar("ocs", CsObj.Instance);
+                    } 
+                    catch (Exception ex) { err = ex; }
                 }
                 else
                     secondTime = false;
 
                 objApp = App;
+                Exception err2 = null;
+                IntPtr ProcessId = IntPtr.Zero;
+
                 if (objApp != null)
                 {
-                    objApp.AutoYield = true;
-                    hWnd = (IntPtr)objApp.hWnd;
-                    SetHWnd();
+                    try
+                    {
+                        ProcessId = (IntPtr)objApp.ProcessId;
+                        hWnd = (IntPtr)objApp.hWnd;
+                        objApp.Visible = true;
+                        objApp.SetVar("ocs", CsObj.Instance);
+
+                        SetHWnd();
+
+                        objApp.AutoYield = true;
+                    } catch (Exception ex) { err2 = ex; }
                 }
 
                 if (secondTime)
@@ -323,14 +438,17 @@ namespace VfpProj
             if (ocs == null)
                 return false;
 
-            dynamic objApp = App;
+            // dynamic 
+            var objApp = App;
             if (FoxCmd.FormObj != null)
             {
                 TryDoCmd("PUBLIC m.ocs as VfpProj.CsObj");
-                objApp.SetVar("ocs", ocs);
+                object obj = ocs;
+                objApp.SetVar("ocs", obj);
             }
 
-            dynamic ocs_form = null;
+            // dynamic 
+            object ocs_form = null;
             ocs_form = objApp.Eval("IIF(TYPE(\"_SCREEN.ocs_form\") = 'U', 0, _SCREEN.ocs_form)");
             if (ocs_form != null && ocs_form is CsForm && (ocs_form as CsForm).Visible)
                 FoxCmd.FormObj = ocs_form as CsForm;
@@ -380,20 +498,29 @@ namespace VfpProj
 
         public static void SetVar()
         {
-            dynamic ocs_form = null;
-            dynamic objApp = App;
-            ocs_form = objApp.Eval("IIF(TYPE(\"_SCREEN.ocs_form.Directory\") != 'C', 0, _SCREEN.ocs_form)");
+            // dynamic 
+            _Form ocs_form = null;
+            var objApp = App;
+            ocs_form = objApp.Eval("IIF(TYPE(\"_SCREEN.ocs_form.Directory\") != 'C', 0, _SCREEN.ocs_form)")
+                     as _Form;
 
             if (ocs_form != null && ocs_form is _Form && FoxCmd.FormObj.Equals(ocs_form))
                 return;
 
             TryDoCmd("PUBLIC m.ocs as VfpProj.CsObj");
-            objApp.SetVar("ocs", CsObj.Instance);
+            object obj = CsObj.Instance;
+            try
+            {
+                objApp.SetVar("ocs", obj);
 
-            // non COM visible class 'System.Windows.Window', the QueryInterface call will fail.
-            TryDoCmd("PUBLIC m.ocs_form as VfpProj.Form");
-            objApp.SetVar("ocs_form", FoxCmd.FormObj);
-            TryDoCmd("_SCREEN.AddProperty(\"ocs_form\", .null.)");
+
+                // non COM visible class 'System.Windows.Window', the QueryInterface call will fail.
+                TryDoCmd("PUBLIC m.ocs_form as VfpProj.Form");
+                obj = FoxCmd.FormObj;
+                objApp.SetVar("ocs_form", obj); // FoxCmd.FormObj);
+                TryDoCmd("_SCREEN.AddProperty(\"ocs_form\", .null.)");
+            }
+            catch { }
         }
 
         public static void StartCmd()
@@ -458,8 +585,9 @@ namespace VfpProj
             int hWnd = 0;
             try
             {
-                dynamic isClose = App.Eval("_SCREEN.QueryUnload()");
-                if (isClose is Boolean && !isClose)
+                //dynamic 
+                var isClose = App.Eval("_SCREEN.QueryUnload()");
+                if (isClose is Boolean && (!(isClose as Boolean?) ?? true))
                     return false;
 
                 hWnd = App.hWnd;

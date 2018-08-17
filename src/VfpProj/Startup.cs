@@ -8,7 +8,7 @@ using VisualFoxpro;
 using Application = System.Windows.Application;
 using System.Runtime.InteropServices;
 using VfpProj.Wcf;
-using Newtonsoft.Json;
+//using Newtonsoft.Json;
 
 namespace Vfp
 {
@@ -104,7 +104,7 @@ namespace Vfp
             set;
         }
 
-        [JsonIgnore]
+        // [JsonIgnore]
         protected CsApp appCur;
 
         public Action<FoxApplication> Then {
@@ -117,7 +117,7 @@ namespace Vfp
         public void Main(FoxApplication app = null, bool lRun = false)
         {
             this.App = app;
-            VfpProj.MainWindow.Dll = "/VfpProj";
+            VfpProj.MainWindow.Dll = "/VfpProj2";
 
             appCur = Application.Current as CsApp ?? VfpProj.CsApp.Instance;
             try
@@ -178,6 +178,34 @@ namespace Vfp
 
             if (lRun)
                 appCur.Run();
+        }
+
+
+        [STAThread]
+        public static void Main()
+        {
+            VfpProj.CsApp app = new VfpProj.CsApp();
+            // app.InitializeComponent();
+            app.Run(new MainWindow());
+        }
+
+        public static FoxApplication CreateApp(MainWindow form)
+        {
+            var inst = Vfp.Startup.Instance;
+            VfpProj.CsApp.Instance.Window.IsStart = false;
+
+            FoxCmd.Attach(secondTime: true);
+
+            if (FoxCmd.App == null)
+                return null;
+            // 
+            var app = FoxCmd.App;
+            form.Load(app);
+            form.txtFile.Text = app.DefaultFilePath;
+            form.txtFile.IsEnabled = true;
+            form.txtFile.Focus();
+
+            return FoxCmd.App;
         }
     }
 }

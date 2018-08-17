@@ -34,14 +34,14 @@ namespace VfpProj.Native
         public string ext;
         public Collection<NativeWndInfo> listWI;
 
-        public EditWindow edit;
+        // public EditWindow edit;
         public System.Windows.Controls.TextBox txtFile;
 
         #region Init, Bind
         public WindowsEvents(MainWindow form)
         {
             this.form = form.FormObject;
-            edit = null;
+            // edit = null;
             FormPrj = null;
 
             listWI = new Collection<NativeWndInfo>();
@@ -89,7 +89,7 @@ namespace VfpProj.Native
             frm.buttonWcf.Click += (s, e) => Wcf.VfpWcf.Bind();
             var sets = System.Configuration.ConfigurationManager.AppSettings;
             var baseAddress = sets.Get("baseAddress");
-            if (!string.IsNullOrWhiteSpace(baseAddress))
+            if (!baseAddress.IsNullOrWhiteSpace())
             {
                 Wcf.VfpWcf.Bind();
                 if (Wcf.Host.Object != null)
@@ -216,13 +216,13 @@ namespace VfpProj.Native
             if (e.RightButton == System.Windows.Input.MouseButtonState.Pressed)
             {
                 e.Handled = true;
-                edit = AppMethods.ShowEditWindow(Form.txtFile.Text);
-                if (edit == null)
-                    return;
+                //edit = AppMethods.ShowEditWindow(Form.txtFile.Text);
+                //if (edit == null)
+                //    return;
 
-                edit.Left = form.Left;
-                if (form.Top < 200)
-                    edit.Top = 80 + form.Top;
+                //edit.Left = form.Left;
+                //if (form.Top < 200)
+                //    edit.Top = 80 + form.Top;
             }
         }
 
@@ -320,7 +320,7 @@ namespace VfpProj.Native
             catch (Exception) { }
 
             var txt = Form.txtFile.Text;
-            if (string.IsNullOrWhiteSpace(txt) || txt[1] == ':')
+            if (txt.IsNullOrWhiteSpace() || txt[1] == ':')
                 Form.txtFile.Text = directory;
         }
 
@@ -530,7 +530,7 @@ namespace VfpProj.Native
                 }
                 form.Directory = dir;
                 form.Caption = dir;
-                hWnd = (IntPtr?)form.App?.hWnd;
+                hWnd = (IntPtr?)(form.App as VisualFoxpro.FoxApplication)?.hWnd;
             }
             catch (Exception ex)
             {

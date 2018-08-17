@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.Contracts;
 using System.IO;
 
 namespace IOFile
@@ -172,8 +171,7 @@ namespace IOFile
         internal static bool HasIllegalCharacters(string path, bool checkAdditional = false)
         {
             // See: http://msdn.microsoft.com/en-us/library/windows/desktop/aa365247(v=vs.85).aspx
-
-            Contract.Requires(path != null);
+            // Contract.Requires(path != null);
 
             foreach (char c in path)
             {
