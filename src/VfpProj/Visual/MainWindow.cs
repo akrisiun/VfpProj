@@ -163,7 +163,6 @@ namespace VfpProj
         void MainWindow_ContentRendered(object sender, EventArgs e)
         {
             IsRendered = true;
-            // this.border.Effect = new DropShadowEffect();
             events?.AfterRendered();
 
             var inst = Vfp.Startup.Instance;

@@ -38,6 +38,7 @@ namespace VfpProj.Native
         public System.Windows.Controls.TextBox txtFile;
 
         #region Init, Bind
+
         public WindowsEvents(MainWindow form)
         {
             this.form = form.FormObject;
@@ -94,6 +95,8 @@ namespace VfpProj.Native
                 Wcf.VfpWcf.Bind();
                 if (Wcf.Host.Object != null)
                     frm.buttonWcf.Visibility = Visibility.Hidden;
+                else 
+                    frm.buttonWcf.Visibility = Visibility.Visible;
             }
         }
         #endregion

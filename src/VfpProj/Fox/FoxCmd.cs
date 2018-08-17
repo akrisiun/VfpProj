@@ -55,8 +55,8 @@ namespace VfpProj
                 var objApp = App;
                 objApp.DoCmd("PUBLIC m.ocs as VfpProj.CsObj");
 
-                object lpvarNumRows = CsObj.Instance;
-                objApp.SetVar("ocs", lpvarNumRows);
+                ocs = CsObj.Instance;
+                objApp.SetVar("ocs", ocs);
 
                 // result check:
                 var m_ocs = objApp.Eval("m.ocs");

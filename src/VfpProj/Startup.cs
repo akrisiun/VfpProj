@@ -198,12 +198,11 @@ namespace Vfp
 
             if (FoxCmd.App == null)
                 return null;
-            // 
+            
             var app = FoxCmd.App;
+
             form.Load(app);
-            form.txtFile.Text = app.DefaultFilePath;
-            form.txtFile.IsEnabled = true;
-            form.txtFile.Focus();
+            inst.Show(app);
 
             return FoxCmd.App;
         }
