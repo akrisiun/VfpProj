@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "VfpConsole": {
+      "commandName": "Executable",
+      "executablePath": "E:\\BetaSave\\VfpProj\\src\\VfpConsole\\bin\\Debug\\net40\\VfpConsole.exe",
+      "workingDirectory": "E:\\BetaSave\\VfpProj\\src\\VfpConsole\\bin\\Debug\\net40\\"
+    }
+  }
+}

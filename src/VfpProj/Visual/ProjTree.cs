@@ -141,8 +141,8 @@ namespace VfpProj
                 // dynamic 
                 var elem = filesNum.Current as IFoxPrjFile;
                 var elemName = "";
-                elemName = elem["Name"] as string;
-                // elemName = elem.Name; // elem["Name"] as string,
+                // elemName = elem["Name"] as string;
+                elemName = elem.Name; // elem["Name"] as string,
                 if (elem != null) {
                     var item = new ProjItem {
                         Name = elemName,

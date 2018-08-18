@@ -7,6 +7,9 @@ using VfpProj;
 using VisualFoxpro;
 using Application = System.Windows.Application;
 using System.Runtime.InteropServices;
+using System.Security;
+using System.IO;
+using System.Reflection;
 //using VfpProj.Wcf;
 //using Newtonsoft.Json;
 
@@ -191,10 +194,44 @@ namespace Vfp
             app.Run(new MainWindow());
         }
 
+        public static string BaseDirectory { get => AppDomain.CurrentDomain.BaseDirectory; }
+        public static Assembly AsmOle { get; private set; }
+
         public static FoxApplication CreateApp(MainWindow form)
         {
             var inst = Vfp.Startup.Instance;
             VfpProj.CsApp.Instance.Window.IsStart = false;
+
+            Instance.LastError = null;
+            try
+            {
+                var ThreadId = SafeLibraryHandle.Win32.GetCurrentThreadId();
+                Console.Write($"ThreadId=0x{ThreadId.ToString("X8")}  ");
+
+                string dll = Path.Combine(BaseDirectory, "vfp8r.dll");
+                Console.Write(dll);
+                var Vfp8R = SafeLibraryHandle.Win32.LoadLibrary(dll);
+
+                Console.WriteLine($" Vfp8R.handle={Vfp8R}");
+
+                //dll = Path.Combine(BaseDirectory, "VfpOleLib.dll");
+                //Console.Write(dll);
+                //if (File.Exists(dll))
+                //    AsmOle = Assembly.LoadFrom(dll);
+                //Console.WriteLine($" Ole OK");
+
+                dll = Path.Combine(BaseDirectory, "Interop.VisualFoxpro.dll");
+                Console.Write(dll);
+                AsmOle = Assembly.LoadFrom(dll);
+                Console.WriteLine($" Interop.VisualFoxpro={AsmOle}");
+
+            }
+            catch (Exception ex)
+            {
+                Instance.LastError = ex;
+                Console.WriteLine($"{ex.InnerException ?? ex}");
+                // return App;
+            }
 
             FoxCmd.Attach(secondTime: true);
 
@@ -209,4 +246,59 @@ namespace Vfp
             return FoxCmd.App;
         }
     }
+
+
+    [DebuggerDisplay("{Handle.ToString(\"X8\")}h")]
+    public struct SafeLibraryHandle : IDisposable
+    {
+        internal class Win32
+        {
+            const string KERNEL32 = "kernel32.dll";
+
+            [DllImport(KERNEL32, ExactSpelling = false, SetLastError = true)] // , CharSet = CharSet.Unicode)]
+            //[ResourceExposure(ResourceScope.Machine)]
+            [SuppressUnmanagedCodeSecurity]
+            [SecurityCritical]
+            internal static extern SafeLibraryHandle LoadLibrary(String libPath);
+
+            [DllImport(KERNEL32, ExactSpelling = true, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+            internal static extern IntPtr GetCurrentThreadId();
+
+            [System.Security.SecurityCritical]
+            [DllImport(KERNEL32, CallingConvention = CallingConvention.Winapi, SetLastError = true)]
+            internal extern static IntPtr GetProcAddress(SafeLibraryHandle hModule, string entryPoint);
+
+            [System.Security.SecurityCritical]
+            [DllImport(KERNEL32, CallingConvention = CallingConvention.Winapi, SetLastError = true)]
+            internal extern static IntPtr GetProcAddress(IntPtr hModule, string entryPoint);
+
+            [DllImport(KERNEL32, ExactSpelling = true)]
+            [SuppressUnmanagedCodeSecurity]
+            [SecurityCritical]
+            internal static extern bool FreeLibrary(IntPtr moduleHandle);
+        }
+
+        public IntPtr Handle { get; set; }
+
+        public bool IsEmpty { get => Handle == IntPtr.Zero; }
+
+        internal SafeLibraryHandle(IntPtr handle)
+        {
+            Handle = handle;
+        }
+
+        public unsafe bool HasFunction(string functionName)
+        {
+            IntPtr ret = Win32.GetProcAddress(this, functionName);
+            return (ret != IntPtr.Zero);
+        }
+
+        public void Dispose()
+        {
+            if (!IsEmpty)
+                Win32.FreeLibrary(Handle);
+            Handle = IntPtr.Zero;
+        }
+    }
+
 }

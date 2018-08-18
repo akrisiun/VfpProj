@@ -14,7 +14,7 @@ namespace VisualFoxpro
         public static Guid FoxAppClass = new Guid("00A19610-D8FC-4A3E-A95F-FEA211444BF7");
     }
 
-#if !COM
+#if COM
     namespace VisualFoxpro
     {
         [Guid("00A19612-D8FC-4A3E-A95F-FEA211444BF7")]

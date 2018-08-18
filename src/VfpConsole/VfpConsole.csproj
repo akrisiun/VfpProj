@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net35;net40</TargetFrameworks>
+    <!--<TargetFramework>net35</TargetFramework>-->
+    <!--<TargetFramework>netstandard1.0</TargetFramework>-->
+    <ApplicationIcon />
+    <OutputType>Exe</OutputType>
+    <PlatformTarget>x86</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <StartupObject>VfpConsole.VfpConsole</StartupObject>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <OutputPath>..\lib\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <!--<ProjectReference Include="..\VfpProjLib\VfpOleLib.csproj" />-->
+    <Reference Include="VfpOleLib">
+      <HintPath>..\VfpProjLib\bin\Debug\net20\VfpOleLib.dll</HintPath>
+    </Reference>
+    <!--<Reference Include="Interop.VisualFoxpro">
+      <HintPath>..\..\Lib\Interop.VisualFoxpro.dll</HintPath>
+    </Reference>-->
+  </ItemGroup>
+</Project>

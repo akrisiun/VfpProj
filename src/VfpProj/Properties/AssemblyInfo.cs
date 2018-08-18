@@ -11,7 +11,7 @@ using System.Windows;
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("VfpProj")]
 // Copyleft
-[assembly: AssemblyCopyright("MIT open source, 2014 - 2017")]
+[assembly: AssemblyCopyright("MIT open source, 2014 - 2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(true)]
