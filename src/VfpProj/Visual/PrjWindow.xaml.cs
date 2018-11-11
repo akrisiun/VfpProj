@@ -1,7 +1,12 @@
-﻿using ICSharpCode.AvalonEdit.Utils;
+﻿#if XAML2
+using ICSharpCode.AvalonEdit.Utils;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Folding;
 using ICSharpCode.AvalonEdit.Indentation;
+//         xmlns:avalonedit="clr-namespace:ICSharpCode.AvalonEdit;assembly=ICSharpCode.AvalonEdit"
+using ICSharpCode.AvalonEdit;
+using AvalonEdit.Sample;
+#endif
 using Microsoft.Win32;
 using System;
 using System.Windows;
@@ -10,8 +15,6 @@ using System.Windows.Markup;
 using Forms = System.Windows.Forms;
 using System.IO;
 using System.Text;
-using ICSharpCode.AvalonEdit;
-using AvalonEdit.Sample;
 using VfpProj.Native;
 using System.Windows.Media.Imaging;
 using VfpProj;

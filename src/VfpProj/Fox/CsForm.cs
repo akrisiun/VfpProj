@@ -15,6 +15,14 @@ using System.Diagnostics;
 
 namespace VfpProj
 {
+#if !NET45
+    internal static class StringHelper
+    {
+        public static bool IsNullOrWhiteSpace(this string str) 
+            => str != null && str.TrimEnd().Length >.0;
+    }
+#endif
+
     [ClassInterface(ClassInterfaceType.AutoDual)]
     [ProgId("VfpProj.Form"), Guid("c155b373-563f-433f-8fcf-18fd98100014")]
     [ComVisible(true)]
@@ -40,10 +48,10 @@ namespace VfpProj
 #pragma warning disable 0067
         public event EventHandler Disposed;
 
-        public dynamic App {
+        public object App {
             [DebuggerStepThrough]
             get => Application;
-            set { Application = value; }
+            set { Application = value as VisualFoxpro.FoxApplication ?? Application; }
         }
 
         public VisualFoxpro.FoxApplication Application {
@@ -90,9 +98,11 @@ namespace VfpProj
         public string Directory {
             get { return _directory; }
             set {
-                _directory = value;
-                if (!string.IsNullOrWhiteSpace(_directory) && IO.Directory.Exists(_directory))
+                _directory = value ?? string.Empty;
+                if (_directory.Length > 0
+                    && IO.Directory.Exists(_directory)) {
                     IO.Directory.SetCurrentDirectory(_directory);
+                }
             }
         }
 
@@ -145,7 +155,7 @@ namespace VfpProj
 
         public void SetText(string value)
         {
-            if (!IsDisposed && !string.IsNullOrWhiteSpace(value) && value.Substring(1, 1) == ":")
+            if (!IsDisposed && !value.IsNullOrWhiteSpace() && value.Substring(1, 1) == ":")
                 SetValueAsync<string>(Form.txtFile, TextBox.TextProperty, value);
         }
 

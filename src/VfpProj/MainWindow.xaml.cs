@@ -1,15 +1,6 @@
 ﻿using System;
-using System.ComponentModel;
-using System.IO;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Markup;
-using System.Windows.Media;
-using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
-using VfpProj;
 
 namespace VfpProj
 {
@@ -24,7 +15,7 @@ namespace VfpProj
             IsStart = false;
 
             if (Dll == null)
-                Dll = "/VfpProj";
+                Dll = "/VfpProj2";
 
             Uri iconUri;
             try

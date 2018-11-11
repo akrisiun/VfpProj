@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Dynamic;
+// using System.Dynamic;
 using System.Runtime.InteropServices;
 
 namespace VfpProj.Fox
 {
+    using ExpandoObject = Dictionary<string, object>;
+
     public class FoxParse
     {
         public static ExpandoObject GetMethods(object obj)

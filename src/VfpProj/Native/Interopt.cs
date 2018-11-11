@@ -115,6 +115,23 @@ namespace System.Native
 {
     using ComTypes = System.Runtime.InteropServices.ComTypes;
 
+    // The enum of the return value of IQuerable.GetInterface
+    //====================================================================
+    [Serializable]
+    [System.Runtime.InteropServices.ComVisible(false)]
+    public enum CustomQueryInterfaceResult
+    {
+        Handled = 0,
+        NotHandled = 1,
+        Failed = 2,
+    }
+
+    public interface ICustomQueryInterface
+    {
+        [System.Security.SecurityCritical]
+        CustomQueryInterfaceResult GetInterface([In]ref Guid iid, out IntPtr ppv);
+    }
+
     [System.Security.SecurityCritical]
     internal class ComEventsSink : IDispatch, ICustomQueryInterface
     {
@@ -151,6 +168,7 @@ namespace System.Native
             ppv = IntPtr.Zero;
             return CustomQueryInterfaceResult.NotHandled;
         }
+
         #endregion
 
         private void Advise(object rcw)

@@ -1,6 +1,4 @@
-﻿using ICSharpCode.AvalonEdit.Folding;
-using ICSharpCode.AvalonEdit.Utils;
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 using System.Windows;
@@ -8,6 +6,11 @@ using VfpProj;
 
 namespace VfpProj
 {
+#if NET45 && XAML
+    using ICSharpCode.AvalonEdit.Folding;
+    using ICSharpCode.AvalonEdit.Utils;
+#endif
+
     public struct VfpFileInfo
     {
         public VisualFoxpro.IFoxProject vfpProj;
@@ -24,6 +27,8 @@ namespace VfpProj
 
     public static class TextRead
     {
+
+#if NET45 && XAML        
         public static void Open(this EditWindow w)
         { 
             string fileName = w.txtPath.Text;
@@ -75,6 +80,7 @@ namespace VfpProj
             // int firstError = -1;
             // foldManager.UpdateFoldings(this.foldStrategy.CreateNewFoldings(doc, out firstError), firstError);
         }
+#endif
 
         public static void ReadVfpInfo(ref VfpFileInfo info, ref string fileName, Action<String> Open)
         {

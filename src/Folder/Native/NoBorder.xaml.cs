@@ -17,7 +17,7 @@ using System.Windows.Shapes;
 namespace Folder
 {
     /// <summary>
-    /// Interaction logic for NoBorder.xaml
+    /// Interaction logic for NoBorder.xaml - Folder.NoBorder
     /// </summary>
     public partial class NoBorder : Window
     {
@@ -29,6 +29,11 @@ namespace Folder
                 topLeft, top, topRight, right, bottomRight, bottom, bottomLeft, left);
             cmdClose.Click += (s, e) => Close();
         }
+
+        void System.Windows.Markup.IComponentConnector.Connect(int connectionId, object target) {
+        }
+        public void InitializeComponent2() {}
+          
     }
 
 }

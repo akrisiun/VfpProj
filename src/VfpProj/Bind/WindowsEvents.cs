@@ -36,14 +36,19 @@ namespace VfpProj.Native
         public string ext;
         public Collection<NativeWndInfo> listWI;
 
+#if NET45
         public EditWindow edit;
+#endif
         public System.Windows.Controls.TextBox txtFile;
 
         #region Init, Bind
-        public WindowsEvents(MainWindow form)
+
+        public WindowsEvents(MainWindow _form)
         {
-            this.form = form.FormObject;
+            form = _form.FormObject as CsForm;
+#if NET45
             edit = null;
+#endif
             FormPrj = null;
 
             listWI = new Collection<NativeWndInfo>();
@@ -108,9 +113,9 @@ namespace VfpProj.Native
 
 
 
-        #endregion
+#endregion
 
-        #region Render, Focus
+#region Render, Focus
 
         public void AfterRendered()
         {
@@ -206,9 +211,9 @@ namespace VfpProj.Native
             }
         }
 
-        #endregion
+#endregion
 
-        #region Button clicks
+#region Button clicks
 
         void buttonModi_Click(object sender, RoutedEventArgs e)
         {
@@ -219,6 +224,7 @@ namespace VfpProj.Native
         {
             if (e.RightButton == System.Windows.Input.MouseButtonState.Pressed) {
                 e.Handled = true;
+#if NET45
                 edit = AppMethods.ShowEditWindow(Form.txtFile.Text);
                 if (edit == null)
                     return;
@@ -226,6 +232,7 @@ namespace VfpProj.Native
                 edit.Left = form.Left;
                 if (form.Top < 200)
                     edit.Top = 80 + form.Top;
+#endif
             }
         }
 
@@ -359,7 +366,7 @@ namespace VfpProj.Native
                 string path = "";
                 try {
                     threadAccess = dispatcher.CheckAccess();
-                    path = CsObj.Instance.App.Eval("_VFP.DefaultFilePath") ?? "";
+                    path = CsObj.Instance.App.Eval("_VFP.DefaultFilePath") as string ?? "";
 
                     var dir = path;
                     if (newPath.Length > 4 && newPath[1] == ':') {
@@ -434,9 +441,9 @@ namespace VfpProj.Native
 
         }
 
-        #endregion
+#endregion
 
-        #region Focus Events
+#region Focus Events
 
         public void form_Drop(object sender, DragEventArgs e)
         {
@@ -506,9 +513,9 @@ namespace VfpProj.Native
             FormFocus(form1);
         }
 
-        #endregion
+#endregion
 
-        #region KeyDown
+#region KeyDown
 #if NOWPF_TEXTBOX
         void txtFile_KeyDown(object sender, Forms.KeyEventArgs e)
         {
@@ -527,7 +534,7 @@ namespace VfpProj.Native
             }
         }
 
-        #endregion
+#endregion
 
         public void DoCmd(string cmd)
         {
@@ -593,7 +600,7 @@ namespace VfpProj.Native
                 }
                 form.Directory = dir;
                 form.Caption = dir;
-                hWnd = (IntPtr?)form.App?.hWnd;
+                hWnd = (IntPtr?)(form.App as VisualFoxpro.FoxApplication)?.hWnd;
             }
             catch (Exception ex) {
                 form.LastError = ex;

@@ -18,8 +18,8 @@
 
 using System;
 using System.Collections.Generic;
-using ICSharpCode.AvalonEdit.Document;
-using ICSharpCode.AvalonEdit.Folding;
+//using ICSharpCode.AvalonEdit.Document;
+//using ICSharpCode.AvalonEdit.Folding;
 // using ICSharpCode.NRefactory.Editor;
 
 namespace AvalonEdit.Sample
@@ -48,21 +48,21 @@ namespace AvalonEdit.Sample
 			this.ClosingBrace = '}';
 		}
 		
-		public void UpdateFoldings(FoldingManager manager, TextDocument document)
-		{
-			int firstErrorOffset;
-			IEnumerable<NewFolding> newFoldings = CreateNewFoldings(document, out firstErrorOffset);
-			manager.UpdateFoldings(newFoldings, firstErrorOffset);
-		}
+		//public void UpdateFoldings(FoldingManager manager, TextDocument document)
+		//{
+		//	int firstErrorOffset;
+		//	IEnumerable<NewFolding> newFoldings = CreateNewFoldings(document, out firstErrorOffset);
+		//	manager.UpdateFoldings(newFoldings, firstErrorOffset);
+		//}
 		
-		/// <summary>
-		/// Create <see cref="NewFolding"/>s for the specified document.
-		/// </summary>
-		public IEnumerable<NewFolding> CreateNewFoldings(TextDocument document, out int firstErrorOffset)
-		{
-			firstErrorOffset = -1;
-			return CreateNewFoldings(document);
-		}
+		///// <summary>
+		///// Create <see cref="NewFolding"/>s for the specified document.
+		///// </summary>
+		//public IEnumerable<NewFolding> CreateNewFoldings(TextDocument document, out int firstErrorOffset)
+		//{
+		//	firstErrorOffset = -1;
+		//	return CreateNewFoldings(document);
+		//}
 		
 		/// <summary>
 		/// Create <see cref="NewFolding"/>s for the specified document.

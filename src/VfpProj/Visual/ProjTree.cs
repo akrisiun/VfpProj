@@ -138,10 +138,17 @@ namespace VfpProj
             IEnumerator filesNum =  files.GetEnumerator();
             while (filesNum.MoveNext())
             {
-                dynamic elem = filesNum.Current;
-
-                var item = new ProjItem { Name = elem.Name, Exclude = elem.Exclude, Type = elem.Type};
-                list.Add(item);
+                // dynamic 
+                var elem = filesNum.Current as IFoxPrjFile;
+                var elemName = "";
+                // elemName = elem["Name"] as string;
+                elemName = elem.Name; // elem["Name"] as string,
+                if (elem != null) {
+                    var item = new ProjItem {
+                        Name = elemName,
+                        Exclude = elem.Exclude, Type = elem.Type };
+                    list.Add(item);
+                }
             }
 
             return list;
