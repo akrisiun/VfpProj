@@ -9,8 +9,9 @@ namespace VfpProj
     /// </summary>
     public partial class CsApp : Application
     {
-        static CsApp() { } // debugger entry
-
+        static CsApp() {
+            startRef = AppDomain.CurrentDomain.GetData("CsObj") as CsApp;
+        } // debugger entry
         static CsApp startRef;
 
         public static CsApp Instance {
@@ -23,7 +24,13 @@ namespace VfpProj
 
         public static CsApp Ref()
         {
-            return Instance ?? new CsApp();
+            return Instance ?? (Instance = new CsApp());
+        }
+
+        public static CsApp Restore()
+        {
+            Instance = AppDomain.CurrentDomain.GetData("CsObj") as CsApp ?? Ref();
+            return Instance;
         }
 
         public static bool StartupMode = false;

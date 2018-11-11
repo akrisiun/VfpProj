@@ -42,6 +42,20 @@ namespace VfpProj
         [DataMember]
         public string Name { get { return "VfpProj.CsObj." + cnt.ToString(); } set { } }
 
+        [DataMember]
+        public string Error { get; set; }
+        public string StackTrace { get; set; }
+
+        private Exception _error;
+        public Exception LastError {
+            get => _error;
+            set {
+                _error = value;
+                Error = _error?.Message ?? Error;
+                StackTrace = _error?.StackTrace ?? Environment.StackTrace;
+            }
+        }
+
         //[NonSerialized]
         public FoxApplication App { get { return FoxCmd.App as FoxApplication; } }
         //[NonSerialized]
@@ -203,7 +217,15 @@ namespace VfpProj
             return "SetProperty: Ptr =" + (ptr == IntPtr.Zero ? " 0 " : ptr.ToString());
         }
 
-        public void Dispose() { Instance = null; }
+        public void Dispose() {
+
+            if (App == null) {
+                Instance = null;
+            } else {
+                var stack = Environment.StackTrace;
+                Console.WriteLine($"IGN CsObj.Dispose: {stack}");
+            }
+        }
         ISite IComponent.Site { get; set; }
 
 #pragma warning disable 0067

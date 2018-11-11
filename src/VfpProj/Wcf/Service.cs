@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System.ServiceModel.Channels;
 using System.Dynamic;
+using Newtonsoft.Json.Linq;
 
 namespace VfpProj.Wcf
 {
@@ -67,18 +68,77 @@ namespace VfpProj.Wcf
             var query = to.PathAndQuery.ToLower();
 
             dynamic data = null;
-            if (query.Contains("/load") && FoxCmd.App != null)
+            data = new ExpandoObject();
+            var bstr = to.Query ?? "";
+            if (bstr.StartsWith("?") || bstr.StartsWith("#")) {
+                bstr = bstr.Substring(1);
+            }
+            if (FoxCmd.App == null) {
+                FoxCmd.Restore();
+                CsApp.Restore();
+                if (FoxCmd.App == null) {
+                    data.Error = "no FoxCmd.App, reload WCF";
+                    return new LandingPageMessage() { Data = data as ExpandoObject };
+                }
+            }
+            Exception error = null;
+
+            // localhost:9001/vfp/eval?_VFP
+            // localhost:9001/vfp/docmd?_VFP
+
+            object obj = null;
+            if (query.Contains("/eval")) {
+
+                try {
+                    obj = FoxCmd.App.Eval(bstr);
+                    var json = JObject.FromObject(obj);
+                    data.name = bstr;
+                    data.obj = json?.ToString() ?? ".NULL.";
+
+                    var uRet = FoxCmd.App.Eval("_VFP.uRet");
+                    data.uRet = uRet?.ToString() ?? "null";
+                }
+                catch (Exception ex) { error = ex.InnerException ?? ex; }
+                if (obj != null) { 
+                    var dataObj = VfpWcf.Instance.Load(obj);
+                    data.data = dataObj;
+                }
+            }            else if (query.Contains("/docmd")) {
+
+                data.param = bstr;
+                try {
+                    FoxCmd.App.DoCmd("_VFP.AddProperty('uRet', .NULL.)");
+                    FoxCmd.App.DoCmd(bstr);
+                    obj = FoxCmd.App.Eval("_VFP.uRet");
+                    if (obj != null) {
+                        data.uRet = obj;
+                    }
+                }
+                catch (Exception ex) { error = ex.InnerException ?? ex; }
+
+                var dataObj = VfpWcf.Instance.Load(FoxCmd.App);
+                data.data = dataObj;
+            }
+            else if (query.Contains("/load") && FoxCmd.App != null)
             {
-                data = new ExpandoObject();
                 var dataObj = VfpWcf.Instance.Load(FoxCmd.App);
                 data.data = dataObj;
                 data.Startup = Vfp.Startup.Instance;
-                // data.CsApp = CsApp.Instance;
+
+                var dispatcher = CsApp.Instance?.Dispatcher;
+                if (dispatcher.CheckAccess()) {
+                    var objCsApp = JObject.FromObject(CsApp.Instance);
+                    data.CsApp = objCsApp?.ToString() ?? ".NULL.";
+                }
+
+                FoxCmd.Save(FoxCmd.App);
+            }
+            if (error != null) {
+                data.Error = error.Message;
+                data.ErrorStack = error.StackTrace;
             }
 
             return new LandingPageMessage() { Data = data as ExpandoObject };
-
-            return new LandingPageMessage();
         }
     }
 
@@ -110,9 +170,12 @@ namespace VfpProj.Wcf
         [DataMember] public string ActiveProject { [DebuggerStepThrough] get; set; }
         [DataMember] public IList<KeyValuePair<string, object>> VFP { [DebuggerStepThrough] get; set; }
 
+        private CsObj Obj { get; set; }
+
         public VfpService()
         {
             VfpWcf.Instance = this;
+            Obj = AppDomain.CurrentDomain.GetData("CsObj") as CsObj ?? CsObj.Instance;
         }
 
         public static Exception VfpError { [DebuggerStepThrough] get; set; }
@@ -125,6 +188,7 @@ namespace VfpProj.Wcf
             var key = obj as string ?? "0";
             Vfp.Startup.Instance.LastError = null;
 
+            Obj = AppDomain.CurrentDomain.GetData("CsObj") as CsObj ?? CsObj.Instance;
             value = AppMethods.App_DoEval(obj as string);
             result.Add(new KeyValuePair<string, object>(key, value));
 
@@ -132,8 +196,9 @@ namespace VfpProj.Wcf
             if (err != null)
                 result.Add(new KeyValuePair<string, object>("Error", err));
 
-            if (key.StartsWith("_VFP.") && Debugger.IsAttached)
+            if (key.StartsWith("_VFP.") && Debugger.IsAttached) {
                 Debugger.Break();
+            }
 
             return result;
         }
@@ -145,6 +210,8 @@ namespace VfpProj.Wcf
             StatusBar = null;
             try
             {
+                Obj = AppDomain.CurrentDomain.GetData("CsObj") as CsObj ?? CsObj.Instance;
+
                 var app = FoxCmd.App;
                 var list = cmd.Split(new char[] { ';' });
                 if (list.Length > 0)
@@ -184,11 +251,10 @@ namespace VfpProj.Wcf
         }
 
         // no [OperationContract]
-        public IVfpData Load(object obj)
-        {
-            //if (Debugger.IsAttached)
-            //    Debugger.Break();
+        public IVfpData Load(object obj) => Load(obj, null);
 
+        public IVfpData Load(object obj, params object[] parm)
+        {
             var context = OperationContext.Current;
 
             Console.WriteLine("WCF: Load");
@@ -199,8 +265,12 @@ namespace VfpProj.Wcf
             try
             {
                 var app = FoxCmd.App;
-                if (app != null)
+                if (app != null) {
                     Host.UpdateValues(this, app);
+
+                    AppDomain.CurrentDomain.SetData("FoxApp", app);
+                    AppDomain.CurrentDomain.SetData("CsObj", CsObj.Instance);
+                }
             }
             catch (Exception ex) { VfpError = ex; }
 
@@ -209,8 +279,10 @@ namespace VfpProj.Wcf
 
         public void Dispose()
         {
-            VfpError = null;
             VFP = null;
+            FoxCmd.Dispose();
+            CsObj.Instance?.Dispose();
+            VfpError = null;
         }
         
     }

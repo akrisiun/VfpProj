@@ -32,7 +32,10 @@ namespace VfpLanguage
 
         public void Dispose()
         {
-            _disposed = true;
+            if (!_disposed)
+            {
+                _disposed = true;
+            }
         }
     }
 

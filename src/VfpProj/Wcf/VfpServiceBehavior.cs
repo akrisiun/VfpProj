@@ -21,9 +21,18 @@ namespace VfpProj.Wcf
             //  var binding = new CustomBinding();
 
             binding.Name = "BasicHttpBinding_IVfpService";
-            binding.ReceiveTimeout = TimeSpan.FromSeconds(5);
-            binding.OpenTimeout = TimeSpan.FromSeconds(3);
-            binding.SendTimeout = TimeSpan.FromSeconds(5);
+            if (Debugger.IsAttached)
+            {
+                binding.ReceiveTimeout = TimeSpan.FromSeconds(500);
+                binding.OpenTimeout = TimeSpan.FromSeconds(300);
+                binding.SendTimeout = TimeSpan.FromSeconds(500);
+            }
+            else
+            {
+                binding.ReceiveTimeout = TimeSpan.FromSeconds(5);
+                binding.OpenTimeout = TimeSpan.FromSeconds(3);
+                binding.SendTimeout = TimeSpan.FromSeconds(5);
+            }
 
             var elems = binding.CreateBindingElements();
             //var elem = new HttpTransportBindingElement();

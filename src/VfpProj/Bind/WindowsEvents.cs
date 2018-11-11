@@ -4,12 +4,14 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Forms = System.Windows.Forms;
+using System.Windows.Threading;
 using VfpInterop;
-using System.ServiceModel;
+using Forms = System.Windows.Forms;
 
 namespace VfpProj.Native
 {
@@ -79,6 +81,14 @@ namespace VfpProj.Native
             frm.Topmost = true;
             frm.tabList.SelectionChanged += tabWI_IndexChanged;
 
+            frm.AllowDrop = true;
+            frm.txtFile.AllowDrop = true;
+            frm.DragOver += form_DragOver;
+            frm.Drop += form_Drop;
+            frm.txtFile.DragOver += form_DragOver;
+            frm.txtFile.Drop += form_Drop;
+
+
 #if NOWPF_TEXTBOX
             //frm.txtFile.KeyDown += txtFile_KeyDown;
 #else
@@ -89,13 +99,15 @@ namespace VfpProj.Native
             frm.buttonWcf.Click += (s, e) => Wcf.VfpWcf.Bind();
             var sets = System.Configuration.ConfigurationManager.AppSettings;
             var baseAddress = sets.Get("baseAddress");
-            if (!string.IsNullOrWhiteSpace(baseAddress))
-            {
+            if (!string.IsNullOrWhiteSpace(baseAddress)) {
                 Wcf.VfpWcf.Bind();
                 if (Wcf.Host.Object != null)
                     frm.buttonWcf.Visibility = Visibility.Hidden;
             }
         }
+
+
+
         #endregion
 
         #region Render, Focus
@@ -108,8 +120,7 @@ namespace VfpProj.Native
             //NativeAutocomplete.SetFileAutoComplete(textFile);
             textFile.Text = FileSystem.CurrentDirectory + "\\";
 
-            if (!CsObj.Instance.IsLockForm)
-            {
+            if (!CsObj.Instance.IsLockForm) {
                 FoxCmd.DefPositionLoad(Form);
                 FormFocus(Form);
             }
@@ -118,12 +129,10 @@ namespace VfpProj.Native
         public IntPtr RpcTest()
         {
             IntPtr hWnd = IntPtr.Zero;
-            try
-            {
+            try {
                 hWnd = (IntPtr)FoxCmd.App.hWnd;
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 Trace.Write(ex);
             }
             return hWnd;
@@ -140,8 +149,7 @@ namespace VfpProj.Native
             IntPtr hWnd = IntPtr.Zero;
             hWnd = RpcTest();
 
-            try
-            {
+            try {
                 //if (hWnd == IntPtr.Zero)
                 //{
                 //    // FoxCmd.App = null;
@@ -152,23 +160,20 @@ namespace VfpProj.Native
                 //    }
                 //    app.Application.Visible = true;
                 //}
-                if (app != null && app.DefaultFilePath != dir)
-                {
+                if (app != null && app.DefaultFilePath != dir) {
                     dir = app.DefaultFilePath;
                     Trace.WriteLine("Focus set dir=" + dir);
                     Directory.SetCurrentDirectory(dir);
 
                 }
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 Trace.WriteLine(ex.Message);
             }
 
             dir = FileSystem.CurrentDirectory;
             form1.events.directory = dir;
-            if (form1.FormObject != null)
-            {
+            if (form1.FormObject != null) {
                 form1.FormObject.Directory = dir;
                 form1.FormObject.Caption = form1.FormObject.Directory;
             }
@@ -195,8 +200,7 @@ namespace VfpProj.Native
 
         public void StartDir()
         {
-            if (FoxCmd.cfg_startDir.Length > 0 && !FileSystem.CurrentDirectory.Contains(FoxCmd.cfg_startDir))
-            {
+            if (FoxCmd.cfg_startDir.Length > 0 && !FileSystem.CurrentDirectory.Contains(FoxCmd.cfg_startDir)) {
                 Directory.SetCurrentDirectory(FoxCmd.cfg_startDir);
                 FoxCmd.AppCmd("CD " + FoxCmd.cfg_startDir);
             }
@@ -213,8 +217,7 @@ namespace VfpProj.Native
 
         void buttonModi_MouseClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            if (e.RightButton == System.Windows.Input.MouseButtonState.Pressed)
-            {
+            if (e.RightButton == System.Windows.Input.MouseButtonState.Pressed) {
                 e.Handled = true;
                 edit = AppMethods.ShowEditWindow(Form.txtFile.Text);
                 if (edit == null)
@@ -236,10 +239,8 @@ namespace VfpProj.Native
             directory = FileSystem.CurrentDirectory;
             this.file = Form.txtFile.Text;
             string path = Path.GetFullPath(this.file);
-            if (path != null && !directory.StartsWith(path))
-            {
-                try
-                {
+            if (path != null && !directory.StartsWith(path)) {
+                try {
                     FileSystem.CurrentDirectory = path;
                 }
                 catch (Exception) { }
@@ -259,16 +260,13 @@ namespace VfpProj.Native
             ext = Path.GetExtension(file).ToLower();
 
             var app = FoxCmd.App;
-            if (app == null) return;
+            if (app == null)
+                return;
 
-            try
-            {
-                if (ext == ".prg")
-                {
+            try {
+                if (ext == ".prg") {
                     app.DoCmd("modi comm " + file + " nowait");
-                }
-                else if (ext == ".pjx")
-                {
+                } else if (ext == ".pjx") {
                     path = Path.GetDirectoryName(file);
                     app.DoCmd("modi proj " + file + " nowait");
                     app.DoCmd("cd " + path);
@@ -277,8 +275,7 @@ namespace VfpProj.Native
                 }
 
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 Trace.WriteLine(ex.Message);
             }
 
@@ -286,12 +283,10 @@ namespace VfpProj.Native
 
         void cmdCD_Click(object sender, EventArgs e)
         {
-            try
-            {
+            try {
                 directory = FoxCmd.App.DefaultFilePath;
             }
-            catch (Exception)
-            {
+            catch (Exception) {
                 directory = FileSystem.CurrentDirectory;
             }
 
@@ -312,8 +307,7 @@ namespace VfpProj.Native
             FileSystem.CurrentDirectory = dlg.SelectedPath;
 #endif
             directory = FileSystem.CurrentDirectory;
-            try
-            {
+            try {
                 FoxCmd.App.DefaultFilePath = directory;
                 FoxCmd.App.DefaultFilePath = FoxCmd.App.DefaultFilePath;
             }
@@ -326,24 +320,72 @@ namespace VfpProj.Native
 
         void cmdPrj_Click(object sender, EventArgs e)
         {
-            if (FormPrj == null || !FormPrj.IsLoaded)
-            {
-                if (VfpProj.Wcf.Host.Object != null)
-                {
+            if (FormPrj == null || !FormPrj.IsLoaded) {
+
+                if (CsObj.Instance?.App == null) {
+                    return;
+                }
+
+                var newPath = txtFile.Text ?? "";
+
+                var taskWcf = Task.Factory.StartNew(() => WcfLoad(this, newPath));
+                var taskProj = Task.Factory.StartNew(() => Proj(this));
+
+
+                TaskWaitAny(new TimeSpan(0, 0, 2),  // 2 sec.
+                        taskProj, taskWcf);
+
+                // Causes the calling thread to yield execution to another thread that is ready
+                // to run on the current processor. The operating system selects the thread to yield to.
+                // true if the operating system switched execution to another thread
+                var yield = Thread.Yield();
+                if (!yield) {
+                    FormPrj?.Show();
+                }
+            }
+        }
+
+        public static void TaskWaitAny(TimeSpan timeout, params Task[] tasks)
+            => Task.WaitAny(tasks, timeout);
+
+        public static void WcfLoad(WindowsEvents evt, string newPath)
+        {
+            var FormPrj = evt.FormPrj;
+            var txtFile = evt.txtFile;
+            Dispatcher dispatcher = evt.txtFile.Dispatcher;
+            bool threadAccess = false;
+
+            if (FormPrj == null || !FormPrj.IsLoaded) {
+                string path = "";
+                try {
+                    threadAccess = dispatcher.CheckAccess();
+                    path = CsObj.Instance.App.Eval("_VFP.DefaultFilePath") ?? "";
+
+                    var dir = path;
+                    if (newPath.Length > 4 && newPath[1] == ':') {
+                        dir = File.Exists(newPath) ? Path.GetDirectoryName(newPath) 
+                            : Path.GetDirectoryName(newPath + Path.DirectorySeparatorChar.ToString());
+                    }
+                    if (Directory.Exists(dir)) {
+                        CsObj.Instance.App.DoCmd($"_VFP.DefaultFilePath = '{dir}'");
+                        path = CsObj.Instance.App.Eval("_VFP.DefaultFilePath") as string;
+                    }
+
+                }
+                catch (Exception ex) { CsObj.Instance.LastError = ex; }
+
+                if (VfpProj.Wcf.Host.Object != null) {
                     // OperationContext ctx = null;
-                    try
-                    {
+                    try {
                         var service = VfpProj.Wcf.VfpServiceBehavior.CreateWebService(true);
-                        if (service != null)
-                        {
+                        if (service != null) {
                             // var htmlMsg = service.Index();
                             service.Load(null);
                             service.Load(CsObj.Instance);
                         }
 
                     }
-                    catch (Exception ex)
-                    {
+                    catch (Exception ex) {
                         var msg = ex.Message;
                         if (ex.InnerException != null)
                             msg += ex.InnerException.Message;
@@ -354,31 +396,66 @@ namespace VfpProj.Native
                     }
 
                 }
+            }
+        }
 
-                FormPrj = null; // clear
-                var txtDir = Form.txtFile.Text;
+        public static void Proj(WindowsEvents evt)
+        {
+            var FormPrj = evt.FormPrj;
+            var txtFile = evt.txtFile;
+
+            FormPrj = null; // clear
+            Dispatcher dispatcher = evt.txtFile.Dispatcher;
+            bool threadAccess = dispatcher.CheckAccess();
+
+            var act = new Action(() => {
+
+                var mainWind = Application.Current.MainWindow;
+                var txtDir = evt.Form.txtFile.Text;
                 if (txtDir.Length > 0 && Directory.Exists(txtDir))
                     FileSystem.CurrentDirectory = txtDir;
 
                 FormPrj = new PrjWindow();
-
-                var mainWind = Application.Current.MainWindow;
                 FormPrj.Left = mainWind.Left + mainWind.Width - FormPrj.Width;
                 if (mainWind.Top < 200)
                     FormPrj.Top = mainWind.Top + mainWind.Height + 20;
 
                 FormPrj.ShowInTaskbar = false;
                 FormPrj.Topmost = true;
+                Tree.LoadFolder(FormPrj, FormPrj.txtPath.Text);
+
+            });
+            if (threadAccess) {
+                act();
+            } else {
+                // Operations are processed before other asynchronous
+                dispatcher.BeginInvoke(DispatcherPriority.Send, act);
             }
 
-            Tree.LoadFolder(FormPrj, FormPrj.txtPath.Text);
-
-            FormPrj.Show();
         }
 
         #endregion
 
         #region Focus Events
+
+        public void form_Drop(object sender, DragEventArgs e)
+        {
+            var data = e.Data as IDataObject;
+            if (data == null) {
+                return;
+            }
+            if (data.GetDataPresent(typeof(string))) {
+                var file = data.GetData(typeof(string)) as string;
+                txtFile.Text = file ?? txtFile.Text;
+            }
+        }
+
+        public void form_DragOver(object sender, DragEventArgs e)
+        {
+            // e.AllowedEffects = DragDropEffects.Copy;
+            e.Effects = DragDropEffects.Copy;
+        }
+
 
         static void form1_MouseLeave(object sender, EventArgs e)
         {
@@ -402,17 +479,14 @@ namespace VfpProj.Native
 
             // {"An outgoing call cannot be made since the application is dispatching an input-synchronous call. 
             // (Exception from HRESULT: 0x8001010D (RPC_E_CANTCALLOUT_ININPUTSYNCCALL))"}
-            try
-            {
-                if (app.DefaultFilePath.ToLower() != dir.ToLower())
-                {
+            try {
+                if (app.DefaultFilePath.ToLower() != dir.ToLower()) {
                     app.Caption = dir;
                     app.DefaultFilePath = dir;
                 }
                 FoxCmd.hWnd = (IntPtr)app.hWnd;
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 Trace.WriteLine(ex.Message);
             }
 
@@ -447,8 +521,7 @@ namespace VfpProj.Native
         {
 #endif
             var textFile = sender as TextBox;
-            if (e.Key == Key.Enter)
-            {
+            if (e.Key == Key.Enter) {
                 string cmd = textFile.Text.Trim();
                 DoCmd(cmd);
             }
@@ -461,8 +534,7 @@ namespace VfpProj.Native
             string dir = form.Directory;
             var formCS = form.Form;
 
-            if (!FoxCmd.App.IsAlive())
-            {
+            if (!FoxCmd.App.IsAlive()) {
                 CsApp.Instance.Window.IsStart = false;
                 Vfp.Startup.Instance.App = null;
                 FoxCmd.Attach(true);
@@ -473,18 +545,14 @@ namespace VfpProj.Native
                 FoxCmd.App.DefaultFilePath = dir;
             }
 
-            if (File.Exists(cmd) || Directory.Exists(cmd))
-            {
-                if (!File.Exists(cmd))
-                {
+            if (File.Exists(cmd) || Directory.Exists(cmd)) {
+                if (!File.Exists(cmd)) {
                     FoxCmd.AppCmd("CD " + cmd);
                     dir = FoxCmd.App.DefaultFilePath;
-                    try
-                    {
+                    try {
                         Directory.SetCurrentDirectory(dir);
                     }
-                    catch (Exception ex)
-                    {
+                    catch (Exception ex) {
                         form.LastError = ex;
                         dir = FileSystem.CurrentDirectory;
                     }
@@ -501,14 +569,11 @@ namespace VfpProj.Native
                 else
                     if (ext == ".pjx")
                     FoxCmd.AppCmd("MODI PROJ " + cmd + " NOWAIT");
-            }
-            else
-            {
+            } else {
                 bool isEval = false;
                 string evalStr = "";
                 // ? _VFP.StatusBar;
-                if (cmd[0] == '?')
-                {
+                if (cmd[0] == '?') {
                     evalStr = cmd.Substring(1).TrimStart();
                     isEval = true;
                 }
@@ -521,19 +586,16 @@ namespace VfpProj.Native
             }
 
             IntPtr? hWnd = null;
-            try
-            {
+            try {
                 dir = FoxCmd.App.DefaultFilePath;
-                if (form.Events.directory != dir)
-                {
+                if (form.Events.directory != dir) {
                     Directory.SetCurrentDirectory(dir);
                 }
                 form.Directory = dir;
                 form.Caption = dir;
                 hWnd = (IntPtr?)form.App?.hWnd;
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 form.LastError = ex;
                 Trace.WriteLine(ex.Message);
             }
@@ -556,14 +618,12 @@ namespace VfpProj.Native
             IntPtr hWnd = wi.ptr;
             if (hWnd == IntPtr.Zero)
                 return;
-            if (!NativeMethods.IsWindowVisible(hWnd))
-            {
+            if (!NativeMethods.IsWindowVisible(hWnd)) {
                 formCS.tabList.Items.RemoveAt(index);
                 return;
             }
 
-            try
-            {
+            try {
                 NativeMethods.BringWindowToTop(hWnd);
                 NativeMethods.SetFocus(hWnd);
 
@@ -579,8 +639,7 @@ namespace VfpProj.Native
                 if (cmd.Length > 0)
                     FoxCmd.AppCmd(cmd);
             }
-            catch (Exception ex)
-            { Trace.Write(ex); }
+            catch (Exception ex) { Trace.Write(ex); }
 
         }
 

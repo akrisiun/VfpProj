@@ -19,6 +19,21 @@ namespace VfpProj
             private set;
         }
 
+        public static object Restore()
+        {
+            if (App == null || !IsAlive(App)) {
+                App = AppDomain.CurrentDomain.GetData("FoxApp") as FoxApplication;
+            }
+            return App;
+        }
+        public static object Save(object app)
+        {
+            app = app ?? App;
+            AppDomain.CurrentDomain.SetData("FoxApp", app);
+            AppDomain.CurrentDomain.SetData("CsObj", CsApp.Instance);
+            return app;
+        }
+
         public static bool IsAlive(this FoxApplication app)
         {
             if (app == null && App == null)
@@ -104,10 +119,10 @@ namespace VfpProj
 
         public static void Dispose()
         {
+            App = null;
             if (CsObj.Instance != null)
                 CsObj.Instance.Dispose();
             FormObj = null;
-            App = null;
         }
 
         #endregion
@@ -249,19 +264,32 @@ namespace VfpProj
 
         public static bool Attach(bool secondTime = false)
         {
-            if (secondTime)
+            if (secondTime && CsObj.Instance != null) {
                 CsObj.Instance.IsLockForm = true;
+            }
 
             try
             {
+                if (CsObj.Instance != null) {
+                    AppDomain.CurrentDomain.SetData("CsObj", CsObj.Instance);
+                }
+
                 dynamic objApp = App;
                 if (App == null && !VfpProj.CsApp.Instance.Window.IsStart)
                 {
-                    if (Vfp.Startup.Instance.App != null)
+                    if (Vfp.Startup.Instance.App != null) {
                         App = Vfp.Startup.Instance.App;
-
-                    if (App == null)
-                        App = AppMethods.CreateFoxApp() as VisualFoxpro.FoxApplication;
+                    }
+                    if (App == null) {
+                        App = AppDomain.CurrentDomain.GetData("FoxApp") as VisualFoxpro.FoxApplication;
+                        if (App == null) {
+                            App = AppMethods.CreateFoxApp() as VisualFoxpro.FoxApplication;
+                        } else {
+                            App.Visible = true;
+                        }
+                    }
+                    AppDomain.CurrentDomain.SetData("FoxApp", App);
+                    AppDomain.CurrentDomain.SetData("CsObj", CsObj.Instance);
 
                     Vfp.Startup.Instance.App = App;
                     objApp = App;

@@ -19,7 +19,7 @@ namespace VfpProj.Wcf
         public static ServiceHost FixHost(ServiceHost host)
         {
             host.Description.Behaviors.Remove<ServiceDebugBehavior>();
-            
+
             /*
             ServiceMetadataBehavior mex = host.Description.Behaviors.Find<ServiceMetadataBehavior>();
             if (mex == null)
@@ -60,7 +60,7 @@ namespace VfpProj.Wcf
             get { return this._headers.MessageVersion; }
         }
 
-        public ExpandoObject  Data { get; set; }
+        public ExpandoObject Data { get; set; }
 
         protected override void OnWriteBodyContents(XmlDictionaryWriter writer)
         {
@@ -68,40 +68,38 @@ namespace VfpProj.Wcf
             writer.WriteStartElement("head");
             writer.WriteStartElement("body");
 
-            if (Data == null)
-            {
+            if (Data == null) {
                 writer.WriteRaw("<h3>VfpService</h3>");
                 writer.WriteStartElement("span");
                 writer.WriteString("WCF service is running.");
                 writer.WriteEndElement();
             }
 
-            if (Data != null)
-            {
-                var json = JsonConvert.SerializeObject(Data, 
+            if (Data != null) {
+                var json = JsonConvert.SerializeObject(Data,
                     new JsonSerializerSettings { MaxDepth = 5 });
+
                 var html = json; // !
                 writer.WriteStartElement("span");
-                writer.WriteString("Data:");
+                //  writer.WriteString("Data:");
                 writer.WriteRaw("<br/>");
 
-                    writer.WriteStartElement("pre");
-                    writer.WriteStartElement("code");
-                    writer.WriteRaw("<br/>");
+                writer.WriteStartElement("pre");
+                writer.WriteStartElement("code");
+                writer.WriteRaw("<br/>");
 
-                        var xmlEn = new StringBuilder();
-                        xmlEn.Append(html); // System.Net.WebUtility.HtmlEncode(html);
-                        xmlEn.Replace("}", "}\n");
-                        xmlEn.Replace("[", "\n[");
-                        xmlEn.Replace("\",", "\",\n");
-                        json = xmlEn.ToString();
+                var xmlEn = new StringBuilder();
+                xmlEn.Append(html); // System.Net.WebUtility.HtmlEncode(html);
+                xmlEn.Replace("}", "}\n");
+                xmlEn.Replace("[", "\n[");
+                xmlEn.Replace("\",", "\",\n");
+                json = xmlEn.ToString();
 
-                        writer.WriteRaw(xmlEn.ToString());
+                writer.WriteRaw(xmlEn.ToString());
 
-                    // writer.WriteString("<br/></code></pre>");
-                    writer.WriteRaw("<br/>");
-                    writer.WriteEndElement();
-                    writer.WriteEndElement();
+                writer.WriteRaw("<br/>");
+                writer.WriteEndElement();
+                writer.WriteEndElement();
 
                 writer.WriteEndElement();
             }
