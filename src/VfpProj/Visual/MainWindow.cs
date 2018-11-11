@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
@@ -42,9 +42,9 @@ namespace VfpProj
             comboCfg = this.cmdPanel.comboCfg;
 
             buttonWcf = this.cmdPanel.buttonWcf;
-            buttonWcf.Visibility = Visibility.Collapsed;
+            buttonWcf.Visibility = Visibility.Visible;
             comboPrj = this.cmdPanel.comboPrj;
-            comboPrj.Visibility = Visibility.Collapsed; // TODO
+            comboPrj.Visibility = Visibility.Visible;
 
             var cfFile = System.AppDomain.CurrentDomain.BaseDirectory + @"cmd.cfg";
             ReadCfg(cfFile);

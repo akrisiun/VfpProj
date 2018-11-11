@@ -1,21 +1,26 @@
-﻿//using ICSharpCode.AvalonEdit.Utils;
-//using ICSharpCode.AvalonEdit.Highlighting;
-//using ICSharpCode.AvalonEdit.Folding;
-//using ICSharpCode.AvalonEdit.Indentation;
-//using ICSharpCode.AvalonEdit;
-//using AvalonEdit.Sample;
+﻿#if XAML2
+using ICSharpCode.AvalonEdit.Utils;
+using ICSharpCode.AvalonEdit.Highlighting;
+using ICSharpCode.AvalonEdit.Folding;
+using ICSharpCode.AvalonEdit.Indentation;
+//         xmlns:avalonedit="clr-namespace:ICSharpCode.AvalonEdit;assembly=ICSharpCode.AvalonEdit"
+using ICSharpCode.AvalonEdit;
+using AvalonEdit.Sample;
+#endif
+using Microsoft.Win32;
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Markup;
 using Forms = System.Windows.Forms;
 using System.IO;
+using System.Text;
 using VfpProj.Native;
+using System.Windows.Media.Imaging;
 using VfpProj;
 
 namespace VfpProj
 {
-    // xmlns:avalonedit="clr-namespace:ICSharpCode.AvalonEdit;assembly=ICSharpCode.AvalonEdit"
-
     public partial class PrjWindow : Window
     {
         public string FileName { get; set; }
@@ -28,7 +33,7 @@ namespace VfpProj
             Icon = MainWindow.PrgIco; //  BitmapFrame.Create(iconUri);
 
             FileName = string.Empty;
-            InitializeComponent();
+            // InitializeComponent();
             if (!_contentLoaded)
             {
                 _contentLoaded = true;
@@ -66,14 +71,9 @@ namespace VfpProj
             }
 
             if (Directory.Exists(dir))
-                Directory.SetCurrentDirectory(dir);
+                Directory.SetCurrentDirectory(dir); 
 
-            string projName = "";
-            try
-            {
-                // projName = info.vfpProj.Name; // ["Name"] as string;
-            }
-            catch { }
+            string projName = info.vfpProj.Name;
             ProjTree.Load(w, w.tree, info.vfpProj, projName);
 
         }

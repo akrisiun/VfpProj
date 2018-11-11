@@ -366,7 +366,7 @@ namespace VfpProj.Native
                 string path = "";
                 try {
                     threadAccess = dispatcher.CheckAccess();
-                    path = CsObj.Instance.App.Eval("_VFP.DefaultFilePath") ?? "";
+                    path = CsObj.Instance.App.Eval("_VFP.DefaultFilePath") as string ?? "";
 
                     var dir = path;
                     if (newPath.Length > 4 && newPath[1] == ':') {

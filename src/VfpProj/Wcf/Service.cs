@@ -245,7 +245,7 @@ namespace VfpProj.Wcf
                 app.DoCmd("ON ERROR _VFP.StatusBar = MESSAGE()");
                 app.DoCmd("COMPILE " + file);
 
-                StatusBar = app.Eval("_VFP.StatusBar");
+                StatusBar = app.Eval("_VFP.StatusBar") as string;
                 result = Host.UpdateValues(this, app);
             }
             catch (Exception ex) { VfpError = ex; }

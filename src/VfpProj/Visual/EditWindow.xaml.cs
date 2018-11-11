@@ -1,4 +1,6 @@
-﻿using ICSharpCode.AvalonEdit.Utils;
+﻿#if XAML2
+
+using ICSharpCode.AvalonEdit.Utils;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Folding;
 using ICSharpCode.AvalonEdit.Indentation;
@@ -119,3 +121,5 @@ namespace VfpProj
     }
 
 }
+
+#endif
