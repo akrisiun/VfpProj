@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -22,7 +21,7 @@ namespace IOFile
         [System.Security.SecurityCritical]
         internal SearchResult(String fullPath, String userPath, Win32FindFile.WIN32_FIND_DATA findData)
         {
-            Contract.Requires(fullPath != null);
+            // Contract.Requires(fullPath != null);
             // Contract.Requires(userPath != null);
 
             this._fullPath = fullPath;
@@ -52,9 +51,7 @@ namespace IOFile
     {
         public SearchData(String fullPath, String userPath, SearchOption searchOption)
         {
-            Contract.Requires(fullPath != null && fullPath.Length > 0);
-            Contract.Requires(userPath != null && userPath.Length > 0);
-            Contract.Requires(searchOption == SearchOption.AllDirectories || searchOption == SearchOption.TopDirectoryOnly);
+            // Contract.Requires(searchOption == SearchOption.AllDirectories || searchOption == SearchOption.TopDirectoryOnly);
 
             this.fullPath = fullPath;
             this.userPath = userPath;
@@ -110,13 +107,8 @@ namespace IOFile
         internal Win32FileSystemEnumerableIterator(String path, String originalUserPath,
             String searchPattern, SearchOption searchOption, SearchResultHandler<TSource> resultHandler)
         {
-            Contract.Requires(path != null);
-            Contract.Requires(originalUserPath != null);
-            Contract.Requires(searchPattern != null);
-            Contract.Requires(searchOption == SearchOption.AllDirectories || searchOption == SearchOption.TopDirectoryOnly);
-            Contract.Requires(resultHandler != null);
+            // Contract.Requires(path != null);
 
-            // _oldMode = Interop.SetErrorMode(Interop.SEM_FAILCRITICALERRORS);
             _searchStack = new List<SearchData>();
 
             String normalizedSearchPattern = NormalizeSearchPattern(searchPattern);
@@ -287,13 +279,13 @@ namespace IOFile
                     }
                 case STATE_SEARCH_NEXT_DIR:
                     {
-                        Contract.Assert(_searchData.searchOption != SearchOption.TopDirectoryOnly, "should not reach this code path if searchOption == TopDirectoryOnly");
+                        // Contract.Assert(_searchData.searchOption != SearchOption.TopDirectoryOnly, "should not reach this code path if searchOption == TopDirectoryOnly");
 
                         // Traverse directory structure. We need to get '*'
                         while (_searchStack.Count > 0)
                         {
                             _searchData = _searchStack[0];
-                            Contract.Assert((_searchData.fullPath != null), "fullpath can't be null!");
+                            // Contract.Assert((_searchData.fullPath != null), "fullpath can't be null!");
                             _searchStack.RemoveAt(0);
 
                             // Traverse the subdirs
@@ -384,8 +376,9 @@ namespace IOFile
         private SearchResult CreateSearchResult(SearchData localSearchData, Win32FindFile.WIN32_FIND_DATA findData)
         {
             string findData_fileName = findData.cFileName;
-            Contract.Requires(findData_fileName.Length != 0 && !Path.IsPathRooted(findData_fileName),
-                "Expected file system enumeration to not have empty file/directory name and not have rooted name");
+            // Contract.Requires(findData_fileName.Length != 0 && !Path.IsPathRooted(findData_fileName),
+            // "Expected file system enumeration to not have empty file/directory name and not have rooted 
+            // name");
 
             String userPathFinal = Path.Combine(localSearchData.userPath ?? "", findData_fileName);
             String fullPathFinal = Path.Combine(localSearchData.fullPath, findData_fileName);
@@ -409,7 +402,7 @@ namespace IOFile
         [System.Security.SecurityCritical]  // auto-generated
         private void AddSearchableDirsToStack(SearchData localSearchData)
         {
-            Contract.Requires(localSearchData != null);
+            // Contract.Requires(localSearchData != null);
 
             String searchPath = Path.Combine(localSearchData.fullPath, "*");
             SafeFindHandle hnd = SafeFindHandle.Zero; // null;
@@ -438,8 +431,9 @@ namespace IOFile
                 {
                     if (Win32FileSystemEnumerableHelpers.IsDir(data))
                     {
-                        Contract.Assert(data.cFileName.Length != 0 && !Path.IsPathRooted(data.cFileName),
-                            "Expected file system enumeration to not have empty file/directory name and not have rooted name");
+                        // Contract.Assert(data.cFileName.Length != 0 && !Path.IsPathRooted(data.cFileName),
+                        // "Expected file system enumeration to not have empty file/directory name and not 
+                        //  have rooted name");
 
                         String tempFullPath = Path.Combine(localSearchData.fullPath, data.cFileName);
                         String tempUserPath = Path.Combine(localSearchData.userPath, data.cFileName);
@@ -463,7 +457,7 @@ namespace IOFile
 
         private static String NormalizeSearchPattern(String searchPattern)
         {
-            Contract.Requires(searchPattern != null);
+            // Contract.Requires(searchPattern != null);
 
             // Win32 normalization trims only U+0020. 
             String tempSearchPattern = searchPattern.TrimEnd(PathHelpers.TrimEndChars);
@@ -480,10 +474,6 @@ namespace IOFile
 
         private static String GetNormalizedSearchCriteria(String fullSearchString, String fullPathMod)
         {
-            Contract.Requires(fullSearchString != null);
-            Contract.Requires(fullPathMod != null);
-            Contract.Requires(fullSearchString.Length >= fullPathMod.Length);
-
             String searchCriteria = null;
             char lastChar = fullPathMod[fullPathMod.Length - 1];
             if (PathHelpers.IsDirectorySeparator(lastChar))
@@ -493,7 +483,7 @@ namespace IOFile
             }
             else
             {
-                Contract.Assert(fullSearchString.Length > fullPathMod.Length);
+                // Contract.Assert(fullSearchString.Length > fullPathMod.Length);
                 searchCriteria = fullSearchString.Substring(fullPathMod.Length + 1);
             }
             return searchCriteria;
@@ -501,9 +491,7 @@ namespace IOFile
 
         private static String GetFullSearchString(String fullPath, String searchPattern)
         {
-            Contract.Requires(fullPath != null);
-            Contract.Requires(searchPattern != null);
-
+            // Contract.Requires(fullPath != null);
             PathHelpers.ThrowIfEmptyOrRootedPath(searchPattern);
             String tempStr = Path.Combine(fullPath, searchPattern);
 
@@ -579,7 +567,7 @@ namespace IOFile
 
         internal static int MakeHRFromErrorCode(int errorCode)
         {
-            Contract.Assert((0xFFFF0000 & errorCode) == 0, "This is an HRESULT, not an error code!");
+            // Contract.Assert((0xFFFF0000 & errorCode) == 0, "This is an HRESULT, not an error code!");
             return unchecked(((int)0x80070000) | errorCode);
         }
 
@@ -613,7 +601,8 @@ namespace IOFile
         {
             bool includeFile = _includeFiles && Win32FileSystemEnumerableHelpers.IsFile(result.FindData);
             bool includeDir = _includeDirs && Win32FileSystemEnumerableHelpers.IsDir(result.FindData);
-            Contract.Assert(!(includeFile && includeDir), result.FindData.cFileName + ": current item can't be both file and dir!");
+            // Contract.Assert(!(includeFile && includeDir), result.FindData.cFileName + ": current item
+            // can't be both file and dir!");
             return (includeFile || includeDir);
         }
 
