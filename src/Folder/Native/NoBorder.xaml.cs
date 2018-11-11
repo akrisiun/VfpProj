@@ -30,9 +30,10 @@ namespace Folder
             cmdClose.Click += (s, e) => Close();
         }
 
-        void System.Windows.Markup.IComponentConnector.Connect(int connectionId, object target) {
-        }
-        public void InitializeComponent2() {}
+#if MONO        
+        void System.Windows.Markup.IComponentConnector.Connect(int connectionId, object target) {}
+        void InitializeComponent() {}
+#endif
           
     }
 
