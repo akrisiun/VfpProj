@@ -13,12 +13,15 @@ namespace VfpProj
 {
     public static class TextDrop
     {
-        public static void BindEdit(this EditWindow w)
+        public static void BindEdit(this Window w)
         {
-            w.editor.Tag = w;
-            w.editor.AllowDrop = true;
-            w.editor.PreviewDragOver += DragOver;
-            w.editor.PreviewDrop += Drop;
+#if XAML2
+            var wedit = w as EditWindow;
+            wedit.editor.Tag = w;
+            wedit.editor.AllowDrop = true;
+            wedit.editor.PreviewDragOver += DragOver;
+            wedit.editor.PreviewDrop += Drop;
+#endif
         }
 
         public static void BindPrjEdit(this PrjWindow w, Forms.TextBox txtFile)
@@ -65,6 +68,7 @@ namespace VfpProj
 
             var fileToLoad = new StreamReader(fileName);
 
+#if XAML2
             EditWindow w = (sender as FrameworkElement).Tag as EditWindow;
             if (w == null)
                 return;
@@ -76,6 +80,7 @@ namespace VfpProj
                 fileToLoad.Close();
             }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
+#endif
         }
 
         // If the data object in args is a single file, this method will return the filename. Otherwise, it returns null.

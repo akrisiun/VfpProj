@@ -1,7 +1,8 @@
 ﻿using System;
 using System.ServiceModel;
 using System.Runtime.Serialization;
-using System.ServiceModel.Web;
+using System.ServiceModel.Web;      // WebOperationContext
+//  C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0\System.ServiceModel.Web.dll
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.ServiceModel.Channels;
@@ -103,7 +104,8 @@ namespace VfpProj.Wcf
                     var dataObj = VfpWcf.Instance.Load(obj);
                     data.data = dataObj;
                 }
-            }            else if (query.Contains("/docmd")) {
+            }
+            else if (query.Contains("/docmd")) {
 
                 data.param = bstr;
                 try {

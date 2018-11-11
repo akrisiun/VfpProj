@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+// using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
@@ -44,6 +42,7 @@ namespace VfpProj
             comboCfg = this.cmdPanel.comboCfg;
 
             buttonWcf = this.cmdPanel.buttonWcf;
+            buttonWcf.Visibility = Visibility.Collapsed;
             comboPrj = this.cmdPanel.comboPrj;
             comboPrj.Visibility = Visibility.Collapsed; // TODO
 
@@ -54,7 +53,7 @@ namespace VfpProj
         public void ReadCfg(string cfFile)
         {
             var cfgCmd = ConfigurationManager.AppSettings["loadcmd"];
-            if (!string.IsNullOrWhiteSpace(cfgCmd) && File.Exists(cfgCmd))
+            if (!cfgCmd.IsNullOrWhiteSpace() && File.Exists(cfgCmd))
                 cfFile = Path.GetFullPath(cfgCmd);
 
             string[] commands = null;
@@ -77,7 +76,14 @@ namespace VfpProj
             IsRendered = false;
             this.ContentRendered += MainWindow_ContentRendered;
 
-            FoxCmd.DefPosition(this);
+            try
+            {
+                FoxCmd.DefPosition(this);
+            } catch (Exception ex)
+            {
+                ex = ex.InnerException ?? ex;
+                MessageBox.Show(ex.Message);
+            }
 
             // <add key="formTop" value="0" />
             // <add key="formLeft" value="0" />
@@ -93,7 +99,7 @@ namespace VfpProj
         
         static int? ToInt(string value)
         {
-            if (string.IsNullOrWhiteSpace(value))
+            if (value.IsNullOrWhiteSpace())
                 return null;
             int intValue = 0;
             if (Int32.TryParse(value, out intValue))
@@ -157,10 +163,14 @@ namespace VfpProj
         void MainWindow_ContentRendered(object sender, EventArgs e)
         {
             IsRendered = true;
-            // this.border.Effect = new DropShadowEffect();
             events?.AfterRendered();
 
             var inst = Vfp.Startup.Instance;
+            if (FoxCmd.App == null)
+            {
+                Vfp.Startup.CreateApp(this);
+            }
+
             if (FoxCmd.App != null && inst != null && inst.Then != null)
             {
                 inst.Then(FoxCmd.App);

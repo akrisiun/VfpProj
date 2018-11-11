@@ -76,16 +76,15 @@ namespace Folder
 
             var window = new FolderWindow();   // NoBorder 
             window.AllowsTransparency = false;
-            //window.Load(null);
             window.Show();
-
-            //if (FoxCmd.Attach())
-            //    FoxCmd.AssignForm(window);
         }
 
-        //public EditWindow ShowEditWindow(string file)
-        //{
-        //    var winEdit = new EditWindow();
+#if NET45 && XAML2
+        public EditWindow ShowEditWindow(string file)
+        {
+            var winEdit = new EditWindow();
+        }
+#endif
 
     }
 }
