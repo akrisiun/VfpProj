@@ -41,6 +41,10 @@ namespace VfpProj.Wcf
         Message Index();
     }
 
+    public interface IComObject : IList<KeyValuePair<string, object>>
+    { 
+    }
+
     public interface IVfpData
     {
         [DataMember] string Name { get; set; }
@@ -50,7 +54,9 @@ namespace VfpProj.Wcf
         [DataMember] string ActiveProject { get; set; }
 
         // non COM object!!
-        [DataMember] IList<KeyValuePair<string, object>> VFP { get; set; }
+        [DataMember] IComObject VFP { get; set; }
+        [DataMember] IComObject SCREEN { get; set; }
+        [DataMember] IList<IComObject> Objects { get; set; }
     }
 
     #endregion
@@ -170,7 +176,11 @@ namespace VfpProj.Wcf
 
         [DataMember] public int? HWnd { get; set; }
         [DataMember] public string ActiveProject { [DebuggerStepThrough] get; set; }
-        [DataMember] public IList<KeyValuePair<string, object>> VFP { [DebuggerStepThrough] get; set; }
+
+        // IList<KeyValuePair<string, object>> 
+        [DataMember] public IComObject VFP { [DebuggerStepThrough] get; set; }
+        [DataMember] public IComObject SCREEN { [DebuggerStepThrough] get; set; }
+        [DataMember] public IList<IComObject> Objects { [DebuggerStepThrough] get; set; }
 
         private CsObj Obj { get; set; }
 

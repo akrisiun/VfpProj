@@ -17,7 +17,7 @@ namespace VfpProj
             cmdClose.Click += (s, e) => Close();
         }
 
-#if !NET45 || MONO || DOTNET
+#if MONO  // !NET45 || DOTNET
         internal System.Windows.Controls.DockPanel titleBar;
             internal System.Windows.Controls.Button cmdClose;
             internal System.Windows.Controls.ContentControl content;
