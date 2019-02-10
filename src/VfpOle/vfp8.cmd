@@ -1,0 +1,1 @@
+start "" "c:\Program Files (x86)\Microsoft Visual FoxPro 8\vfp8.exe" %*
