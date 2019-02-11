@@ -32,9 +32,11 @@ using System.Windows.Shapes;
 using System.Windows.Shell;
 
 
-namespace VfpProj {
-    
-    
+namespace VfpProj
+{
+
+
     /// <summary>
     /// NoBorder
     /// </summary>
+}

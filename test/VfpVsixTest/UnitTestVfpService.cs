@@ -1,15 +1,15 @@
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Diagnostics;
-using VfpProj.Wcf;
 using Xunit.Sdk;
-using System.ServiceModel;
 using System.Linq;
+// using System.ServiceModel;
 
 namespace Vfp15Test
 {
 #if VSIX
     using VfpLanguage;
+using VfpProj.Wcf;
 
     [TestClass]
     public class UnitTestVfpLang
@@ -69,8 +69,8 @@ namespace Vfp15Test
         [TestMethod]
         public void Test_ServiceJsonEval()
         {
-                var uri = baseAddressJson;
-                // http://localhost:9001/Vfp/Eval/?_VFP.StatusBar
+            var uri = baseAddressJson;
+            // http://localhost:9001/Vfp/Eval/?_VFP.StatusBar
         }
     }
 }

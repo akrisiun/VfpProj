@@ -101,14 +101,15 @@ namespace VfpProj.Native
 #endif
             frm.buttonDO.Click += (s, e) => DoCmd(form.Text);
 
-            frm.buttonWcf.Click += (s, e) => Wcf.VfpWcf.Bind();
-            var sets = System.Configuration.ConfigurationManager.AppSettings;
-            var baseAddress = sets.Get("baseAddress");
-            if (!string.IsNullOrWhiteSpace(baseAddress)) {
-                Wcf.VfpWcf.Bind();
-                if (Wcf.Host.Object != null)
-                    frm.buttonWcf.Visibility = Visibility.Hidden;
-            }
+            frm.buttonWcf.IsEnabled = false;
+            // frm.buttonWcf.Click += (s, e) => Wcf.VfpWcf.Bind();
+            //var sets = System.Configuration.ConfigurationManager.AppSettings;
+            //var baseAddress = sets.Get("baseAddress");
+            //if (!string.IsNullOrWhiteSpace(baseAddress)) {
+            //    Wcf.VfpWcf.Bind();
+            //    if (Wcf.Host.Object != null)
+            //        frm.buttonWcf.Visibility = Visibility.Hidden;
+            //}
         }
 
 
@@ -381,28 +382,28 @@ namespace VfpProj.Native
                 }
                 catch (Exception ex) { CsObj.Instance.LastError = ex; }
 
-                if (VfpProj.Wcf.Host.Object != null) {
-                    // OperationContext ctx = null;
-                    try {
-                        var service = VfpProj.Wcf.VfpServiceBehavior.CreateWebService(true);
-                        if (service != null) {
-                            // var htmlMsg = service.Index();
-                            service.Load(null);
-                            service.Load(CsObj.Instance);
-                        }
+                //if (VfpProj.Wcf.Host.Object != null) {
+                //    // OperationContext ctx = null;
+                //    try {
+                //        var service = VfpProj.Wcf.VfpServiceBehavior.CreateWebService(true);
+                //        if (service != null) {
+                //            // var htmlMsg = service.Index();
+                //            service.Load(null);
+                //            service.Load(CsObj.Instance);
+                //        }
 
-                    }
-                    catch (Exception ex) {
-                        var msg = ex.Message;
-                        if (ex.InnerException != null)
-                            msg += ex.InnerException.Message;
-                        MessageBox.Show(msg);
-                        //StatusDescriptionStrings
-                        //  internal const string HttpContentTypeMismatch = 
-                        // "Cannot process the message because the content type '{0}' was not the expected type '{1}'.";
-                    }
+                //    }
+                //    catch (Exception ex) {
+                //        var msg = ex.Message;
+                //        if (ex.InnerException != null)
+                //            msg += ex.InnerException.Message;
+                //        MessageBox.Show(msg);
+                //        //StatusDescriptionStrings
+                //        //  internal const string HttpContentTypeMismatch = 
+                //        // "Cannot process the message because the content type '{0}' was not the expected type '{1}'.";
+                //    }
 
-                }
+                //}
             }
         }
 
@@ -543,7 +544,7 @@ namespace VfpProj.Native
 
             if (!FoxCmd.App.IsAlive()) {
                 CsApp.Instance.Window.IsStart = false;
-                Vfp.Startup.Instance.App = null;
+                VfpProj.Startup.Instance.App = null;
                 FoxCmd.Attach(true);
                 if (FoxCmd.App == null)
                     return;

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <!--$(MSBuildToolsVersion)-->
   <Import Project="$(MSBuildExtensionsPath)\14.0\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\14.0\Microsoft.Common.props')" />
@@ -10,12 +10,13 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>VfpProj</RootNamespace>
     <AssemblyName>VfpProj2</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
     <ReferencesCopiedInThisBuild>true</ReferencesCopiedInThisBuild>
     <UseCommonOutputDirectory>true</UseCommonOutputDirectory>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -23,7 +24,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\lib\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;DOTNET</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -43,7 +44,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>pjx.ico</ApplicationIcon>
-    <StartupObject>Vfp.Startup</StartupObject>
+    <StartupObject>VfpProj.Startup</StartupObject>
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>vfp8.snk</AssemblyOriginatorKeyFile>
     <NoWin32Manifest>true</NoWin32Manifest>
@@ -113,6 +114,7 @@
     <Compile Include="FS\Win32\Win32FileSystemEnumerableIterator.cs" />
     <Compile Include="FS\Win32\Win32FindFile.cs" />
     <Compile Include="FS\Win32\Win32Marshal.cs" />
+    <Compile Include="Host\SecondDomain.cs" />
     <Compile Include="Json\SimpleJson.cs" />
     <Compile Include="Native\Interopt.cs" />
     <Compile Include="Startup.cs" />
@@ -125,12 +127,8 @@
     <Compile Include="Visual\ProjTree.cs" />
     <Compile Include="Visual\TextDrop.cs" />
     <Compile Include="Visual\MainWindow.cs" />
-    <Compile Include="Visual\TextRead.cs" />
+    <Compile Include="Visual\VfpTextRead.cs" />
     <Compile Include="Visual\VfpTabs.cs" />
-    <Compile Include="Wcf\Landing.cs" />
-    <Compile Include="Wcf\Host.cs" />
-    <Compile Include="Wcf\VfpServiceBehavior.cs" />
-    <Compile Include="Wcf\Service.cs" />
     <Page Include="Visual\PrjWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -185,6 +183,16 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\vendor\AvalonEdit\ICSharpCode.AvalonEdit\ICSharpCode.AvalonEdit.csproj">
+      <Project>{6423f688-b52c-4099-8286-e51219703e8b}</Project>
+      <Name>ICSharpCode.AvalonEdit</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VfpAvalon\VfpAvalon.csproj">
+      <Project>{01b48c56-8160-4658-b29c-26daba6197ae}</Project>
+      <Name>VfpAvalon</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

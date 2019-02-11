@@ -37,7 +37,7 @@ namespace VfpProj
                 // project file
                 var info = new VfpFileInfo();
 
-                TextRead.ReadVfpInfo(ref info, ref dir, (f) =>
+                VfpTextRead.ReadVfpInfo(ref info, ref dir, (f) =>
                     {
                     }
                 );

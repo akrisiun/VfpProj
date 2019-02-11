@@ -165,10 +165,10 @@ namespace VfpProj
             IsRendered = true;
             events?.AfterRendered();
 
-            var inst = Vfp.Startup.Instance;
+            var inst = VfpProj.Startup.Instance;
             if (FoxCmd.App == null)
             {
-                Vfp.Startup.CreateApp(this);
+                VfpProj.Startup.CreateApp(this);
             }
 
             if (FoxCmd.App != null && inst != null && inst.Then != null)

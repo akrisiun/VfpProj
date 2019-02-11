@@ -10,7 +10,7 @@ using System.Text;
 using Folder.Native;
 using System.Windows.Media.Imaging;
 using VfpProj;
-using Vfp;
+using VfpProj;
 using MultiSelect;
 
 namespace Folder

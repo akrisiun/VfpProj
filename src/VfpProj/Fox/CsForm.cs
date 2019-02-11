@@ -5,7 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Interop;
 using System.ComponentModel;
 using IO = System.IO;
-using Vfp;
+using VfpProj;
 using System.Text;
 using System.Security.Permissions;
 using Microsoft.Win32;

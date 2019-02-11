@@ -19,7 +19,8 @@
 using System;
 using System.Collections.Generic;
 //using ICSharpCode.AvalonEdit.Document;
-//using ICSharpCode.AvalonEdit.Folding;
+using ICSharpCode.AvalonEdit.Folding;
+using ICSharpCode.NRefactory.Editor;
 // using ICSharpCode.NRefactory.Editor;
 
 namespace AvalonEdit.Sample
@@ -38,6 +39,8 @@ namespace AvalonEdit.Sample
 		/// Gets/Sets the closing brace. The default value is '}'.
 		/// </summary>
 		public char ClosingBrace { get; set; }
+
+        public int FirstErrorOffset { get; set; }
 		
 		/// <summary>
 		/// Creates a new BraceFoldingStrategy.
@@ -69,12 +72,15 @@ namespace AvalonEdit.Sample
 		/// </summary>
 		public IEnumerable<NewFolding> CreateNewFoldings(ITextSource document)
 		{
+            this.FirstErrorOffset = -1;
+
 			List<NewFolding> newFoldings = new List<NewFolding>();
 			
 			Stack<int> startOffsets = new Stack<int>();
 			int lastNewLineOffset = 0;
 			char openingBrace = this.OpeningBrace;
 			char closingBrace = this.ClosingBrace;
+
 			for (int i = 0; i < document.TextLength; i++) {
 				char c = document.GetCharAt(i);
 				if (c == openingBrace) {
@@ -89,7 +95,9 @@ namespace AvalonEdit.Sample
 					lastNewLineOffset = i + 1;
 				}
 			}
+
 			newFoldings.Sort((a,b) => a.StartOffset.CompareTo(b.StartOffset));
+
 			return newFoldings;
 		}
 	}

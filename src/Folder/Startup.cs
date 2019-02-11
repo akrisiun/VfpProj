@@ -15,7 +15,7 @@ using VisualFoxpro;
 using Application = System.Windows.Application;
 using System.Runtime.InteropServices;
 
-namespace Vfp
+namespace VfpProj
 {
     public class Startup : IComponent, IDisposable // _Startup
     {

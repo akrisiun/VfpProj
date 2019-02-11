@@ -23,11 +23,13 @@ namespace Folder
     {
         public NoBorder()
         {
+#if NET45 // || DOTNET
             InitializeComponent();
 
             Native.WpfNoBorder.Init(this, titleBar,
                 topLeft, top, topRight, right, bottomRight, bottom, bottomLeft, left);
             cmdClose.Click += (s, e) => Close();
+#endif
         }
 
 #if MONO        

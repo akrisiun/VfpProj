@@ -61,7 +61,7 @@ namespace VfpProj
 
             if (File.Exists(dir))
             {
-                TextRead.ReadVfpInfo(ref info, ref dir, (f) => { 
+                VfpTextRead.ReadVfpInfo(ref info, ref dir, (f) => { 
                 
                     }
                 );

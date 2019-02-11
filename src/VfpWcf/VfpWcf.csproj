@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!--$(MSBuildToolsVersion)-->
+  <Import Project="$(MSBuildExtensionsPath)\14.0\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\14.0\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{3118674E-D584-4B55-BF87-8730137E9066}</ProjectGuid>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>VfpProj</RootNamespace>
+    <AssemblyName>VfpWcf</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <ReferencesCopiedInThisBuild>true</ReferencesCopiedInThisBuild>
+    <UseCommonOutputDirectory>true</UseCommonOutputDirectory>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\lib\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <LangVersion>7</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>pjx.ico</ApplicationIcon>
+    <StartupObject>Vfp.Startup</StartupObject>
+    <SignAssembly>false</SignAssembly>
+    <AssemblyOriginatorKeyFile>vfp8.snk</AssemblyOriginatorKeyFile>
+    <NoWin32Manifest>true</NoWin32Manifest>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CustomMarshalers" />
+    <Reference Include="Interop.vfpbuild, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\Lib\Interop.vfpbuild.dll</HintPath>
+    </Reference>
+    <Reference Include="Interop.VisualFoxpro, Version=8.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\Lib\Interop.VisualFoxpro.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Lib\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceModel.Web" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsFormsIntegration">
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="CsApp.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="AppMethods.cs" />
+    <Compile Include="Fox\CsDomain.cs" />
+    <Compile Include="Fox\CsForm.cs" />
+    <Compile Include="Fox\CsObj.cs" />
+    <Compile Include="Fox\FoxParse.cs" />
+    <Compile Include="Fox\VfpOleInterfaces.cs" />
+    <Compile Include="Fox\OleInterfaces.cs" />
+    <Compile Include="Fox\FoxCmd.cs" />
+    <Compile Include="Bind\WindowsEvents.cs" />
+    <Compile Include="Bind\WindowsTab.cs" />
+    <Compile Include="Fox\UnsafeNativeMethods.cs" />
+    <Compile Include="FS\DirectoryEnum.cs" />
+    <Compile Include="FS\ProjItem.cs" />
+    <Compile Include="FS\FileSystem.cs" />
+    <Compile Include="FS\Win32\Iterator.cs" />
+    <Compile Include="FS\Win32\PathHelpers.cs" />
+    <Compile Include="FS\Win32\Win32FileSystemEnumerableHelpers.cs" />
+    <Compile Include="FS\Win32\Win32FileSystemEnumerableIterator.cs" />
+    <Compile Include="FS\Win32\Win32FindFile.cs" />
+    <Compile Include="FS\Win32\Win32Marshal.cs" />
+    <Compile Include="Json\SimpleJson.cs" />
+    <Compile Include="Native\Interopt.cs" />
+    <Compile Include="Startup.cs" />
+    <Compile Include="Visual\CmdPanel.xaml.cs">
+      <DependentUpon>CmdPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Visual\PrjWindow.xaml.cs">
+      <DependentUpon>PrjWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Visual\ProjTree.cs" />
+    <Compile Include="Visual\TextDrop.cs" />
+    <Compile Include="Visual\MainWindow.cs" />
+    <Compile Include="Visual\TextRead.cs" />
+    <Compile Include="Visual\VfpTabs.cs" />
+    <Compile Include="Wcf\Landing.cs" />
+    <Compile Include="Wcf\Host.cs" />
+    <Compile Include="Wcf\VfpServiceBehavior.cs" />
+    <Compile Include="Wcf\Service.cs" />
+    <Page Include="Visual\PrjWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="CsApp.xaml.cs">
+      <DependentUpon>CsApp.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="Native\NoBorder.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Visual\CmdPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Native\NativeAutocomplete.cs" />
+    <Compile Include="Native\NativeMethods.cs" />
+    <Compile Include="Native\NativeWndInfo.cs" />
+    <Compile Include="Native\WpfNoBorder.cs" />
+    <Compile Include="Native\NoBorder.xaml.cs">
+      <DependentUpon>NoBorder.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <None Include="vfp8.snk" />
+    <AppDesigner Include="Properties\" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+    <Resource Include="pjx.ico" />
+    <Resource Include="prg.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="VisualFoxpro">
+      <Guid>{00A19611-D8FC-4A3E-A95F-FEA211444BF7}</Guid>
+      <VersionMajor>8</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

@@ -49,7 +49,9 @@
                     <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.AppWorkspaceColorKey}}"/>
                 </Border.BorderBrush>
             </Border>
-            <avalonedit:TextEditor x:Name="editor" Margin="10,0,0,0"
+            <avalonedit:TextEditor 
+                    x:Name="editor"  x:FieldModifier="public"
+                    Margin="10,0,0,0"
                                SyntaxHighlighting="C#"
                                AllowDrop="True"
                                HorizontalScrollBarVisibility="Auto" BorderThickness="2,2,1,1"

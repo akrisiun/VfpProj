@@ -4,7 +4,7 @@ using VfpProj;
 
 namespace Vfp15Test
 {
-    using Wcf = VfpProj.Wcf;
+    // using Wcf = VfpProj.Wcf;
 
     [TestClass]
     public class VfpCmdTests
@@ -13,10 +13,11 @@ namespace Vfp15Test
         public void Test_Init()
         {
             // VfpLanguagePackage package = new VfpLanguagePackage();
-            Service = new Wcf.VfpServiceTest();
-            Wcf.VfpWcf.Instance = Service;
+            //Service = new Wcf.VfpServiceTest();
+            //Wcf.VfpWcf.Instance = Service;
         }
 
+#if WCF
         public Wcf.VfpServiceTest Service;
  
 
@@ -32,6 +33,6 @@ namespace Vfp15Test
             var res = Service.Eval(null);
 
         }
-
+#endif
     }
 }

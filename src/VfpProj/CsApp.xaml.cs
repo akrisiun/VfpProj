@@ -41,7 +41,7 @@ namespace VfpProj
                 Startup += AppMethods.App_Startup;
         }
 
-#if NET40 || MONO || DOTNET
+#if MONO || !DOTNET // NET40 || 
         [STAThread]
         public static void Main()
         {

@@ -7,10 +7,9 @@ using VfpProj;
 using VisualFoxpro;
 using Application = System.Windows.Application;
 using System.Runtime.InteropServices;
-using VfpProj.Wcf;
 //using Newtonsoft.Json;
 
-namespace Vfp
+namespace VfpProj
 {
     public class Startup : _Startup, IComponent, IDisposable
     {
@@ -25,14 +24,17 @@ namespace Vfp
         {
             appCur = null;
             App = null;
-            if (Host.Object != null)
+            if (Host != null)
             {
-                Host.Object.Close();
-                Host.Object = null;
+                Host?.Dispose(); // .Object.Close();
+                Host = null;
             }
         }
 
+        public IDisposable Host { get; set; }
+
         ISite IComponent.Site { get; set; }
+
 #pragma warning disable 0067
         public event EventHandler Disposed;
 
@@ -191,7 +193,7 @@ namespace Vfp
 
         public static FoxApplication CreateApp(MainWindow form)
         {
-            var inst = Vfp.Startup.Instance;
+            var inst = VfpProj.Startup.Instance;
             VfpProj.CsApp.Instance.Window.IsStart = false;
 
             FoxCmd.Attach(secondTime: true);

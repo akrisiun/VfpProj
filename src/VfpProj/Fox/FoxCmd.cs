@@ -142,7 +142,7 @@ namespace VfpProj
             }
             catch (Exception ex)
             {
-                Vfp.Startup.Instance.LastError = ex;
+                VfpProj.Startup.Instance.LastError = ex;
                 if (throwEx)
                     AppMethods.Application_ThreadException(null, new ThreadExceptionEventArgs(ex));
             }
@@ -158,11 +158,11 @@ namespace VfpProj
             }
             catch (COMException ex)
             {
-                Vfp.Startup.Instance.LastError = ex;
+                VfpProj.Startup.Instance.LastError = ex;
             }
             catch (Exception ex)
             {
-                Vfp.Startup.Instance.LastError = ex;
+                VfpProj.Startup.Instance.LastError = ex;
                 AppMethods.Application_ThreadException(null, new ThreadExceptionEventArgs(ex));
             }
             return result;
@@ -209,7 +209,7 @@ namespace VfpProj
             }
             catch (COMException ex)
             {
-                Vfp.Startup.Instance.LastError = ex;
+                VfpProj.Startup.Instance.LastError = ex;
                 AppMethods.Application_ThreadException(null, new ThreadExceptionEventArgs(ex));
             }
             catch (Exception ex)
@@ -277,8 +277,8 @@ namespace VfpProj
                 dynamic objApp = App;
                 if (App == null && !VfpProj.CsApp.Instance.Window.IsStart)
                 {
-                    if (Vfp.Startup.Instance.App != null) {
-                        App = Vfp.Startup.Instance.App;
+                    if (VfpProj.Startup.Instance.App != null) {
+                        App = VfpProj.Startup.Instance.App;
                     }
                     if (App == null) {
                         App = AppDomain.CurrentDomain.GetData("FoxApp") as VisualFoxpro.FoxApplication;
@@ -291,7 +291,7 @@ namespace VfpProj
                     AppDomain.CurrentDomain.SetData("FoxApp", App);
                     AppDomain.CurrentDomain.SetData("CsObj", CsObj.Instance);
 
-                    Vfp.Startup.Instance.App = App;
+                    VfpProj.Startup.Instance.App = App;
                     objApp = App;
                     objApp?.SetVar("ocs", CsObj.Instance);
                 }

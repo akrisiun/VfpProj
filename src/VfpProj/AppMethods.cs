@@ -4,8 +4,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using Vfp;
-using VfpProj.Wcf;
+using VfpProj;
 
 namespace VfpProj
 {
@@ -99,7 +98,7 @@ namespace VfpProj
                     FoxCmd.SetApp(app);
                     FoxCmd.SetVar();
 
-                    var inst = Vfp.Startup.Instance;
+                    var inst = VfpProj.Startup.Instance;
                     inst.ShowThen(app, then: (app1) =>
                     {
                         var screen = app1.Eval("_SCREEN");
@@ -154,14 +153,14 @@ namespace VfpProj
                  : FoxCmd.AppEval(expr);
         }
 
-        public static void WcfBind()
+        public static void HostBind()
         {
-            var service = VfpWcf.Instance;
+            //var service = VfpWcf.Instance;
 
-            if (Host.Object != null)
-                return;
+            //if (Host.Object != null)
+            //    return;
 
-            Task.Factory.StartNew(() => Host.Create());
+            //Task.Factory.StartNew(() => Host.Create());
         }
     }
 }
